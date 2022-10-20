@@ -80,7 +80,7 @@ const getFontSize = (props: IStyleProps) => {
     return 16;
   }
   if (props.size === "lg") {
-    return 14;
+    return 16;
   }
   if (props.iconOnly) {
     return 14;
@@ -93,7 +93,7 @@ const getPadding = (props: IStyleProps) => {
     return ".8em 2.5em";
   }
   if (props.size === "lg") {
-    return ".7em 2.0em";
+    return "1.0em 1.5em";
   }
   if (props.iconOnly) {
     return "1.5px 3px";
