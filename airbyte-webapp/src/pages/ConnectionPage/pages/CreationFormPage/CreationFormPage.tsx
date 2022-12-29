@@ -24,6 +24,7 @@ import {
   SourceRead,
   WebBackendConnectionRead,
 } from "../../../../core/request/AirbyteClient";
+import ConnectionStep from "./components/ConnectionStep";
 import { ConnectionCreateDestinationForm } from "./components/DestinationForm";
 import ExistingEntityForm from "./components/ExistingEntityForm";
 import { ConnectionCreateSourceForm } from "./components/SourceForm";
@@ -196,15 +197,15 @@ export const CreationFormPage: React.FC = () => {
       ? [
           {
             id: StepsTypes.CREATE_ENTITY,
-            name: <FormattedMessage id="onboarding.createSource" />,
+            name: <FormattedMessage id="onboarding.addSource" />,
           },
           {
             id: StepsTypes.CREATE_CONNECTOR,
-            name: <FormattedMessage id="onboarding.createDestination" />,
+            name: <FormattedMessage id="onboarding.addDestination" />,
           },
           {
             id: StepsTypes.CREATE_CONNECTION,
-            name: <FormattedMessage id="onboarding.setUpConnection" />,
+            name: <FormattedMessage id="onboarding.configurations" />,
           },
         ]
       : [
@@ -233,12 +234,14 @@ export const CreationFormPage: React.FC = () => {
 
   return (
     <>
+      <ConnectionStep lightMode data={steps} activeStep={currentStep} />
       <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} />
       <ConnectorDocumentationWrapper>
         <PageTitle
           title={<FormattedMessage id={titleId} />}
           middleComponent={<StepsMenu lightMode data={steps} activeStep={currentStep} />}
         />
+
         <FormPageContent big={currentStep === StepsTypes.CREATE_CONNECTION}>
           {currentStep !== StepsTypes.CREATE_CONNECTION && (!!source || !!destination) && (
             <ConnectionBlock
