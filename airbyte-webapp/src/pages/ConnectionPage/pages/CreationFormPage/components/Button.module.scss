@@ -1,0 +1,37 @@
+.button {
+  box-sizing: border-box;
+  width: 264px;
+  height: 68px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #6b6b6f;
+  font-size: 18px;
+
+  &:hover {
+    cursor: pointer;
+    border-color: #4f46e5;
+  }
+}
+
+.disabled {
+  color: #fff;
+  background-color: #d1d5db;
+
+  &:hover {
+    cursor: not-allowed;
+    border-color: #d1d5db;
+  }
+}
+
+.active {
+  color: #fff;
+  background-color: #4f46e5;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

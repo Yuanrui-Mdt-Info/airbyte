@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { LoadingPage, PageTitle } from "components";
+import { LoadingPage } from "components"; // PageTitle
 import ConnectionBlock from "components/ConnectionBlock";
 import { FormPageContent } from "components/ConnectorBlocks";
 import CreateConnectionContent from "components/CreateConnectionContent";
-import HeadTitle from "components/HeadTitle";
-import StepsMenu from "components/StepsMenu";
+// import HeadTitle from "components/HeadTitle";
+// import StepsMenu from "components/StepsMenu";
 
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useFormChangeTrackerService } from "hooks/services/FormChangeTracker";
@@ -24,10 +24,12 @@ import {
   SourceRead,
   WebBackendConnectionRead,
 } from "../../../../core/request/AirbyteClient";
+import ButtonGroup from "./components/ButtonGroup";
 import ConnectionStep from "./components/ConnectionStep";
+import DataPanel from "./components/DataPanel";
 import { ConnectionCreateDestinationForm } from "./components/DestinationForm";
 import ExistingEntityForm from "./components/ExistingEntityForm";
-import { ConnectionCreateSourceForm } from "./components/SourceForm";
+// import { ConnectionCreateSourceForm } from "./components/SourceForm";
 
 export enum StepsTypes {
   CREATE_ENTITY = "createEntity",
@@ -39,6 +41,11 @@ export enum EntityStepsTypes {
   SOURCE = "source",
   DESTINATION = "destination",
   CONNECTION = "connection",
+}
+
+export interface ButtonItems {
+  btnText: string;
+  type: "cancel" | "disabled" | "active";
 }
 
 const hasSourceId = (state: unknown): state is { sourceId: string } => {
@@ -102,15 +109,16 @@ export const CreationFormPage: React.FC = () => {
   const { destinationDefinition, sourceDefinition, source, destination } = usePreloadData();
 
   const onSelectExistingSource = (id: string) => {
-    clearAllFormChanges();
-    push("", {
-      state: {
-        ...(location.state as Record<string, unknown>),
-        sourceId: id,
-      },
-    });
-    setCurrentEntityStep(EntityStepsTypes.DESTINATION);
-    setCurrentStep(StepsTypes.CREATE_CONNECTOR);
+    console.log("onSelectExistingSource", id);
+    // clearAllFormChanges();
+    // push("", {
+    //   state: {
+    //     ...(location.state as Record<string, unknown>),
+    //     sourceId: id,
+    //   },
+    // });
+    // setCurrentEntityStep(EntityStepsTypes.DESTINATION);
+    // setCurrentStep(StepsTypes.CREATE_CONNECTOR);
   };
 
   const onSelectExistingDestination = (id: string) => {
@@ -131,10 +139,11 @@ export const CreationFormPage: React.FC = () => {
         return (
           <>
             {type === EntityStepsTypes.CONNECTION && (
-              <ExistingEntityForm type="source" onSubmit={onSelectExistingSource} />
+              <ExistingEntityForm type="source" onSubmit={onSelectExistingSource} onChange={onSelectNewDefinition} />
             )}
 
-            <ConnectionCreateSourceForm
+            <DataPanel onSelect={onSelectNewDefinition} value={definitionId} />
+            {/* <ConnectionCreateSourceForm
               afterSubmit={() => {
                 if (type === "connection") {
                   setCurrentEntityStep(EntityStepsTypes.DESTINATION);
@@ -144,14 +153,18 @@ export const CreationFormPage: React.FC = () => {
                   setCurrentStep(StepsTypes.CREATE_CONNECTION);
                 }
               }}
-            />
+            /> */}
           </>
         );
       } else if (currentEntityStep === EntityStepsTypes.DESTINATION) {
         return (
           <>
             {type === EntityStepsTypes.CONNECTION && (
-              <ExistingEntityForm type="destination" onSubmit={onSelectExistingDestination} />
+              <ExistingEntityForm
+                type="destination"
+                onSubmit={onSelectExistingDestination}
+                onChange={onSelectNewDefinition}
+              />
             )}
             <ConnectionCreateDestinationForm
               afterSubmit={() => {
@@ -224,23 +237,65 @@ export const CreationFormPage: React.FC = () => {
           },
         ];
 
-  const titleId: string = (
-    {
-      [EntityStepsTypes.CONNECTION]: "connection.newConnectionTitle",
-      [EntityStepsTypes.DESTINATION]: "destinations.newDestinationTitle",
-      [EntityStepsTypes.SOURCE]: "sources.newSourceTitle",
-    } as Record<EntityStepsTypes, string>
-  )[type];
+  // const titleId: string = ({
+  //   [EntityStepsTypes.CONNECTION]: "connection.newConnectionTitle",
+  //   [EntityStepsTypes.DESTINATION]: "destinations.newDestinationTitle",
+  //   [EntityStepsTypes.SOURCE]: "sources.newSourceTitle",
+  // } as Record<EntityStepsTypes, string>)[type];
 
+  // const ButtonItems: ButtonItems[] = [
+
+  // ];
+
+  /** ***************************/
+  const [ButtonItems, setButtonItems] = useState([
+    {
+      btnText: "Cancel",
+      type: "cancel",
+    },
+    {
+      btnText: "Select & Continue",
+      type: "disabled",
+    },
+  ] as ButtonItems[]);
+
+  const changeButtonStatus = (index: number, type: "cancel" | "disabled" | "active") => {
+    const NewData = ButtonItems.map((rows, key) => {
+      if (index === key) {
+        rows.type = type;
+      }
+      return rows;
+    });
+    setButtonItems(NewData);
+  };
+
+  // selected sourceID or destiantionID
+  const [definitionId, setDefinitionId] = useState("");
+
+  const onSelectNewDefinition = (id: string) => {
+    if (definitionId === id) {
+      setDefinitionId("");
+    } else {
+      setDefinitionId(id);
+    }
+  };
+
+  useEffect(() => {
+    changeButtonStatus(1, !definitionId ? "disabled" : "active");
+  }, [definitionId]);
+
+  /** ***************************/
   return (
     <>
       <ConnectionStep lightMode data={steps} activeStep={currentStep} />
-      <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} />
+      {/* <ExistingDataPanel /> */}
+
+      {/* <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} /> */}
       <ConnectorDocumentationWrapper>
-        <PageTitle
+        {/* <PageTitle
           title={<FormattedMessage id={titleId} />}
           middleComponent={<StepsMenu lightMode data={steps} activeStep={currentStep} />}
-        />
+        /> */}
 
         <FormPageContent big={currentStep === StepsTypes.CREATE_CONNECTION}>
           {currentStep !== StepsTypes.CREATE_CONNECTION && (!!source || !!destination) && (
@@ -256,7 +311,9 @@ export const CreationFormPage: React.FC = () => {
               }
             />
           )}
+
           {renderStep()}
+          <ButtonGroup data={ButtonItems} />
         </FormPageContent>
       </ConnectorDocumentationWrapper>
     </>
