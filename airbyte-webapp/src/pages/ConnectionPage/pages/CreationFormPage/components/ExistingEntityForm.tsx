@@ -18,6 +18,7 @@ interface IProps {
   type: "source" | "destination";
   onSubmit: (id: string) => void;
   onChange: (id: string) => void;
+  value?: string;
 }
 
 const FormContent = styled(Form)`
@@ -97,6 +98,14 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, onChange }) => {
   if (!dropDownData.length) {
     return null;
   }
+
+  // useEffect(()=>{
+  //   if(value){
+  //     const selectObject = dropDownData.find(val=>val.value === value)
+  //     console.log('selected',selectObject)
+  //   }
+
+  // })
 
   const initialValues = { entityId: "" };
   return (

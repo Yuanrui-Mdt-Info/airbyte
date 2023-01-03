@@ -20,6 +20,8 @@ const ButtonContent = styled.div`
   margin-top: 26px;
   display: flex;
   justify-content: flex-end;
+  // align-items: center;
+  // justify-content: space-around;
 `;
 
 const ButtonWithMargin = styled(Button)`
@@ -56,7 +58,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <ButtonWithMargin onClick={onClose} type="button" secondary disabled={isLoading}>
             <FormattedMessage id={cancelButtonText ?? "form.cancel"} />
           </ButtonWithMargin>
-          <LoadingButton danger onClick={onSubmitBtnClick} data-id={submitButtonDataId} isLoading={isLoading}>
+          <LoadingButton onClick={onSubmitBtnClick} data-id={submitButtonDataId} isLoading={isLoading}>
             <FormattedMessage id={submitButtonText} />
           </LoadingButton>
         </ButtonContent>

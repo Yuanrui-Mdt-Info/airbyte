@@ -9,6 +9,7 @@ import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumenta
 
 interface ConnectionCreateSourceFormProps {
   afterSubmit: () => void;
+  entityId?: string;
 }
 
 export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProps> = ({ afterSubmit }) => {

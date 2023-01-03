@@ -96,7 +96,8 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   // const job = jobInfo || LogsRequestError.extractJobInfo(errorStatusRequest);
 
   return (
-    <Card title={title} fullWidth={full}>
+    // title={title}
+    <Card fullWidth={full}>
       <ServiceForm
         {...props}
         errorMessage={props.errorMessage || (error && generateMessageFromError(error))}

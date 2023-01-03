@@ -10,6 +10,7 @@ export interface ButtonItems {
 
 interface ButtonProps {
   data: ButtonItems[];
+  onClick: (btnType: string) => void;
 }
 
 export const ButtonRows = styled.div`
@@ -19,11 +20,11 @@ export const ButtonRows = styled.div`
   margin-top: 40px;
 `;
 
-const ButtonGroup: React.FC<ButtonProps> = ({ data }) => {
+const ButtonGroup: React.FC<ButtonProps> = ({ data, onClick }) => {
   return (
     <ButtonRows>
       {data.map((item, index) => (
-        <Button btnText={item.btnText} type={item.type} key={index + 1} />
+        <Button btnText={item.btnText} type={item.type} key={index + 1} onClick={onClick} />
       ))}
     </ButtonRows>
   );

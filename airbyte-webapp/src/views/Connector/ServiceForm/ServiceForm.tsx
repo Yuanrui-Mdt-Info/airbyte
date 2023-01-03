@@ -17,6 +17,7 @@ import { CheckConnectionRead } from "../../../core/request/AirbyteClient";
 import { useDocumentationPanelContext } from "../ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ConnectorNameControl } from "./components/Controls/ConnectorNameControl";
 import { ConnectorServiceTypeControl } from "./components/Controls/ConnectorServiceTypeControl";
+import FormHeaderBox from "./components/FormHeaderBox";
 import { FormRoot } from "./FormRoot";
 import { ServiceFormContextProvider, useServiceForm } from "./serviceFormContext";
 import { ServiceFormValues } from "./types";
@@ -202,18 +203,21 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       },
       serviceType: {
         component: (property: FormBaseItem, componentProps: FormComponentOverrideProps) => (
-          <ConnectorServiceTypeControl
-            property={property}
-            formType={formType}
-            onChangeServiceType={props.onServiceSelect}
-            availableServices={props.availableServices}
-            isEditMode={props.isEditMode}
-            onOpenRequestConnectorModal={(name) => {
-              setInitialRequestName(name);
-              toggleOpenRequestModal();
-            }}
-            {...componentProps}
-          />
+          <>
+            <FormHeaderBox />
+            <ConnectorServiceTypeControl
+              property={property}
+              formType={formType}
+              onChangeServiceType={props.onServiceSelect}
+              availableServices={props.availableServices}
+              isEditMode={props.isEditMode}
+              onOpenRequestConnectorModal={(name) => {
+                setInitialRequestName(name);
+                toggleOpenRequestModal();
+              }}
+              {...componentProps}
+            />
+          </>
         ),
       },
     }),

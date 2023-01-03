@@ -6,15 +6,26 @@ import styles from "./Button.module.scss";
 interface CardProps {
   btnText: string;
   type: "cancel" | "disabled" | "active";
+  onClick: (btnType: string) => void;
 }
 
-const Button: React.FC<CardProps> = ({ btnText, type }) => {
+const Button: React.FC<CardProps> = ({ btnText, type, onClick }) => {
   const buttonClassName = classnames(
     styles.button,
     { [styles.active]: type === "active" },
     { [styles.disabled]: type === "disabled" }
   );
-  return <div className={buttonClassName}>{btnText}</div>;
+  return (
+    <div
+      aria-hidden="true"
+      className={buttonClassName}
+      onClick={() => {
+        onClick(type);
+      }}
+    >
+      {btnText}
+    </div>
+  );
 };
 
 export default Button;
