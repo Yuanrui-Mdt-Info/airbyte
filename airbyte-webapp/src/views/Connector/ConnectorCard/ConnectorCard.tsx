@@ -60,6 +60,7 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   const analyticsService = useAnalyticsService();
 
   const onHandleSubmit = async (values: ServiceFormValues) => {
+    console.log("onHandleSubmit");
     // setErrorStatusRequest(null);
 
     const connector = props.availableServices.find((item) => Connector.id(item) === values.serviceType);
@@ -100,8 +101,10 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
 
   // const job = jobInfo || LogsRequestError.extractJobInfo(errorStatusRequest);
 
+  const useNewUI = true;
+
   return (
-    <Card title={title} fullWidth={full}>
+    <Card fullWidth={full} title={useNewUI ? "" : title}>
       <ServiceForm
         {...props}
         errorMessage={props.errorMessage || (error && generateMessageFromError(error))}

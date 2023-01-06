@@ -12,6 +12,7 @@ import style from "./TestLoading.module.scss";
 interface Iprops {
   // type?: "source" | "destination" | "connection";
   currentStep: string; // selecting|creating|Testing
+  requestStatus: string; // loading|finish|error
   onClickBtn: (step: string, selectedId?: string) => void;
 }
 
@@ -44,7 +45,7 @@ const Image = styled.img`
 //     margin-top: 40px;
 // }
 
-const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn }) => {
+const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn, requestStatus }) => {
   const { push } = useRouter();
   const [status, setStatus] = useState<string>("loading"); // loading or finish
   const [ButtonItems, setButtonItems] = useState([
@@ -59,8 +60,10 @@ const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn }) => {
   ] as ButtonItems[]);
 
   useEffect(() => {
-    changeButtonStatus(1, status === "finish" ? "active" : "disabled");
-  }, [setStatus]);
+    changeButtonStatus(1, requestStatus === "finish" ? "active" : "disabled");
+    setStatus(requestStatus);
+    console.log("requestStatus", requestStatus);
+  }, [setStatus, requestStatus]);
 
   const changeButtonStatus = (index: number, type: "cancel" | "disabled" | "active") => {
     const NewData = ButtonItems.map((rows, key) => {
@@ -92,7 +95,7 @@ const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn }) => {
         <Image
           src={status === "loading" ? "/icons/loading-icon.png" : "/icons/finish-icon.png"}
           alt=""
-          className={style.loadingIcon}
+          className={status === "loading" ? style.loadingIcon : ""}
         />
         {/* <div className={style.loadingDiv}></div> */}
       </Container>

@@ -19,6 +19,7 @@ import { ConnectorNameControl } from "./components/Controls/ConnectorNameControl
 import { ConnectorServiceTypeControl } from "./components/Controls/ConnectorServiceTypeControl";
 import FormHeaderBox from "./components/FormHeaderBox";
 import { FormRoot } from "./FormRoot";
+// import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { ServiceFormContextProvider, useServiceForm } from "./serviceFormContext";
 import { ServiceFormValues } from "./types";
 import {
@@ -129,7 +130,7 @@ export interface ServiceFormProps {
   fetchingConnectorError?: Error | null;
   errorMessage?: React.ReactNode;
   successMessage?: React.ReactNode;
-  selectDefinition?: string;
+  // selectDefinition?: string;
   isTestConnectionInProgress?: boolean;
   onStopTesting?: () => void;
   testConnector?: (v?: ServiceFormValues) => Promise<CheckConnectionRead>;
@@ -140,11 +141,11 @@ export interface ServiceFormProps {
 const ServiceForm: React.FC<ServiceFormProps> = (props) => {
   const formId = useUniqueFormId(props.formId);
   const { clearFormChange } = useFormChangeTrackerService();
+  const useNewUI = true;
+  // const { selectDefinition } = useDataCardContext();
 
   const [isOpenRequestModal, toggleOpenRequestModal] = useToggle(false);
   const [initialRequestName, setInitialRequestName] = useState<string>();
-  const [definitionIcon, setDefinitionIcon] = useState<string>("");
-  const [definitionName, setDefinitionName] = useState<string>("");
 
   const {
     formType,
@@ -203,8 +204,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     });
     setDocumentationUrl(selectedServiceDefinition?.documentationUrl ?? "");
     setDocumentationPanelOpen(true);
-    setDefinitionIcon(selectedServiceDefinition?.icon ?? "");
-    setDefinitionName(selectedServiceDefinition?.name ?? "");
   }, [availableServices, selectedConnectorDefinitionSpecification, setDocumentationPanelOpen, setDocumentationUrl]);
 
   const uiOverrides = useMemo(
@@ -217,19 +216,22 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       serviceType: {
         component: (property: FormBaseItem, componentProps: FormComponentOverrideProps) => (
           <>
-            <FormHeaderBox icon={definitionIcon} name={definitionName} formType={formType} />
-            <ConnectorServiceTypeControl
-              property={property}
-              formType={formType}
-              onChangeServiceType={props.onServiceSelect}
-              availableServices={props.availableServices}
-              isEditMode={props.isEditMode}
-              onOpenRequestConnectorModal={(name) => {
-                setInitialRequestName(name);
-                toggleOpenRequestModal();
-              }}
-              {...componentProps}
-            />
+            {useNewUI ? (
+              <FormHeaderBox formType={formType} />
+            ) : (
+              <ConnectorServiceTypeControl
+                property={property}
+                formType={formType}
+                onChangeServiceType={props.onServiceSelect}
+                availableServices={props.availableServices}
+                isEditMode={props.isEditMode}
+                onOpenRequestConnectorModal={(name) => {
+                  setInitialRequestName(name);
+                  toggleOpenRequestModal();
+                }}
+                {...componentProps}
+              />
+            )}
           </>
         ),
       },
@@ -253,9 +255,12 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     [validationSchema]
   );
 
+  // const sleep = (ms:number) => new Promise((r) => setTimeout(r, ms)); //await sleep(500);
+
   const onFormSubmit = useCallback(
     async (values: ServiceFormValues) => {
       const valuesToSend = getValues(values);
+
       await onSubmit(valuesToSend);
 
       clearFormChange(formId);
@@ -298,6 +303,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
           <FormikPatch />
           <FormChangeTracker changed={dirty} formId={formId} />
           <PatchInitialValuesWithWidgetConfig schema={jsonSchema} initialValues={initialValues} />
+
           <FormRoot
             {...props}
             errorMessage={props.errorMessage}
@@ -307,6 +313,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
             formFields={formFields}
             onClickBtn={clickButton}
           />
+
           {isOpenRequestModal && (
             <RequestConnectorModal
               connectorType={formType}

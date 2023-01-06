@@ -47,13 +47,11 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
 
+  // const _selectEntityId = selectEntityId ? selectEntityId : null;
+
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
-    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null // _selectEntityId
   );
-
-  // if(selectEntityId)setSourceDefinitionId(selectEntityId)
-
-  // console.log('selectEntityId',selectEntityId)
 
   const {
     data: sourceDefinitionSpecification,

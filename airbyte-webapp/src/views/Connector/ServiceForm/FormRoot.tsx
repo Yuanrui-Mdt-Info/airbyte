@@ -8,13 +8,15 @@ import { FormBlock } from "core/form/types";
 
 import CreateControls from "./components/CreateControls";
 import EditControls from "./components/EditControls";
+import FormButtonGroup from "./components/FormButtonGroup";
 import { FormSection } from "./components/Sections/FormSection";
 import ShowLoadingMessage from "./components/ShowLoadingMessage";
 import { useServiceForm } from "./serviceFormContext";
 import { ServiceFormValues } from "./types";
 
 const FormContainer = styled(Form)`
-  padding: 22px 27px 23px 24px;
+  //padding: 22px 27px 23px 24px;
+  padding: 34px 40px 34px 80px;
 `;
 
 const LoaderContainer = styled.div`
@@ -51,6 +53,7 @@ const FormRoot: React.FC<FormRootProps> = ({
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
+  const useNewUI = true;
 
   return (
     <FormContainer>
@@ -64,7 +67,20 @@ const FormRoot: React.FC<FormRootProps> = ({
         </LoaderContainer>
       )}
 
-      {isEditMode ? (
+      {useNewUI && (
+        <FormButtonGroup
+          currentStep="creating"
+          onClickBtn={onClickBtn}
+          isSubmitting={isSubmitting || isTestConnectionInProgress}
+          hasSuccess={hasSuccess}
+          errorMessage={errorMessage}
+          isLoadSchema={isLoadingSchema}
+        />
+      )}
+
+      {useNewUI ? (
+        ""
+      ) : isEditMode ? (
         <EditControls
           isTestConnectionInProgress={isTestConnectionInProgress}
           onCancelTesting={onStopTestingConnector}
@@ -89,8 +105,6 @@ const FormRoot: React.FC<FormRootProps> = ({
           isLoadSchema={isLoadingSchema}
           fetchingConnectorError={fetchingConnectorError}
           hasSuccess={hasSuccess}
-          currentStep="creating"
-          onClickBtn={onClickBtn}
         />
       )}
     </FormContainer>

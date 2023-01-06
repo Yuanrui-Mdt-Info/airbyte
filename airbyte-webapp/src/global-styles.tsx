@@ -22,6 +22,10 @@ const GlobalStyle = createGlobalStyle<ThemeProps<Theme>>`
   button, input, textarea {
     font-family: ${({ theme }) => theme.regularFont};
   }
+
+  ::-webkit-scrollbar {
+    //display: none;
+  }
   
   * {
     box-sizing: border-box;

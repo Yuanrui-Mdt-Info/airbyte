@@ -1,14 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 
-import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
+import { useSourceDefinitionList, SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 
 import DataCard from "./components/DataCard";
 
 interface SourcePanelProps {
   value?: string;
   title: string;
-  onSelect: (id: string) => void;
+  onSelect: (data: SourceDefinitionReadWithLatestTag) => void;
 }
 
 export const Panel = styled.div`

@@ -6,6 +6,7 @@ import DataPanel from "components/DataPanel";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
+import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 
 export interface ButtonItems {
   btnText: string;
@@ -15,7 +16,8 @@ export interface ButtonItems {
 interface Iprops {
   type?: "source" | "destination" | "connection";
   currentStep: string; // selecting|creating|Testing
-  onClickBtn: (step: string, selectedId?: string) => void;
+  onClickBtn: (step: string, selectedId?: string, definitionName?: string) => void;
+  selectEntityId?: string;
 }
 
 const Container = styled.div`
@@ -23,9 +25,10 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const SelectNewSourceCard: React.FC<Iprops> = ({ currentStep, onClickBtn }) => {
+const SelectNewSourceCard: React.FC<Iprops> = ({ currentStep, onClickBtn, selectEntityId }) => {
   const { push } = useRouter();
-  const [definitionId, setDefinitionId] = useState("");
+  const [definitionId, setDefinitionId] = useState(selectEntityId);
+  const [definitionName, setDefinitionName] = useState("");
 
   useEffect(() => {
     changeButtonStatus(1, !definitionId ? "disabled" : "active");
@@ -63,19 +66,20 @@ const SelectNewSourceCard: React.FC<Iprops> = ({ currentStep, onClickBtn }) => {
     }
 
     if (currentStep === "selecting") {
-      onClickBtn("creating", definitionId);
+      onClickBtn("creating", definitionId, definitionName);
     }
 
     if (currentStep === "creating") {
-      onClickBtn("Testing");
+      onClickBtn("Testing", definitionId, definitionName);
     }
   };
 
-  const onSelectNewDefinition = (id: string) => {
-    if (definitionId === id) {
+  const onSelectNewDefinition = (selectCardData: SourceDefinitionReadWithLatestTag) => {
+    if (definitionId === selectCardData.sourceDefinitionId) {
       return setDefinitionId("");
     }
-    setDefinitionId(id);
+    setDefinitionId(selectCardData.sourceDefinitionId);
+    setDefinitionName(selectCardData.name);
   };
   return (
     <Container>

@@ -9,6 +9,7 @@ import rehypeSlug from "rehype-slug";
 import urls from "rehype-urls";
 
 import { LoadingPage, PageTitle } from "components";
+import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { Markdown } from "components/Markdown";
 
 import { useConfig } from "config";
@@ -48,6 +49,8 @@ export const DocumentationPanel: React.FC = () => {
     setDocumentationPanelOpen(false);
   }, [setDocumentationPanelOpen, location.pathname]);
 
+  const { selectDefinition } = useDataCardContext();
+
   return isLoading || documentationUrl === "" ? (
     <LoadingPage />
   ) : (
@@ -55,7 +58,7 @@ export const DocumentationPanel: React.FC = () => {
       <PageTitle
         withLine
         title={<FormattedMessage id="connector.setupGuide" />}
-        subText="Follow our setup guide to connect Amazon Ads to Daspire."
+        subText={`Follow our setup guide to connect ${selectDefinition.name} to Daspire.`}
       />
       <Markdown
         className={styles.content}

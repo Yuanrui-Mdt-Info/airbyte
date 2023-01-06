@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 import ConnectionStep from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
+import { DataCardProvider } from "components/DataPanel/DataCardContext";
 import HeadTitle from "components/HeadTitle";
 // import PageTitle from "components/PageTitle";
 
@@ -21,8 +22,10 @@ const CreateSourcePage: React.FC = () => {
   useTrackPage(PageTrackingCodes.SOURCE_NEW);
   const { push } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
-  const [currentStep, setCurrentStep] = useState<string>("creating"); // selecting|creating|testing
-  const [selectEntityId, setSelectEntityId] = useState("435bb9a5-7887-4809-aa58-28c27df0d7ad");
+  const [currentStep, setCurrentStep] = useState<string>("selecting"); // selecting|creating|testing
+  const [selectEntityId, setSelectEntityId] = useState("");
+  // const [selectEntityName, setSelectEntityName] = useState("");
+  const [requestStatus] = useState("loading"); // loading|finish|error setRequestStatus
 
   const { sourceDefinitions } = useSourceDefinitionList();
   const { mutateAsync: createSource } = useCreateSource();
@@ -38,6 +41,9 @@ const CreateSourcePage: React.FC = () => {
       throw new Error("No Connector Found");
     }
     const result = await createSource({ values, sourceConnector: connector });
+
+    console.log(JSON.stringify(result, null, 2));
+
     setSuccessRequest(true);
     setTimeout(() => {
       setSuccessRequest(false);
@@ -45,12 +51,18 @@ const CreateSourcePage: React.FC = () => {
     }, 2000);
   };
 
-  const onClickBtn = (step: string, selectId?: string) => {
+  const onClickBtn = (step: string, selectId?: string, name?: string) => {
     setCurrentStep(step);
+    console.log("createSource", step, selectId, name);
+    if (selectId) {
+      setSelectEntityId(selectId);
+    }
     if (step === "creating") {
-      if (selectId) {
-        setSelectEntityId(selectId);
-      }
+      // if (name) setSelectEntityName(name);
+    }
+
+    if (step === "testing") {
+      // if (selectId) setRequestStatus(name);
     }
   };
 
@@ -68,19 +80,28 @@ const CreateSourcePage: React.FC = () => {
     }
 
     if (currentStep === "testing") {
-      return <TestLoading currentStep={currentStep} onClickBtn={onClickBtn} />;
+      return <TestLoading currentStep={currentStep} onClickBtn={onClickBtn} requestStatus={requestStatus} />;
     }
-    return <SelectNewSourceCard type="source" currentStep={currentStep} onClickBtn={onClickBtn} />;
+    return (
+      <SelectNewSourceCard
+        type="source"
+        currentStep={currentStep}
+        onClickBtn={onClickBtn}
+        selectEntityId={selectEntityId}
+      />
+    );
   };
 
   return (
     <>
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
       <ConnectionStep lightMode type="source" />
-      <ConnectorDocumentationWrapper>
-        {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="sources.newSourceTitle" />} /> */}
-        <FormPageContent>{renderCard()}</FormPageContent>
-      </ConnectorDocumentationWrapper>
+      <DataCardProvider>
+        <ConnectorDocumentationWrapper>
+          {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="sources.newSourceTitle" />} /> */}
+          <FormPageContent>{renderCard()}</FormPageContent>
+        </ConnectorDocumentationWrapper>
+      </DataCardProvider>
     </>
   );
 };

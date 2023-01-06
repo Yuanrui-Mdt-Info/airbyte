@@ -21,12 +21,13 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const ButtonGroup: React.FC<ButtonProps> = ({ data, onClick }) => {
+const ButtonGroup: React.FC<ButtonProps> = ({ data, onClick, children }) => {
   return (
     <ButtonRows>
       {data.map((item, index) => (
         <Button btnText={item.btnText} type={item.type} key={index + 1} onClick={onClick} />
       ))}
+      {children}
     </ButtonRows>
   );
 };

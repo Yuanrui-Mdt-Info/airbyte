@@ -2,13 +2,13 @@ import React from "react";
 import styled from "styled-components";
 
 import { ConnectorIcon } from "components/ConnectorIcon";
+import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
-
 interface CardProps {
   checked: boolean;
   data: SourceDefinitionReadWithLatestTag;
-  onClick: (id: string) => void;
+  onClick: (data: SourceDefinitionReadWithLatestTag) => void;
 }
 
 export const Box = styled.div<{
@@ -42,11 +42,18 @@ export const Image = styled(ConnectorIcon)`
 `;
 
 const DataCard: React.FC<CardProps> = ({ data, onClick, checked }) => {
+  const { setSelectDefinition } = useDataCardContext();
+
   return (
     <Box
       checked={checked}
       onClick={() => {
-        onClick(data.sourceDefinitionId);
+        onClick(data);
+        setSelectDefinition({
+          definitionId: data.sourceDefinitionId,
+          icon: data.icon,
+          name: data.name,
+        });
       }}
     >
       <Image icon={data.icon} />
