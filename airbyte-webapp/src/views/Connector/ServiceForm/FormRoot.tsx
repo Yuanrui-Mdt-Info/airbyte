@@ -35,6 +35,7 @@ interface FormRootProps {
   successMessage?: React.ReactNode;
   onRetest?: () => void;
   onStopTestingConnector?: () => void;
+  onClickBtn?: (step: string, selectedId?: string) => void;
 }
 
 const FormRoot: React.FC<FormRootProps> = ({
@@ -46,6 +47,7 @@ const FormRoot: React.FC<FormRootProps> = ({
   fetchingConnectorError,
   hasSuccess,
   onStopTestingConnector,
+  onClickBtn,
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
@@ -87,6 +89,8 @@ const FormRoot: React.FC<FormRootProps> = ({
           isLoadSchema={isLoadingSchema}
           fetchingConnectorError={fetchingConnectorError}
           hasSuccess={hasSuccess}
+          currentStep="creating"
+          onClickBtn={onClickBtn}
         />
       )}
     </FormContainer>

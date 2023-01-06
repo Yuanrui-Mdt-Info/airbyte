@@ -71,7 +71,7 @@ $red-600: #e51145;
 $red-700: #d00543;
 $red-800: #bc0042;
 $red-900: #99003f;
-$red: $red-300;
+$red: #ff5454; //$red-300;
 
 $beige-50: #fef9f4;
 $beige-100: #ffebd7;
@@ -103,3 +103,7 @@ $cardShadowColor: rgba(26, 25, 77, 12%);
 $lightRedColor: #ff8870;
 
 $transparentColor: rgba(255, 255, 255, 0%);
+
+// Anet add
+$borderColor: #d1d5db;
+$backgroundColor: #eff0f5;

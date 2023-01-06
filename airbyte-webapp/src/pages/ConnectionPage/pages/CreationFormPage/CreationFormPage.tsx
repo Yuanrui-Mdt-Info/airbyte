@@ -5,7 +5,7 @@ import { LoadingPage, PageTitle } from "components";
 import ConnectionBlock from "components/ConnectionBlock";
 import { FormPageContent } from "components/ConnectorBlocks";
 import CreateConnectionContent from "components/CreateConnectionContent";
-import HeadTitle from "components/HeadTitle";
+// import HeadTitle from "components/HeadTitle";
 import StepsMenu from "components/StepsMenu";
 
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
@@ -233,7 +233,7 @@ export const CreationFormPage: React.FC = () => {
 
   return (
     <>
-      <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} />
+      {/* <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} /> */}
       <ConnectorDocumentationWrapper>
         <PageTitle
           title={<FormattedMessage id={titleId} />}

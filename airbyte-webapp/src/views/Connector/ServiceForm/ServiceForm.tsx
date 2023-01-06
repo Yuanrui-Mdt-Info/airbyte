@@ -17,6 +17,7 @@ import { CheckConnectionRead } from "../../../core/request/AirbyteClient";
 import { useDocumentationPanelContext } from "../ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ConnectorNameControl } from "./components/Controls/ConnectorNameControl";
 import { ConnectorServiceTypeControl } from "./components/Controls/ConnectorServiceTypeControl";
+import FormHeaderBox from "./components/FormHeaderBox";
 import { FormRoot } from "./FormRoot";
 import { ServiceFormContextProvider, useServiceForm } from "./serviceFormContext";
 import { ServiceFormValues } from "./types";
@@ -27,6 +28,9 @@ import {
   useConstructValidationSchema,
   usePatchFormik,
 } from "./useBuildForm";
+
+// import { SourceDefinitionRead } from "core/request/AirbyteClient";
+// import { useGetSource } from "hooks/services/useSourceHook";
 
 const FormikPatch: React.FC = () => {
   usePatchFormik();
@@ -41,6 +45,7 @@ const FormikPatch: React.FC = () => {
 const PatchInitialValuesWithWidgetConfig: React.FC<{
   schema: JSONSchema7;
   initialValues: ServiceFormValues;
+  entityId?: string;
 }> = ({ schema, initialValues }) => {
   const { widgetsInfo } = useServiceForm();
   const { setFieldValue } = useFormikContext<ServiceFormValues>();
@@ -124,10 +129,12 @@ export interface ServiceFormProps {
   fetchingConnectorError?: Error | null;
   errorMessage?: React.ReactNode;
   successMessage?: React.ReactNode;
-
+  selectDefinition?: string;
   isTestConnectionInProgress?: boolean;
   onStopTesting?: () => void;
   testConnector?: (v?: ServiceFormValues) => Promise<CheckConnectionRead>;
+  entityId?: string;
+  onClickBtn?: (step: string, selectedId?: string) => void;
 }
 
 const ServiceForm: React.FC<ServiceFormProps> = (props) => {
@@ -136,6 +143,9 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
 
   const [isOpenRequestModal, toggleOpenRequestModal] = useToggle(false);
   const [initialRequestName, setInitialRequestName] = useState<string>();
+  const [definitionIcon, setDefinitionIcon] = useState<string>("");
+  const [definitionName, setDefinitionName] = useState<string>("");
+
   const {
     formType,
     formValues,
@@ -146,6 +156,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     testConnector,
     selectedConnectorDefinitionSpecification,
     availableServices,
+    onClickBtn,
   } = props;
 
   const specifications = useBuildInitialSchema(selectedConnectorDefinitionSpecification);
@@ -170,6 +181,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
   const { formFields, initialValues } = useBuildForm(jsonSchema, formValues);
 
   const { setDocumentationUrl, setDocumentationPanelOpen } = useDocumentationPanelContext();
+
   useEffect(() => {
     if (!selectedConnectorDefinitionSpecification) {
       return;
@@ -191,6 +203,8 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     });
     setDocumentationUrl(selectedServiceDefinition?.documentationUrl ?? "");
     setDocumentationPanelOpen(true);
+    setDefinitionIcon(selectedServiceDefinition?.icon ?? "");
+    setDefinitionName(selectedServiceDefinition?.name ?? "");
   }, [availableServices, selectedConnectorDefinitionSpecification, setDocumentationPanelOpen, setDocumentationUrl]);
 
   const uiOverrides = useMemo(
@@ -202,18 +216,21 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       },
       serviceType: {
         component: (property: FormBaseItem, componentProps: FormComponentOverrideProps) => (
-          <ConnectorServiceTypeControl
-            property={property}
-            formType={formType}
-            onChangeServiceType={props.onServiceSelect}
-            availableServices={props.availableServices}
-            isEditMode={props.isEditMode}
-            onOpenRequestConnectorModal={(name) => {
-              setInitialRequestName(name);
-              toggleOpenRequestModal();
-            }}
-            {...componentProps}
-          />
+          <>
+            <FormHeaderBox icon={definitionIcon} name={definitionName} formType={formType} />
+            <ConnectorServiceTypeControl
+              property={property}
+              formType={formType}
+              onChangeServiceType={props.onServiceSelect}
+              availableServices={props.availableServices}
+              isEditMode={props.isEditMode}
+              onOpenRequestConnectorModal={(name) => {
+                setInitialRequestName(name);
+                toggleOpenRequestModal();
+              }}
+              {...componentProps}
+            />
+          </>
         ),
       },
     }),
@@ -245,6 +262,14 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     },
     [clearFormChange, formId, getValues, onSubmit]
   );
+
+  const clickButton = (step: string, selectedId?: string) => {
+    console.log(step, selectedId);
+    setDocumentationPanelOpen(false);
+    onClickBtn && onClickBtn(step, selectedId);
+    // if (step === "selecting ") {
+    // }
+  };
 
   return (
     <Formik
@@ -280,6 +305,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
             onStopTestingConnector={onStopTesting ? () => onStopTesting() : undefined}
             onRetest={testConnector ? async () => await testConnector() : undefined}
             formFields={formFields}
+            onClickBtn={clickButton}
           />
           {isOpenRequestModal && (
             <RequestConnectorModal

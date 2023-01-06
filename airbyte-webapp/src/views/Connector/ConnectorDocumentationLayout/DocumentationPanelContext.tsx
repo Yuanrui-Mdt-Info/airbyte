@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 export type DocumentationPanelContext = ReturnType<typeof useDocumentationPanelState>;
 
 export const useDocumentationPanelState = () => {
-  const [documentationPanelOpen, setDocumentationPanelOpen] = useState(false);
+  const [documentationPanelOpen, setDocumentationPanelOpen] = useState(true);
   const [documentationUrl, setDocumentationUrlState] = useState("");
 
   /* Ad blockers prevent the Google Ads docs .md file from rendering.  Because these URLs are

@@ -52,7 +52,11 @@ export const DocumentationPanel: React.FC = () => {
     <LoadingPage />
   ) : (
     <div className={styles.container}>
-      <PageTitle withLine title={<FormattedMessage id="connector.setupGuide" />} />
+      <PageTitle
+        withLine
+        title={<FormattedMessage id="connector.setupGuide" />}
+        subText="Follow our setup guide to connect Amazon Ads to Daspire."
+      />
       <Markdown
         className={styles.content}
         content={!docs?.includes("<!DOCTYPE html>") ? docs : formatMessage({ id: "connector.setupGuide.notFound" })}

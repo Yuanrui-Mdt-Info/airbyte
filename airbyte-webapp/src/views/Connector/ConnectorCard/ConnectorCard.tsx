@@ -23,6 +23,9 @@ interface ConnectorCardBaseProps extends ConnectorCardProvidedProps {
   title?: React.ReactNode;
   full?: boolean;
   jobInfo?: SynchronousJobRead | null;
+  selectDefinition?: string;
+  entityId?: string;
+  onClickBtn?: (step: string, selectedId?: string) => void;
 }
 
 interface ConnectorCardCreateProps extends ConnectorCardBaseProps {
@@ -39,6 +42,8 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   full,
   jobInfo,
   onSubmit,
+  entityId,
+  onClickBtn,
   ...props
 }) => {
   const [saved, setSaved] = useState(false);
@@ -104,6 +109,8 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
         onStopTesting={onStopTesting}
         testConnector={testConnector}
         onSubmit={onHandleSubmit}
+        entityId={entityId}
+        onClickBtn={onClickBtn}
         successMessage={
           props.successMessage || (saved && props.isEditMode && <FormattedMessage id="form.changesSaved" />)
         }

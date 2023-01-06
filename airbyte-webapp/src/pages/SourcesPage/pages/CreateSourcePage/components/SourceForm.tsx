@@ -23,6 +23,8 @@ interface SourceFormProps {
   sourceDefinitions: SourceDefinitionReadWithLatestTag[];
   hasSuccess?: boolean;
   error?: FormError | null;
+  selectEntityId?: string;
+  onClickBtn?: (step: string, selectedId?: string) => void;
 }
 
 const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
@@ -38,7 +40,9 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   sourceDefinitions,
   error,
   hasSuccess,
+  selectEntityId,
   afterSelectConnector,
+  onClickBtn,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
@@ -47,11 +51,15 @@ export const SourceForm: React.FC<SourceFormProps> = ({
     hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
   );
 
+  // if(selectEntityId)setSourceDefinitionId(selectEntityId)
+
+  // console.log('selectEntityId',selectEntityId)
+
   const {
     data: sourceDefinitionSpecification,
     error: sourceDefinitionError,
     isLoading,
-  } = useGetSourceDefinitionSpecificationAsync(sourceDefinitionId);
+  } = useGetSourceDefinitionSpecificationAsync(selectEntityId || sourceDefinitionId);
 
   const onDropDownSelect = (sourceDefinitionId: string) => {
     setSourceDefinitionId(sourceDefinitionId);
@@ -92,6 +100,8 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       formValues={sourceDefinitionId ? { serviceType: sourceDefinitionId, name: "" } : undefined}
       title={<FormattedMessage id="onboarding.sourceSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
+      entityId={selectEntityId}
+      onClickBtn={onClickBtn}
     />
   );
 };
