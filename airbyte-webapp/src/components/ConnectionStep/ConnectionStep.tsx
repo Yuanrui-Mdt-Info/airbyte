@@ -36,7 +36,7 @@ export enum EntityStepsTypes {
 
 export const StepBlock = styled.div`
   width: 100%;
-  height: 120px;
+  height: 90px;
   background: #eff0f5;
   font-weight: 500;
   font-size: 16px;
@@ -48,7 +48,7 @@ export const StepBlock = styled.div`
 
 export const SingleText = styled.div`
   font-weight: 700;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 30px;
 `;
 

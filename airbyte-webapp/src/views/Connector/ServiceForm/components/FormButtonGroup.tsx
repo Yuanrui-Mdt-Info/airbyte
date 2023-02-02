@@ -6,7 +6,11 @@ import { Button } from "components";
 import ButtonGroup from "components/ButtonGroup";
 import { ButtonItems } from "components/ButtonGroup/ButtonGroup";
 
-// import { TestingConnectionError, FetchingConnectorError } from "./TestingConnectionError";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
+
+// import { useServiceForm } from "../serviceFormContext";
+import { ServiceFormValues } from "../types";
+import { TestingConnectionError, FetchingConnectorError } from "./TestingConnectionError";
 // import TestingConnectionSpinner from "./TestingConnectionSpinner";
 // import TestingConnectionSuccess from "./TestingConnectionSuccess";
 
@@ -19,19 +23,20 @@ interface FormRootProps {
   errorMessage?: React.ReactNode;
   hasSuccess?: boolean;
   isLoadSchema?: boolean;
-  // fetchingConnectorError?: Error | null;
-
-  // isTestConnectionInProgress?: boolean;
+  fetchingConnectorError?: Error | null;
+  formValues?: Partial<ServiceFormValues>;
+  isTestConnectionInProgress?: boolean;
   // onCancelTesting?: () => void;
   currentStep: string; // selecting|creating|Testing
-  onClickBtn?: (step: string, selectedId?: string) => void;
+  onClickBtn?: (params: SwitchStepParams) => void;
 }
 
 const ButtonContainer = styled.div`
   margin-top: 34px;
   display: flex;
-  align-items: center;
+  //align-items: center;
   justify-content: space-between;
+  flex-direction: column;
 `;
 
 const SubmitButton = styled(Button)`
@@ -50,13 +55,16 @@ const FormRootNew: React.FC<FormRootProps> = ({
   //   //formType,
   hasSuccess,
   errorMessage,
-  //  // fetchingConnectorError,
+  fetchingConnectorError,
   isLoadSchema,
   // onCancelTesting,
   currentStep,
   onClickBtn,
+  formValues,
 }) => {
   // const { push } = useRouter();
+
+  // const { getValues } = useServiceForm();
 
   // const useNewUI = true;
 
@@ -66,27 +74,17 @@ const FormRootNew: React.FC<FormRootProps> = ({
       btnText: "Back",
       type: "cancel",
     },
-    // {
-    //   btnText: "Save & Test",
-    //   type: "active",
-    // },
   ] as ButtonItems[]);
 
   if (isSubmitting) {
-    console.log("isSubmitting", isSubmitting);
-    // onClickBtn && onClickBtn("testing");
-    //  // return <TestingConnectionSpinner isCancellable={isTestConnectionInProgress} onCancelTesting={onCancelTesting} />;
+    //  return <TestingConnectionSpinner isCancellable={isTestConnectionInProgress} onCancelTesting={onCancelTesting} />;
   }
 
   if (hasSuccess) {
-    console.log("hasSuccess", hasSuccess);
-    // onClickBtn && onClickBtn("testing", "finish");
-    //  return <TestingConnectionSuccess />;
+    // return <TestingConnectionSuccess />;
   }
 
   if (errorMessage) {
-    console.log("errorMessage", errorMessage);
-    // onClickBtn && onClickBtn("testing", "finish");
   }
 
   // useEffect(() => {
@@ -103,16 +101,15 @@ const FormRootNew: React.FC<FormRootProps> = ({
   //   setButtonItems(NewData);
   // };
 
-  // setTimeout(()=>{
-  //   changeButtonStatus(1,'active')
-  // },1500)
-
   const clickButton = (btnType: string) => {
     if (btnType === "disabled") {
       return;
     }
     if (btnType === "cancel" && onClickBtn) {
-      return onClickBtn("selecting");
+      return onClickBtn({
+        currentStep: "creating",
+        formValue: formValues,
+      });
     }
 
     if (currentStep === "creating" && onClickBtn) {
@@ -123,8 +120,8 @@ const FormRootNew: React.FC<FormRootProps> = ({
   // id={`onboarding.${formType}SetUp.buttonText`}
   return (
     <ButtonContainer>
-      {/* {errorMessage && !fetchingConnectorError && <TestingConnectionError errorMessage={errorMessage} />}
-      {fetchingConnectorError && <FetchingConnectorError />} */}
+      {errorMessage && !fetchingConnectorError && <TestingConnectionError errorMessage={errorMessage} />}
+      {fetchingConnectorError && <FetchingConnectorError />}
       <ButtonGroup data={ButtonItems} onClick={clickButton}>
         <SubmitButton type="submit" disabled={isLoadSchema}>
           <FormattedMessage id="form.button.saveTest" />

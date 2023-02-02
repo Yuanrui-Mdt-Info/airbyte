@@ -6,6 +6,7 @@ import DataPanel from "components/DataPanel";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 
 export interface ButtonItems {
@@ -16,7 +17,7 @@ export interface ButtonItems {
 interface Iprops {
   type?: "source" | "destination" | "connection";
   currentStep: string; // selecting|creating|Testing
-  onClickBtn: (step: string, selectedId?: string, definitionName?: string) => void;
+  onClickBtn: (params: SwitchStepParams) => void;
   selectEntityId?: string;
 }
 
@@ -66,11 +67,19 @@ const SelectNewSourceCard: React.FC<Iprops> = ({ currentStep, onClickBtn, select
     }
 
     if (currentStep === "selecting") {
-      onClickBtn("creating", definitionId, definitionName);
+      onClickBtn({
+        currentStep: "creating",
+        selectDefinitionId: definitionId,
+        selectDefinitionName: definitionName,
+      });
     }
 
     if (currentStep === "creating") {
-      onClickBtn("Testing", definitionId, definitionName);
+      onClickBtn({
+        currentStep: "Testing",
+        selectDefinitionId: definitionId,
+        selectDefinitionName: definitionName,
+      });
     }
   };
 

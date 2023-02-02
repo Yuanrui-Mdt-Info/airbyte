@@ -5,10 +5,12 @@ import styled from "styled-components";
 import { Spinner } from "components";
 
 import { FormBlock } from "core/form/types";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 
 import CreateControls from "./components/CreateControls";
 import EditControls from "./components/EditControls";
 import FormButtonGroup from "./components/FormButtonGroup";
+import FormHeaderBox from "./components/FormHeaderBox";
 import { FormSection } from "./components/Sections/FormSection";
 import ShowLoadingMessage from "./components/ShowLoadingMessage";
 import { useServiceForm } from "./serviceFormContext";
@@ -37,7 +39,8 @@ interface FormRootProps {
   successMessage?: React.ReactNode;
   onRetest?: () => void;
   onStopTestingConnector?: () => void;
-  onClickBtn?: (step: string, selectedId?: string) => void;
+  onClickBtn?: (params: SwitchStepParams) => void;
+  formValues?: Partial<ServiceFormValues>;
 }
 
 const FormRoot: React.FC<FormRootProps> = ({
@@ -50,13 +53,17 @@ const FormRoot: React.FC<FormRootProps> = ({
   hasSuccess,
   onStopTestingConnector,
   onClickBtn,
+  formValues,
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
   const useNewUI = true;
 
+  // console.log("formValues---------------", values);
+
   return (
     <FormContainer>
+      <FormHeaderBox formType={formType} />
       <FormSection blocks={formFields} disabled={isSubmitting || isTestConnectionInProgress} />
       {isLoadingSchema && (
         <LoaderContainer>
@@ -75,6 +82,7 @@ const FormRoot: React.FC<FormRootProps> = ({
           hasSuccess={hasSuccess}
           errorMessage={errorMessage}
           isLoadSchema={isLoadingSchema}
+          formValues={formValues}
         />
       )}
 

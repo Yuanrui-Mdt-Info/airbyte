@@ -10,22 +10,36 @@ import HeadTitle from "components/HeadTitle";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateSource } from "hooks/services/useSourceHook";
-import useRouter from "hooks/useRouter";
+// import useRouter from "hooks/useRouter";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
+import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout/ConnectorDocumentationWrapper";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 import SelectNewSourceCard from "./components/SelectNewSource";
 import { SourceForm } from "./components/SourceForm";
 import TestLoading from "./components/TestLoading";
 
+export interface SwitchStepParams {
+  currentStep: string;
+  selectDefinitionId?: string;
+  selectDefinitionName?: string;
+  fetchingConnectorError?: FormError | null;
+  formValue?: Partial<ServiceFormValues>;
+  isLoading?: false;
+}
+
 const CreateSourcePage: React.FC = () => {
   useTrackPage(PageTrackingCodes.SOURCE_NEW);
-  const { push } = useRouter();
+
+  // const { push } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("selecting"); // selecting|creating|testing
   const [selectEntityId, setSelectEntityId] = useState("");
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [formValues, setFormValues] = useState<Partial<ServiceFormValues>>({});
   // const [selectEntityName, setSelectEntityName] = useState("");
-  const [requestStatus] = useState("loading"); // loading|finish|error setRequestStatus
+  const [requestStatus, setRequestStatus] = useState("loading"); // loading|finish|error setRequestStatus
 
   const { sourceDefinitions } = useSourceDefinitionList();
   const { mutateAsync: createSource } = useCreateSource();
@@ -40,29 +54,49 @@ const CreateSourcePage: React.FC = () => {
       // Unsure if this can happen, but the types want it defined
       throw new Error("No Connector Found");
     }
-    const result = await createSource({ values, sourceConnector: connector });
-
-    console.log(JSON.stringify(result, null, 2));
-
+    // const result =
+    await createSource({ values, sourceConnector: connector });
     setSuccessRequest(true);
+
     setTimeout(() => {
       setSuccessRequest(false);
-      push(`../${result.sourceId}`);
+      setRequestStatus("finish");
+      clickBtnHandleStep &&
+        clickBtnHandleStep({
+          currentStep: "testing",
+          formValue: values,
+        });
+      //  push(`../${result.sourceId}`);
     }, 2000);
   };
 
-  const onClickBtn = (step: string, selectId?: string, name?: string) => {
-    setCurrentStep(step);
-    console.log("createSource", step, selectId, name);
-    if (selectId) {
-      setSelectEntityId(selectId);
-    }
-    if (step === "creating") {
-      // if (name) setSelectEntityName(name);
+  //
+  const clickBtnHandleStep = ({
+    currentStep,
+    selectDefinitionId,
+    fetchingConnectorError,
+    formValue,
+  }: SwitchStepParams) => {
+    console.log(`回到createPage页面进行切换至===>${currentStep}`, "selectId:", selectDefinitionId);
+    if (currentStep) {
+      setCurrentStep(currentStep);
     }
 
-    if (step === "testing") {
-      // if (selectId) setRequestStatus(name);
+    if (selectDefinitionId) {
+      setSelectEntityId(selectDefinitionId);
+    }
+    // if (fetchingConnectorError) {
+    setFetchingConnectorError(fetchingConnectorError || null);
+    setFormValues(formValue || {});
+
+    console.log(JSON.stringify(formValue, null, 2));
+    // }
+    // if (step === "creating") {
+    //   // if (name) setSelectEntityName(name);
+    // }
+
+    if (currentStep === "testing") {
+      // setRequestStatus(requestStatus==='finish'?'loading':"finish")
     }
   };
 
@@ -74,19 +108,21 @@ const CreateSourcePage: React.FC = () => {
           sourceDefinitions={sourceDefinitions}
           hasSuccess={successRequest}
           selectEntityId={selectEntityId}
-          onClickBtn={onClickBtn}
+          onClickBtn={clickBtnHandleStep}
+          error={fetchingConnectorError}
+          formValue={formValues}
         />
       );
     }
 
     if (currentStep === "testing") {
-      return <TestLoading currentStep={currentStep} onClickBtn={onClickBtn} requestStatus={requestStatus} />;
+      return <TestLoading currentStep={currentStep} onClickBtn={clickBtnHandleStep} requestStatus={requestStatus} />;
     }
     return (
       <SelectNewSourceCard
         type="source"
         currentStep={currentStep}
-        onClickBtn={onClickBtn}
+        onClickBtn={clickBtnHandleStep}
         selectEntityId={selectEntityId}
       />
     );

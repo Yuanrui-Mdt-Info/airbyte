@@ -1,4 +1,7 @@
 import { useState, createContext, useContext } from "react";
+
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
+
 // import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 
 export interface SelectDefinition {
@@ -9,15 +12,25 @@ export interface SelectDefinition {
 
 export type DataCardContext = ReturnType<typeof useDataCardState>;
 export const useDataCardState = () => {
+  const [formValues, setFormValues] = useState<Partial<ServiceFormValues>>();
   const [selectDefinition, setSelectDefinition] = useState<SelectDefinition>({
     definitionId: "",
     icon: "",
     name: "",
   });
 
+  // const changeFormValues = useMemo(
+  //   (values: ServiceFormValues) => {
+  //     setFormValues(values);
+  //   },
+  //   [formValues, setFormValues]
+  // );
+
   return {
     selectDefinition,
     setSelectDefinition,
+    formValues,
+    setFormValues,
   };
 };
 

@@ -35,8 +35,13 @@ const DataPanel: React.FC<SourcePanelProps> = ({ onSelect, value, title }) => {
     <Panel>
       <PanelTitle>{title}</PanelTitle>
       <BoxList>
-        {sourceDefinitions.map((item, key) => (
-          <DataCard data={item} key={key + 1} onClick={onSelect} checked={item.sourceDefinitionId === value} />
+        {sourceDefinitions.map((item) => (
+          <DataCard
+            data={item}
+            key={item.sourceDefinitionId}
+            onClick={onSelect}
+            checked={item.sourceDefinitionId === value}
+          />
         ))}
       </BoxList>
     </Panel>

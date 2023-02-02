@@ -6,6 +6,7 @@ import { ButtonItems } from "components/ButtonGroup/ButtonGroup";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 
 import style from "./TestLoading.module.scss";
 
@@ -13,7 +14,7 @@ interface Iprops {
   // type?: "source" | "destination" | "connection";
   currentStep: string; // selecting|creating|Testing
   requestStatus: string; // loading|finish|error
-  onClickBtn: (step: string, selectedId?: string) => void;
+  onClickBtn: (params: SwitchStepParams) => void;
 }
 
 const Container = styled.div`
@@ -80,7 +81,9 @@ const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn, requestStatus 
       return;
     }
     if (btnType === "cancel") {
-      return onClickBtn("creating");
+      return onClickBtn({
+        currentStep: "creating",
+      });
     }
 
     if (currentStep === "testing") {
@@ -92,11 +95,16 @@ const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn, requestStatus 
     <>
       <Container>
         <Text>{status === "loading" ? "Testing your connection..." : "Source validated!"}</Text>
-        <Image
-          src={status === "loading" ? "/icons/loading-icon.png" : "/icons/finish-icon.png"}
-          alt=""
+        {status === "loading" ? (
+          <Image src="/icons/loading-icon.png" className={style.loadingIcon} alt="loading-icon" />
+        ) : (
+          <Image src="/icons/finish-icon.png" alt="finish-icon" />
+        )}
+        {/* <Image
+          src={status === "finish" ? "" : ""}
+          
           className={status === "loading" ? style.loadingIcon : ""}
-        />
+        /> */}
         {/* <div className={style.loadingDiv}></div> */}
       </Container>
       <ButtonGroup data={ButtonItems} onClick={clickButton} />

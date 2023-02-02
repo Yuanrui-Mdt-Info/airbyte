@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { useDataCardContext } from "components/DataPanel/DataCardContext";
+
 import { Action, Namespace } from "core/analytics";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { LogsRequestError } from "core/request/LogsRequestError";
 import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 import { useGetSourceDefinitionSpecificationAsync } from "services/connector/SourceDefinitionSpecificationService";
 import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
@@ -24,7 +27,8 @@ interface SourceFormProps {
   hasSuccess?: boolean;
   error?: FormError | null;
   selectEntityId?: string;
-  onClickBtn?: (step: string, selectedId?: string) => void;
+  onClickBtn?: (params: SwitchStepParams) => void;
+  formValue?: Partial<ServiceFormValues>;
 }
 
 const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
@@ -46,11 +50,14 @@ export const SourceForm: React.FC<SourceFormProps> = ({
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
+  const { formValues } = useDataCardContext();
 
-  // const _selectEntityId = selectEntityId ? selectEntityId : null;
+  console.log("formValues*******************", formValues);
+
+  const _selectEntityId = selectEntityId ? selectEntityId : null;
 
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
-    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null // _selectEntityId
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : _selectEntityId // null
   );
 
   const {
@@ -84,6 +91,8 @@ export const SourceForm: React.FC<SourceFormProps> = ({
 
   const errorMessage = error ? generateMessageFromError(error) : null;
 
+  console.log("errorMessage", errorMessage);
+
   return (
     <ConnectorCard
       onServiceSelect={onDropDownSelect}
@@ -95,10 +104,11 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       fetchingConnectorError={sourceDefinitionError instanceof Error ? sourceDefinitionError : null}
       errorMessage={errorMessage}
       isLoading={isLoading}
-      formValues={sourceDefinitionId ? { serviceType: sourceDefinitionId, name: "" } : undefined}
+      // formValues={sourceDefinitionId ? { serviceType: sourceDefinitionId, name: "" } : undefined}
+      //  formValues={formValue && formValue.serviceType ? formValue : {}}
+      formValues={formValues}
       title={<FormattedMessage id="onboarding.sourceSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
-      entityId={selectEntityId}
       onClickBtn={onClickBtn}
     />
   );
