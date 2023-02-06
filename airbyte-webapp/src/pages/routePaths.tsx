@@ -18,6 +18,10 @@ export enum RoutePaths {
   SourceNew = "new-source",
   DestinationNew = "new-destination",
 
+  SelectSource = "select-source",
+  CreateSource = "create-source",
+  TestConnector = "test-connector",
+
   UserSignup = "user_signup",
   Signup = "signup",
   Signin = "signin",

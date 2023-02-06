@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { Button } from "components";
-import ButtonGroup from "components/ButtonGroup";
-import { ButtonItems } from "components/ButtonGroup/ButtonGroup";
 
+// import Button from "components/ButtonGroup/components/Button";
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
 import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 
 // import { useServiceForm } from "../serviceFormContext";
@@ -14,15 +15,12 @@ import { TestingConnectionError, FetchingConnectorError } from "./TestingConnect
 // import TestingConnectionSpinner from "./TestingConnectionSpinner";
 // import TestingConnectionSuccess from "./TestingConnectionSuccess";
 
-// import { RoutePaths } from "pages/routePaths";
-// import useRouter from "hooks/useRouter";
-
 interface FormRootProps {
   // formType: "source" | "destination";
   isSubmitting?: boolean;
   errorMessage?: React.ReactNode;
   hasSuccess?: boolean;
-  isLoadSchema?: boolean;
+  disabled?: boolean;
   fetchingConnectorError?: Error | null;
   formValues?: Partial<ServiceFormValues>;
   isTestConnectionInProgress?: boolean;
@@ -49,6 +47,27 @@ const SubmitButton = styled(Button)`
   line-height: 22px;
 `;
 
+const BackButton = styled(Button)`
+  // margin-left: auto;
+  width: 264px;
+  height: 68px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  background: #fff;
+  color: #6b6b6f;
+  border-color: #d1d5db;
+`;
+
+export const ButtonRows = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 40px;
+  width: 100%;
+`;
+
 const FormRootNew: React.FC<FormRootProps> = ({
   // isTestConnectionInProgress,
   isSubmitting,
@@ -56,25 +75,17 @@ const FormRootNew: React.FC<FormRootProps> = ({
   hasSuccess,
   errorMessage,
   fetchingConnectorError,
-  isLoadSchema,
+  disabled,
   // onCancelTesting,
-  currentStep,
-  onClickBtn,
-  formValues,
+  // currentStep,
+  // onClickBtn,
+  // formValues,
 }) => {
-  // const { push } = useRouter();
+  const { push } = useRouter();
 
-  // const { getValues } = useServiceForm();
-
-  // const useNewUI = true;
-
-  const [ButtonItems] = useState([
-    // setButtonItems
-    {
-      btnText: "Back",
-      type: "cancel",
-    },
-  ] as ButtonItems[]);
+  console.log("fetchingConnectorError", fetchingConnectorError);
+  console.log("errorMessage", errorMessage);
+  console.log("disabled", disabled);
 
   if (isSubmitting) {
     //  return <TestingConnectionSpinner isCancellable={isTestConnectionInProgress} onCancelTesting={onCancelTesting} />;
@@ -87,34 +98,8 @@ const FormRootNew: React.FC<FormRootProps> = ({
   if (errorMessage) {
   }
 
-  // useEffect(() => {
-  //   changeButtonStatus(1, "active");
-  // }, [setStatus]);
-
-  // const changeButtonStatus = (index: number, type: "cancel" | "disabled" | "active") => {
-  //   const NewData = ButtonItems.map((rows, key) => {
-  //     if (index === key) {
-  //       rows.type = type;
-  //     }
-  //     return rows;
-  //   });
-  //   setButtonItems(NewData);
-  // };
-
-  const clickButton = (btnType: string) => {
-    if (btnType === "disabled") {
-      return;
-    }
-    if (btnType === "cancel" && onClickBtn) {
-      return onClickBtn({
-        currentStep: "creating",
-        formValue: formValues,
-      });
-    }
-
-    if (currentStep === "creating" && onClickBtn) {
-      // return onClickBtn("testing");
-    }
+  const goBack = () => {
+    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
   };
 
   // id={`onboarding.${formType}SetUp.buttonText`}
@@ -122,11 +107,14 @@ const FormRootNew: React.FC<FormRootProps> = ({
     <ButtonContainer>
       {errorMessage && !fetchingConnectorError && <TestingConnectionError errorMessage={errorMessage} />}
       {fetchingConnectorError && <FetchingConnectorError />}
-      <ButtonGroup data={ButtonItems} onClick={clickButton}>
-        <SubmitButton type="submit" disabled={isLoadSchema}>
+      <ButtonRows>
+        <BackButton type="button" onClick={goBack}>
+          Back
+        </BackButton>
+        <SubmitButton type="submit" disabled={disabled}>
           <FormattedMessage id="form.button.saveTest" />
         </SubmitButton>
-      </ButtonGroup>
+      </ButtonRows>
     </ButtonContainer>
   );
 };

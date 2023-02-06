@@ -28,7 +28,6 @@ import PreferencesPage from "./PreferencesPage";
 import { RoutePaths } from "./routePaths";
 import SettingsPage from "./SettingsPage";
 import SourcesPage from "./SourcesPage";
-
 // const useAddAnalyticsContextForWorkspace = (workspace: WorkspaceRead): void => {
 //   const analyticsContext = useMemo(
 //     () => ({

@@ -17,7 +17,7 @@ const AllSourcesPage: React.FC = () => {
   const { push } = useRouter();
   const { sources } = useSourceList();
   useTrackPage(PageTrackingCodes.SOURCE_LIST);
-  const onCreateSource = () => push(`${RoutePaths.SourceNew}`);
+  const onCreateSource = () => push(`${RoutePaths.SelectSource}`); // SourceNew
   return sources.length ? (
     <MainPageWithScroll
       withPadding

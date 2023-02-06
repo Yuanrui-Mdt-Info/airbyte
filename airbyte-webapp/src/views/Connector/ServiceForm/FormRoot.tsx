@@ -59,7 +59,8 @@ const FormRoot: React.FC<FormRootProps> = ({
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
   const useNewUI = true;
 
-  // console.log("formValues---------------", values);
+  console.log("!(isValid && dirty)", !(isValid && dirty));
+  console.log("dirty", dirty);
 
   return (
     <FormContainer>
@@ -80,8 +81,8 @@ const FormRoot: React.FC<FormRootProps> = ({
           onClickBtn={onClickBtn}
           isSubmitting={isSubmitting || isTestConnectionInProgress}
           hasSuccess={hasSuccess}
-          errorMessage={errorMessage}
-          isLoadSchema={isLoadingSchema}
+          errorMessage={dirty || !isValid ? "" : errorMessage}
+          disabled={!(isValid && dirty)}
           formValues={formValues}
         />
       )}

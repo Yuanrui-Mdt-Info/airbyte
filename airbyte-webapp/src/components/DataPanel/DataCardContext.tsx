@@ -1,8 +1,6 @@
-import { useState, createContext, useContext } from "react";
+import { useState, useCallback, createContext, useContext } from "react";
 
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
-
-// import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 
 export interface SelectDefinition {
   definitionId: string;
@@ -19,18 +17,25 @@ export const useDataCardState = () => {
     name: "",
   });
 
-  // const changeFormValues = useMemo(
-  //   (values: ServiceFormValues) => {
-  //     setFormValues(values);
-  //   },
-  //   [formValues, setFormValues]
-  // );
+  const clearFormValues = useCallback(() => {
+    setFormValues({});
+  }, [setFormValues]);
+
+  const clearSelectDefinition = useCallback(() => {
+    setSelectDefinition({
+      definitionId: "",
+      icon: "",
+      name: "",
+    });
+  }, [setFormValues]);
 
   return {
     selectDefinition,
     setSelectDefinition,
     formValues,
     setFormValues,
+    clearFormValues,
+    clearSelectDefinition,
   };
 };
 

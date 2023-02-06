@@ -11,7 +11,7 @@ import { isDestinationDefinitionSpecification } from "core/domain/connector/dest
 import { isSourceDefinition, isSourceDefinitionSpecification } from "core/domain/connector/source";
 import { FormBaseItem, FormComponentOverrideProps } from "core/form/types";
 import { useFormChangeTrackerService, useUniqueFormId } from "hooks/services/FormChangeTracker";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
+// import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { isDefined } from "utils/common";
 import RequestConnectorModal from "views/Connector/RequestConnectorModal";
 
@@ -22,6 +22,9 @@ import { ConnectorNameControl } from "./components/Controls/ConnectorNameControl
 import { FormRoot } from "./FormRoot";
 import { ServiceFormContextProvider, useServiceForm } from "./serviceFormContext";
 import { ServiceFormValues } from "./types";
+// import useRouter from "hooks/useRouter";
+// import { RoutePaths } from "pages/routePaths";
+
 import {
   useBuildForm,
   useBuildInitialSchema,
@@ -134,12 +137,12 @@ export interface ServiceFormProps {
   isTestConnectionInProgress?: boolean;
   onStopTesting?: () => void;
   testConnector?: (v?: ServiceFormValues) => Promise<CheckConnectionRead>;
-  onClickBtn?: (params: SwitchStepParams) => void;
 }
 
 const ServiceForm: React.FC<ServiceFormProps> = (props) => {
   const formId = useUniqueFormId(props.formId);
   const { clearFormChange } = useFormChangeTrackerService();
+  // const { push } = useRouter();
 
   const [isOpenRequestModal, toggleOpenRequestModal] = useToggle(false);
   const [initialRequestName] = useState<string>(); // setInitialRequestName
@@ -155,7 +158,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     testConnector,
     selectedConnectorDefinitionSpecification,
     availableServices,
-    onClickBtn,
   } = props;
 
   const specifications = useBuildInitialSchema(selectedConnectorDefinitionSpecification);
@@ -247,8 +249,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     [validationSchema]
   );
 
-  // const sleep = (ms:number) => new Promise((r) => setTimeout(r, ms)); //await sleep(500);
-
   const onFormSubmit = useCallback(
     async (values: ServiceFormValues) => {
       const valuesToSend = getValues(values);
@@ -259,12 +259,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     },
     [clearFormChange, formId, getValues, onSubmit, setDocumentationPanelOpen]
   );
-
-  const clickButton = ({ currentStep, formValue }: SwitchStepParams) => {
-    setDocumentationPanelOpen(false);
-    console.warn("formValue", formValue);
-    onClickBtn && onClickBtn({ currentStep, formValue });
-  };
 
   return (
     <Formik
@@ -301,7 +295,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
             onStopTestingConnector={onStopTesting ? () => onStopTesting() : undefined}
             onRetest={testConnector ? async () => await testConnector() : undefined}
             formFields={formFields}
-            onClickBtn={clickButton}
             formValues={formValues}
           />
 

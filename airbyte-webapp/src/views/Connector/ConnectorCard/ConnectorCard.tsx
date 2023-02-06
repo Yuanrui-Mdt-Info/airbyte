@@ -26,7 +26,6 @@ interface ConnectorCardBaseProps extends ConnectorCardProvidedProps {
   title?: React.ReactNode;
   full?: boolean;
   jobInfo?: SynchronousJobRead | null;
-  selectDefinition?: string;
   onClickBtn?: (params: SwitchStepParams) => void;
 }
 
@@ -52,6 +51,7 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
 
   const { testConnector, isTestConnectionInProgress, onStopTesting, error, reset } = useTestConnector(props);
   const { setFormValues } = useDataCardContext();
+  // const { push } = useRouter();
 
   useEffect(() => {
     // Whenever the selected connector changed, reset the check connection call and other errors
@@ -62,11 +62,10 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   const analyticsService = useAnalyticsService();
 
   const onHandleSubmit = async (values: ServiceFormValues) => {
-    console.log("onHandleSubmit");
     onClickBtn &&
       onClickBtn({
+        isLoading: true,
         currentStep: "testing",
-        formValue: values,
       });
 
     setFormValues(values);
@@ -104,17 +103,13 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
       await testConnectorWithTracking();
       await onSubmit(values);
       setSaved(true);
-      console.log("onHandleSubmit --------------success");
     } catch (e) {
       // Testing failed and return create from page
-      // onClickBtn && onClickBtn('creating');
-      console.log("onHandleSubmit --------------error");
-      // console.error(e)
       onClickBtn &&
         onClickBtn({
           currentStep: "creating",
+          isLoading: false,
           fetchingConnectorError: e,
-          formValue: values,
         });
       // setErrorStatusRequest(e);
     }
@@ -123,8 +118,6 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   // const job = jobInfo || LogsRequestError.extractJobInfo(errorStatusRequest);
 
   const useNewUI = true;
-
-  console.log("error", error);
 
   return (
     <Card fullWidth={full} title={useNewUI ? "" : title}>
@@ -135,7 +128,6 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
         onStopTesting={onStopTesting}
         testConnector={testConnector}
         onSubmit={onHandleSubmit}
-        onClickBtn={onClickBtn}
         successMessage={
           props.successMessage || (saved && props.isEditMode && <FormattedMessage id="form.changesSaved" />)
         }

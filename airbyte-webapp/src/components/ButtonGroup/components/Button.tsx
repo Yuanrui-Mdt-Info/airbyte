@@ -20,6 +20,9 @@ const Button: React.FC<CardProps> = ({ btnText, type, onClick }) => {
       aria-hidden="true"
       className={buttonClassName}
       onClick={() => {
+        if (type === "disabled") {
+          return;
+        }
         onClick(type);
       }}
     >

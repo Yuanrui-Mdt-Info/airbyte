@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 
-import ButtonGroup from "components/ButtonGroup";
-import { ButtonItems } from "components/ButtonGroup/ButtonGroup";
+import Button from "components/ButtonGroup/components/Button";
+import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
@@ -11,9 +11,7 @@ import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/Creat
 import style from "./TestLoading.module.scss";
 
 interface Iprops {
-  // type?: "source" | "destination" | "connection";
-  currentStep: string; // selecting|creating|Testing
-  requestStatus: string; // loading|finish|error
+  isLoading: boolean;
   onClickBtn: (params: SwitchStepParams) => void;
 }
 
@@ -23,6 +21,14 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+`;
+
+export const ButtonRows = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 40px;
+  width: 100%;
 `;
 
 const Text = styled.div`
@@ -46,68 +52,33 @@ const Image = styled.img`
 //     margin-top: 40px;
 // }
 
-const TestLoading: React.FC<Iprops> = ({ currentStep, onClickBtn, requestStatus }) => {
+const TestLoading: React.FC<Iprops> = ({ isLoading, onClickBtn }) => {
   const { push } = useRouter();
-  const [status, setStatus] = useState<string>("loading"); // loading or finish
-  const [ButtonItems, setButtonItems] = useState([
-    {
-      btnText: "Back",
-      type: "cancel",
-    },
-    {
-      btnText: "Finish",
-      type: "disabled",
-    },
-  ] as ButtonItems[]);
-
-  useEffect(() => {
-    changeButtonStatus(1, requestStatus === "finish" ? "active" : "disabled");
-    setStatus(requestStatus);
-    console.log("requestStatus", requestStatus);
-  }, [setStatus, requestStatus]);
-
-  const changeButtonStatus = (index: number, type: "cancel" | "disabled" | "active") => {
-    const NewData = ButtonItems.map((rows, key) => {
-      if (index === key) {
-        rows.type = type;
-      }
-      return rows;
-    });
-    setButtonItems(NewData);
-  };
-
+  const { clearSelectDefinition } = useDataCardContext();
   const clickButton = (btnType: string) => {
-    if (btnType === "disabled") {
+    if (btnType === "active") {
+      push(`/${RoutePaths.Source}`);
+      clearSelectDefinition();
       return;
     }
-    if (btnType === "cancel") {
-      return onClickBtn({
-        currentStep: "creating",
-      });
-    }
-
-    if (currentStep === "testing") {
-      return push(`/${RoutePaths.Source}`);
-    }
+    onClickBtn({
+      currentStep: "creating",
+      fetchingConnectorError: null,
+      btnType,
+    });
   };
 
   return (
     <>
       <Container>
-        <Text>{status === "loading" ? "Testing your connection..." : "Source validated!"}</Text>
-        {status === "loading" ? (
-          <Image src="/icons/loading-icon.png" className={style.loadingIcon} alt="loading-icon" />
-        ) : (
-          <Image src="/icons/finish-icon.png" alt="finish-icon" />
-        )}
-        {/* <Image
-          src={status === "finish" ? "" : ""}
-          
-          className={status === "loading" ? style.loadingIcon : ""}
-        /> */}
-        {/* <div className={style.loadingDiv}></div> */}
+        <Text>{isLoading ? "Testing your connection..." : "Source validated!"}</Text>
+        {isLoading && <Image src="/icons/loading-icon.png" className={style.loadingIcon} alt="loading-icon" />}
+        {!isLoading && <Image src="/icons/finish-icon.png" alt="finish-icon" />}
       </Container>
-      <ButtonGroup data={ButtonItems} onClick={clickButton} />
+      <ButtonRows>
+        <Button btnText="Back" onClick={clickButton} type="cancel" />
+        <Button btnText="Finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
+      </ButtonRows>
     </>
   );
 };

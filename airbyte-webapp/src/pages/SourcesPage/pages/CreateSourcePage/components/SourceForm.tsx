@@ -14,6 +14,7 @@ import { useGetSourceDefinitionSpecificationAsync } from "services/connector/Sou
 import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
+// import { RoutePaths } from "pages/routePaths";
 
 interface SourceFormProps {
   onSubmit: (values: {
@@ -26,9 +27,7 @@ interface SourceFormProps {
   sourceDefinitions: SourceDefinitionReadWithLatestTag[];
   hasSuccess?: boolean;
   error?: FormError | null;
-  selectEntityId?: string;
   onClickBtn?: (params: SwitchStepParams) => void;
-  formValue?: Partial<ServiceFormValues>;
 }
 
 const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
@@ -44,27 +43,25 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   sourceDefinitions,
   error,
   hasSuccess,
-  selectEntityId,
   afterSelectConnector,
   onClickBtn,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { formValues } = useDataCardContext();
-
-  console.log("formValues*******************", formValues);
-
-  const _selectEntityId = selectEntityId ? selectEntityId : null;
+  const { formValues, selectDefinition } = useDataCardContext();
+  if (!selectDefinition.definitionId) {
+    // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+  }
 
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
-    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : _selectEntityId // null
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : selectDefinition.definitionId // null
   );
 
   const {
     data: sourceDefinitionSpecification,
     error: sourceDefinitionError,
     isLoading,
-  } = useGetSourceDefinitionSpecificationAsync(selectEntityId || sourceDefinitionId);
+  } = useGetSourceDefinitionSpecificationAsync(sourceDefinitionId);
 
   const onDropDownSelect = (sourceDefinitionId: string) => {
     setSourceDefinitionId(sourceDefinitionId);
@@ -90,8 +87,6 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   };
 
   const errorMessage = error ? generateMessageFromError(error) : null;
-
-  console.log("errorMessage", errorMessage);
 
   return (
     <ConnectorCard
