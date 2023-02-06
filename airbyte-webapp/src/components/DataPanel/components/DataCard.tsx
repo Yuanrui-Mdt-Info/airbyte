@@ -4,11 +4,12 @@ import styled from "styled-components";
 import { ConnectorIcon } from "components/ConnectorIcon";
 import { useDataCardContext, SelectDefinition } from "components/DataPanel/DataCardContext";
 
-import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
+import { Connector, ConnectorDefinition } from "core/domain/connector";
+
 interface CardProps {
   checked: boolean;
-  data: SourceDefinitionReadWithLatestTag;
-  onClick: (data: SourceDefinitionReadWithLatestTag) => void;
+  data: ConnectorDefinition;
+  onClick: (data: ConnectorDefinition) => void;
 }
 
 export const Box = styled.div<{
@@ -40,7 +41,7 @@ export const Box = styled.div<{
 export const Image = styled(ConnectorIcon)`
   width: 106px;
   height: 106px;
-  margin-bottom: 2px;
+  margin-bottom: 6px;
 `;
 
 const DataCard: React.FC<CardProps> = ({ data, onClick, checked }) => {
@@ -49,7 +50,7 @@ const DataCard: React.FC<CardProps> = ({ data, onClick, checked }) => {
   const clickBox = () => {
     onClick(data);
     const obj: SelectDefinition = {
-      definitionId: data.sourceDefinitionId,
+      definitionId: Connector.id(data),
       icon: data.icon,
       name: data.name,
     };

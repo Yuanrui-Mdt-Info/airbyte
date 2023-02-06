@@ -16,7 +16,7 @@ import { TestingConnectionError, FetchingConnectorError } from "./TestingConnect
 // import TestingConnectionSuccess from "./TestingConnectionSuccess";
 
 interface FormRootProps {
-  // formType: "source" | "destination";
+  formType: "source" | "destination";
   isSubmitting?: boolean;
   errorMessage?: React.ReactNode;
   hasSuccess?: boolean;
@@ -71,7 +71,7 @@ export const ButtonRows = styled.div`
 const FormRootNew: React.FC<FormRootProps> = ({
   // isTestConnectionInProgress,
   isSubmitting,
-  //   //formType,
+  formType,
   hasSuccess,
   errorMessage,
   fetchingConnectorError,
@@ -95,7 +95,11 @@ const FormRootNew: React.FC<FormRootProps> = ({
   }
 
   const goBack = () => {
-    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+    const path =
+      formType === "source"
+        ? `/${RoutePaths.Source}/${RoutePaths.SelectSource}`
+        : `/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`;
+    push(path);
   };
 
   // id={`onboarding.${formType}SetUp.buttonText`}

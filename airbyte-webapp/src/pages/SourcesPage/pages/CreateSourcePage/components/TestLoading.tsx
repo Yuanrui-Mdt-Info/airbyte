@@ -12,6 +12,7 @@ import style from "./TestLoading.module.scss";
 
 interface Iprops {
   isLoading: boolean;
+  type: "destination" | "source";
   onClickBtn: (params: SwitchStepParams) => void;
 }
 
@@ -52,12 +53,13 @@ const Image = styled.img`
 //     margin-top: 40px;
 // }
 
-const TestLoading: React.FC<Iprops> = ({ isLoading, onClickBtn }) => {
+const TestLoading: React.FC<Iprops> = ({ isLoading, type, onClickBtn }) => {
   const { push } = useRouter();
   const { clearSelectDefinition } = useDataCardContext();
   const clickButton = (btnType: string) => {
     if (btnType === "active") {
-      push(`/${RoutePaths.Source}`);
+      const path = type === "source" ? `/${RoutePaths.Source}` : `/${RoutePaths.Destination}`;
+      push(path);
       clearSelectDefinition();
       return;
     }

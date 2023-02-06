@@ -80,6 +80,7 @@ const FormRoot: React.FC<FormRootProps> = ({
           errorMessage={dirty || !isValid ? "" : errorMessage}
           disabled={!(isValid && dirty)}
           formValues={formValues}
+          formType={formType}
         />
       )}
 

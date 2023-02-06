@@ -18,7 +18,7 @@ const AllDestinationsPage: React.FC = () => {
   const { destinations } = useDestinationList();
   useTrackPage(PageTrackingCodes.DESTINATION_LIST);
 
-  const onCreateDestination = () => push(`${RoutePaths.DestinationNew}`);
+  const onCreateDestination = () => push(`${RoutePaths.SelectDestination}`); // DestinationNew
 
   return destinations.length ? (
     <MainPageWithScroll

@@ -9,12 +9,12 @@ import HeadTitle from "components/HeadTitle";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateSource } from "hooks/services/useSourceHook";
+import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout/ConnectorDocumentationWrapper";
 
 import { SourceForm } from "./components/SourceForm";
-import TestLoading from "./components/TestLoading";
 
 export interface SwitchStepParams {
   currentStep: string;
@@ -73,7 +73,9 @@ const CreateSourcePage: React.FC = () => {
         {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="sources.newSourceTitle" />} /> */}
         <FormPageContent>
           {/* {renderCard()} */}
-          {currentStep === "testing" && <TestLoading onClickBtn={clickBtnHandleStep} isLoading={isLoading} />}
+          {currentStep === "testing" && (
+            <TestLoading onClickBtn={clickBtnHandleStep} isLoading={isLoading} type="source" />
+          )}
           {currentStep === "creating" && (
             <SourceForm
               onSubmit={onSubmitSourceStep}

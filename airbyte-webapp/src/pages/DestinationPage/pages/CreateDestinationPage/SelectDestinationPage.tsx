@@ -9,7 +9,7 @@ import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
+import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
 
 export interface ButtonItems {
   btnText: string;
@@ -29,11 +29,12 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const SelectNewSourceCard: React.FC = () => {
+const SelectDestinationCard: React.FC = () => {
   const { push } = useRouter();
   const { selectDefinition, clearFormValues } = useDataCardContext();
   const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
-  const { sourceDefinitions } = useSourceDefinitionList();
+
+  const { destinationDefinitions } = useDestinationDefinitionList();
 
   // const clickCancel = () => {
   //   push(`/${RoutePaths.Source}`);
@@ -44,7 +45,7 @@ const SelectNewSourceCard: React.FC = () => {
       return;
     }
     clearFormValues();
-    push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`);
+    push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`);
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
@@ -54,16 +55,17 @@ const SelectNewSourceCard: React.FC = () => {
     }
     setDefinitionId(selectId);
   };
+
   return (
     <>
-      <ConnectionStep lightMode type="source" />
+      <ConnectionStep lightMode type="destination" />
       <Container>
         <DataPanel
           onSelect={afterSelect}
-          data={sourceDefinitions}
+          data={destinationDefinitions}
           value={definitionId}
-          type="source"
-          title="Set up a new data source"
+          type="destination"
+          title="Set up a new data destination"
         />
         <ButtonRows>
           {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
@@ -74,4 +76,4 @@ const SelectNewSourceCard: React.FC = () => {
   );
 };
 
-export default SelectNewSourceCard;
+export default SelectDestinationCard;

@@ -1,14 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 
-import { useSourceDefinitionList, SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
+import { Connector, ConnectorDefinition } from "core/domain/connector";
 
 import DataCard from "./components/DataCard";
-
 interface SourcePanelProps {
   value?: string;
   title: string;
-  onSelect: (data: SourceDefinitionReadWithLatestTag) => void;
+  onSelect: (data: ConnectorDefinition) => void;
+  type: "destination" | "source";
+  data: ConnectorDefinition[];
 }
 
 export const Panel = styled.div`
@@ -29,19 +30,13 @@ export const BoxList = styled.div`
   flex-wrap: wrap;
 `;
 
-const DataPanel: React.FC<SourcePanelProps> = ({ onSelect, value, title }) => {
-  const { sourceDefinitions } = useSourceDefinitionList();
+const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title }) => {
   return (
     <Panel>
       <PanelTitle>{title}</PanelTitle>
       <BoxList>
-        {sourceDefinitions.map((item) => (
-          <DataCard
-            data={item}
-            key={item.sourceDefinitionId}
-            onClick={onSelect}
-            checked={item.sourceDefinitionId === value}
-          />
+        {data.map((item) => (
+          <DataCard data={item} key={Connector.id(item)} onClick={onSelect} checked={Connector.id(item) === value} />
         ))}
       </BoxList>
     </Panel>
