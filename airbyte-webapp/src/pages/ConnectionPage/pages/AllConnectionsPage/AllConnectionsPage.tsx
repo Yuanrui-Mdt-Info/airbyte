@@ -43,7 +43,7 @@ const AllConnectionsPage: React.FC = () => {
 
   const allowCreateConnection = useFeature(FeatureItem.AllowCreateConnection);
 
-  const onCreateClick = () => push(`${RoutePaths.ConnectionNew}`);
+  const onCreateClick = () => push(`${RoutePaths.SelectConnection}`); // ConnectionNew
 
   return (
     <Suspense fallback={<LoadingPage />}>

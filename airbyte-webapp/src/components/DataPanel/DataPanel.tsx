@@ -1,4 +1,5 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
@@ -6,7 +7,6 @@ import { Connector, ConnectorDefinition } from "core/domain/connector";
 import DataCard from "./components/DataCard";
 interface SourcePanelProps {
   value?: string;
-  title: string;
   onSelect: (data: ConnectorDefinition) => void;
   type: "destination" | "source";
   data: ConnectorDefinition[];
@@ -30,10 +30,12 @@ export const BoxList = styled.div`
   flex-wrap: wrap;
 `;
 
-const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title }) => {
+const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, type }) => {
   return (
     <Panel>
-      <PanelTitle>{title}</PanelTitle>
+      <PanelTitle>
+        <FormattedMessage id={`form.setup.${type}`} />
+      </PanelTitle>
       <BoxList>
         {data.map((item) => (
           <DataCard data={item} key={Connector.id(item)} onClick={onSelect} checked={Connector.id(item) === value} />

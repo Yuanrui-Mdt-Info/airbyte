@@ -25,7 +25,7 @@ export const ButtonRows = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 40px;
+  margin: 40px 0 60px 0;
   width: 100%;
 `;
 
@@ -58,16 +58,10 @@ const SelectNewSourceCard: React.FC = () => {
     <>
       <ConnectionStep lightMode type="source" />
       <Container>
-        <DataPanel
-          onSelect={afterSelect}
-          data={sourceDefinitions}
-          value={definitionId}
-          type="source"
-          title="Set up a new data source"
-        />
+        <DataPanel onSelect={afterSelect} data={sourceDefinitions} value={definitionId} type="source" />
         <ButtonRows>
           {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
-          <Button btnText="Select & Continue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />
+          <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />
         </ButtonRows>
       </Container>
     </>

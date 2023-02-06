@@ -3,6 +3,7 @@ import { FormattedMessage } from "react-intl";
 
 import { LoadingPage, PageTitle } from "components";
 import ConnectionBlock from "components/ConnectionBlock";
+import ConnectionStep from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
 import CreateConnectionContent from "components/CreateConnectionContent";
 // import HeadTitle from "components/HeadTitle";
@@ -74,6 +75,7 @@ export const CreationFormPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_NEW);
   const { location, push } = useRouter();
   const { clearAllFormChanges } = useFormChangeTrackerService();
+  const useNewUI = true;
 
   // TODO: Probably there is a better way to figure it out instead of just checking third elem
   // const locationType = location.pathname.split("/")[3];
@@ -129,8 +131,8 @@ export const CreationFormPage: React.FC = () => {
       if (currentEntityStep === EntityStepsTypes.SOURCE) {
         return (
           <>
-            {type === EntityStepsTypes.CONNECTION && (
-              <ExistingEntityForm type="source" onSubmit={onSelectExistingSource} />
+            {!useNewUI && type === EntityStepsTypes.CONNECTION && (
+              <ExistingEntityForm type="source" onSubmit={onSelectExistingSource} value="" />
             )}
 
             <ConnectionCreateSourceForm
@@ -149,8 +151,8 @@ export const CreationFormPage: React.FC = () => {
       } else if (currentEntityStep === EntityStepsTypes.DESTINATION) {
         return (
           <>
-            {type === EntityStepsTypes.CONNECTION && (
-              <ExistingEntityForm type="destination" onSubmit={onSelectExistingDestination} />
+            {!useNewUI && type === EntityStepsTypes.CONNECTION && (
+              <ExistingEntityForm type="destination" onSubmit={onSelectExistingDestination} value="" />
             )}
             <ConnectionCreateDestinationForm
               afterSubmit={() => {
@@ -234,11 +236,14 @@ export const CreationFormPage: React.FC = () => {
   return (
     <>
       {/* <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} /> */}
+      <ConnectionStep lightMode type="source" />
       <ConnectorDocumentationWrapper>
-        <PageTitle
-          title={<FormattedMessage id={titleId} />}
-          middleComponent={<StepsMenu lightMode data={steps} activeStep={currentStep} />}
-        />
+        {!useNewUI && (
+          <PageTitle
+            title={<FormattedMessage id={titleId} />}
+            middleComponent={<StepsMenu lightMode data={steps} activeStep={currentStep} />}
+          />
+        )}
         <FormPageContent big={currentStep === StepsTypes.CREATE_CONNECTION}>
           {currentStep !== StepsTypes.CREATE_CONNECTION && (!!source || !!destination) && (
             <ConnectionBlock

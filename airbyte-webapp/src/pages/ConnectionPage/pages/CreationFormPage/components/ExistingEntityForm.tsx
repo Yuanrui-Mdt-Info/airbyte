@@ -1,11 +1,11 @@
 import { Field, FieldProps, Form, Formik } from "formik";
-import React, { useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import React, { useMemo, useEffect } from "react";
+import { FormattedMessage } from "react-intl"; // useIntl
 import styled from "styled-components";
 import * as yup from "yup";
 
-import { Button, ControlLabels, DropDown } from "components";
-import { Card } from "components/base/Card";
+import { ControlLabels, DropDown } from "components"; // Button
+// import { Card } from "components/base/Card";
 import { ConnectorIcon } from "components/ConnectorIcon";
 
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
@@ -13,41 +13,57 @@ import { useSourceDefinitionList } from "services/connector/SourceDefinitionServ
 
 import { useDestinationList } from "../../../../../hooks/services/useDestinationHook";
 import { useSourceList } from "../../../../../hooks/services/useSourceHook";
+import style from "./ExistingEntityForm.module.scss";
 
 interface IProps {
   type: "source" | "destination";
   onSubmit: (id: string) => void;
+  value: string;
 }
 
 const FormContent = styled(Form)`
-  padding: 22px 27px 23px 24px;
+  padding: 22px 27px 23px 0px;
 `;
 
-const BottomBlock = styled.div`
-  text-align: right;
-  margin-top: 34px;
-`;
-
-const PaddingBlock = styled.div`
-  text-align: center;
-  padding: 18px 0 15px;
+const FormTitle = styled.div`
+  font-size: 24px;
+  line-height: 30px;
+  color: #27272a;
   font-weight: 500;
-  font-size: 15px;
-  line-height: 18px;
+  margin-top: 38px;
 `;
+
+// const BottomBlock = styled.div`
+//   text-align: right;
+//   margin-top: 34px;
+// `;
+
+// const PaddingBlock = styled.div`
+//   text-align: center;
+//   padding: 18px 0 15px;
+//   font-weight: 500;
+//   font-size: 15px;
+//   line-height: 18px;
+// `;
 
 const existingEntityValidationSchema = yup.object().shape({
   entityId: yup.string().required("form.empty.error"),
 });
 
-const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit }) => {
-  const { formatMessage } = useIntl();
+const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
+  // const { formatMessage } = useIntl();
   const { sources } = useSourceList();
   const { sourceDefinitions } = useSourceDefinitionList();
 
   const { destinations } = useDestinationList();
 
   const { destinationDefinitions } = useDestinationDefinitionList();
+
+  // const {resetForm}  = useFormikContext()
+
+  useEffect(() => {
+    // formikHelpers.resetForm({ entityId: value });
+  }, [value]);
 
   const dropDownData = useMemo(() => {
     if (type === "source") {
@@ -81,46 +97,52 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit }) => {
   const initialValues = { entityId: "" };
   return (
     <>
-      <Card title={<FormattedMessage id={`connectionForm.${type}Existing`} />}>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={existingEntityValidationSchema}
-          onSubmit={async (values: { entityId: string }, { resetForm }) => {
-            onSubmit(values.entityId);
-            resetForm({});
-          }}
-        >
-          {({ isSubmitting, setFieldValue }) => (
-            <FormContent>
-              <Field name="entityId">
-                {({ field }: FieldProps<string>) => (
-                  <ControlLabels
-                    label={formatMessage({
-                      id: `connectionForm.${type}Title`,
-                    })}
-                  >
-                    <DropDown
-                      {...field}
-                      options={dropDownData}
-                      onChange={(item: { value: string }) => {
-                        setFieldValue(field.name, item.value);
-                      }}
-                    />
-                  </ControlLabels>
-                )}
-              </Field>
-              <BottomBlock>
+      {/* <Card title={<FormattedMessage id={`connectionForm.${type}Existing`} />}> */}
+      <FormTitle>
+        <FormattedMessage id={`form.select.existing.${type}`} />
+      </FormTitle>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={existingEntityValidationSchema}
+        onSubmit={async (values: { entityId: string }, { resetForm }) => {
+          onSubmit(values.entityId);
+          resetForm({});
+        }}
+      >
+        {(
+          { setFieldValue } // isSubmitting
+        ) => (
+          <FormContent>
+            <Field name="entityId">
+              {({ field }: FieldProps<string>) => (
+                <ControlLabels
+                // label={formatMessage({
+                //   id: `connectionForm.${type}Title`,
+                // })}
+                >
+                  <DropDown
+                    {...field}
+                    className={style.selectDropdown}
+                    options={dropDownData}
+                    placeholder="Select a Source"
+                    onChange={(item: { value: string }) => {
+                      console.log("onChange", field.name, item.value);
+                      setFieldValue(field.name, item.value);
+                    }}
+                  />
+                </ControlLabels>
+              )}
+            </Field>
+            {/* <BottomBlock>
                 <Button disabled={isSubmitting} type="submit">
                   <FormattedMessage id={`connectionForm.${type}Use`} />
                 </Button>
-              </BottomBlock>
-            </FormContent>
-          )}
-        </Formik>
-      </Card>
-      <PaddingBlock>
-        <FormattedMessage id="onboarding.or" />
-      </PaddingBlock>
+              </BottomBlock> */}
+          </FormContent>
+        )}
+      </Formik>
+      {/* </Card> */}
+      {/* <PaddingBlock> <FormattedMessage id="onboarding.or" /> </PaddingBlock>*/}
     </>
   );
 };

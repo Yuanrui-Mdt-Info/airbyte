@@ -1,4 +1,5 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { ConnectorIcon } from "components/ConnectorIcon";
@@ -61,7 +62,9 @@ const FormHeaderBox: React.FC<BoxProps> = () => {
       </ImageBox>
       <Content>
         <Title>{selectDefinition.name}</Title>
-        <Text>Following the setup guide on the right to connect your data source to Daspire. </Text>
+        <Text>
+          <FormattedMessage id="form.header.subTitle" />{" "}
+        </Text>
       </Content>
     </FormHeader>
   );

@@ -1,5 +1,6 @@
 import classnames from "classnames";
 import React from "react";
+import { FormattedMessage } from "react-intl";
 
 import styles from "./Button.module.scss";
 
@@ -26,7 +27,7 @@ const Button: React.FC<CardProps> = ({ btnText, type, onClick }) => {
         onClick(type);
       }}
     >
-      {btnText}
+      <FormattedMessage id={`form.button.${btnText}`} />
     </div>
   );
 };

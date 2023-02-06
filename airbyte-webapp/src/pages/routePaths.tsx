@@ -22,6 +22,7 @@ export enum RoutePaths {
   CreateSource = "create-source",
 
   SelectDestination = "select-destination",
+  SelectConnection = "select-connection",
 
   UserSignup = "user_signup",
   Signup = "signup",

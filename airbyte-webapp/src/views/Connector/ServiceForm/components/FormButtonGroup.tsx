@@ -109,7 +109,7 @@ const FormRootNew: React.FC<FormRootProps> = ({
       {fetchingConnectorError && <FetchingConnectorError />}
       <ButtonRows>
         <BackButton type="button" onClick={goBack}>
-          Back
+          <FormattedMessage id="form.button.back" />
         </BackButton>
         <SubmitButton type="submit" disabled={disabled}>
           <FormattedMessage id="form.button.saveTest" />

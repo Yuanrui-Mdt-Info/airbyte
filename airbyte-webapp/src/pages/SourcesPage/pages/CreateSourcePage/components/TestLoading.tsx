@@ -1,4 +1,5 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
@@ -73,13 +74,15 @@ const TestLoading: React.FC<Iprops> = ({ isLoading, type, onClickBtn }) => {
   return (
     <>
       <Container>
-        <Text>{isLoading ? "Testing your connection..." : "Source validated!"}</Text>
+        <Text>
+          {isLoading ? <FormattedMessage id="form.testing" /> : <FormattedMessage id={`form.${type}.validated`} />}
+        </Text>
         {isLoading && <Image src="/icons/loading-icon.png" className={style.loadingIcon} alt="loading-icon" />}
         {!isLoading && <Image src="/icons/finish-icon.png" alt="finish-icon" />}
       </Container>
       <ButtonRows>
-        <Button btnText="Back" onClick={clickButton} type="cancel" />
-        <Button btnText="Finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
+        <Button btnText="form.back" onClick={clickButton} type="cancel" />
+        <Button btnText="form.finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
       </ButtonRows>
     </>
   );

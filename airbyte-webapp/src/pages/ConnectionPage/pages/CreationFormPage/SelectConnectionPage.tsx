@@ -9,7 +9,9 @@ import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
+import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
+
+import ExistingEntityForm from "./components/ExistingEntityForm";
 
 export interface ButtonItems {
   btnText: string;
@@ -29,12 +31,11 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const SelectDestinationCard: React.FC = () => {
+const SelectNewConnectionCard: React.FC = () => {
   const { push } = useRouter();
   const { selectDefinition, clearFormValues } = useDataCardContext();
   const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
-
-  const { destinationDefinitions } = useDestinationDefinitionList();
+  const { sourceDefinitions } = useSourceDefinitionList();
 
   // const clickCancel = () => {
   //   push(`/${RoutePaths.Source}`);
@@ -45,7 +46,7 @@ const SelectDestinationCard: React.FC = () => {
       return;
     }
     clearFormValues();
-    push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`);
+    push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`);
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
@@ -56,11 +57,19 @@ const SelectDestinationCard: React.FC = () => {
     setDefinitionId(selectId);
   };
 
+  const onSelectExistingSource = (id: string) => {
+    if (definitionId === id) {
+      return setDefinitionId("");
+    }
+    setDefinitionId(id);
+    console.log(`onSelectExistingSource:${id}`);
+  };
   return (
     <>
-      <ConnectionStep lightMode type="destination" />
+      <ConnectionStep lightMode type="source" />
       <Container>
-        <DataPanel onSelect={afterSelect} data={destinationDefinitions} value={definitionId} type="destination" />
+        <ExistingEntityForm type="source" onSubmit={onSelectExistingSource} value={definitionId} />
+        <DataPanel onSelect={afterSelect} data={sourceDefinitions} value={definitionId} type="source" />
         <ButtonRows>
           {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
           <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />
@@ -70,4 +79,4 @@ const SelectDestinationCard: React.FC = () => {
   );
 };
 
-export default SelectDestinationCard;
+export default SelectNewConnectionCard;
