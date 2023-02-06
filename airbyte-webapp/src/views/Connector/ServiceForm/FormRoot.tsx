@@ -58,10 +58,6 @@ const FormRoot: React.FC<FormRootProps> = ({
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
   const useNewUI = true;
-
-  console.log("!(isValid && dirty)", !(isValid && dirty));
-  console.log("dirty", dirty);
-
   return (
     <FormContainer>
       <FormHeaderBox formType={formType} />

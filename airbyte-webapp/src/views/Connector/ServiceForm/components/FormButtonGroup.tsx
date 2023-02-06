@@ -83,10 +83,6 @@ const FormRootNew: React.FC<FormRootProps> = ({
 }) => {
   const { push } = useRouter();
 
-  console.log("fetchingConnectorError", fetchingConnectorError);
-  console.log("errorMessage", errorMessage);
-  console.log("disabled", disabled);
-
   if (isSubmitting) {
     //  return <TestingConnectionSpinner isCancellable={isTestConnectionInProgress} onCancelTesting={onCancelTesting} />;
   }
