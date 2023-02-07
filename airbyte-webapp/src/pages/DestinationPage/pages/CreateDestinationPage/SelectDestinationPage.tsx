@@ -58,7 +58,7 @@ const SelectDestinationCard: React.FC = () => {
 
   return (
     <>
-      <ConnectionStep lightMode type="destination" />
+      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
       <Container>
         <DataPanel onSelect={afterSelect} data={destinationDefinitions} value={definitionId} type="destination" />
         <ButtonRows>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
@@ -11,6 +11,7 @@ export interface StepMenuItem {
   name: string | React.ReactNode;
   status?: string;
   isPartialSuccess?: boolean;
+
   onSelect?: () => void;
 }
 
@@ -20,6 +21,7 @@ interface IProps {
   activeStep?: string;
   onSelect?: (id: string) => void;
   type?: "source" | "destination" | "connection";
+  currentStepNumber: number; // 1~4
 }
 
 export enum StepsTypes {
@@ -52,9 +54,10 @@ export const SingleText = styled.div`
   line-height: 30px;
 `;
 
-const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
+const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, currentStepNumber }) => {
   const { location } = useRouter(); // push
   const locationType = location.pathname.split("/")[1];
+
   const type: EntityStepsTypes =
     locationType === "connections"
       ? EntityStepsTypes.CONNECTION
@@ -62,27 +65,27 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
       ? EntityStepsTypes.DESTINATION
       : EntityStepsTypes.SOURCE;
 
-  const hasSourceId = (state: unknown): state is { sourceId: string } => {
-    return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
-  };
+  // const hasSourceId = (state: unknown): state is { sourceId: string } => {
+  //   return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
+  // };
 
-  const hasDestinationId = (state: unknown): state is { destinationId: string } => {
-    return (
-      typeof state === "object" &&
-      state !== null &&
-      typeof (state as { destinationId?: string }).destinationId === "string"
-    );
-  };
+  // const hasDestinationId = (state: unknown): state is { destinationId: string } => {
+  //   return (
+  //     typeof state === "object" &&
+  //     state !== null &&
+  //     typeof (state as { destinationId?: string }).destinationId === "string"
+  //   );
+  // };
 
-  const [currentStep] = useState(
-    // setCurrentStep
+  // const [currentStep] = useState(
+  //   // setCurrentStep
 
-    hasSourceId(location.state) && hasDestinationId(location.state)
-      ? StepsTypes.CREATE_CONNECTION
-      : hasSourceId(location.state) && !hasDestinationId(location.state)
-      ? StepsTypes.CREATE_CONNECTOR
-      : StepsTypes.CREATE_ENTITY
-  );
+  //   hasSourceId(location.state) && hasDestinationId(location.state)
+  //     ? StepsTypes.CREATE_CONNECTION
+  //     : hasSourceId(location.state) && !hasDestinationId(location.state)
+  //     ? StepsTypes.CREATE_CONNECTOR
+  //     : StepsTypes.CREATE_ENTITY
+  // );
 
   // setCurrentStep(StepsTypes.CREATE_CONNECTOR)
 
@@ -134,10 +137,12 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
               isPartialSuccess={item.isPartialSuccess}
               lightMode={lightMode}
               key={item.id}
-              num={key + 1}
+              stepNumber={key}
               {...item}
               onClick={onSelect || item.onSelect}
-              isActive={currentStep === item.id}
+              currentStepNumber={currentStepNumber}
+              // isActive={currentStep === item.id}
+              isActive={key < currentStepNumber}
             />
           ))}
         </>

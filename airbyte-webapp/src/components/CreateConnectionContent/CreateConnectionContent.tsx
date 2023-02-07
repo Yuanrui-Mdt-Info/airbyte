@@ -1,10 +1,11 @@
-import { faRedoAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Suspense, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { Button, Card } from "components";
 import { IDataItem } from "components/base/DropDown/components/Option";
+import { Tooltip } from "components/base/Tooltip";
 import { JobItem } from "components/JobItem/JobItem";
 import LoadingSchema from "components/LoadingSchema";
 
@@ -107,10 +108,16 @@ const CreateConnectionContent: React.FC<CreateConnectionContentProps> = ({
         onDropDownSelect={onSelectFrequency}
         onSubmit={onSubmitConnectionStep}
         additionalSchemaControl={
-          <Button onClick={onDiscoverSchema} type="button">
-            <FontAwesomeIcon className={styles.tryArrowIcon} icon={faRedoAlt} />
+          <Tooltip
+            control={
+              <Button onClick={onDiscoverSchema} type="button" secondary iconOnly>
+                <FontAwesomeIcon className={styles.tryArrowIcon} icon={faSync} />
+              </Button>
+            }
+            placement="top"
+          >
             <FormattedMessage id="connection.refreshSchema" />
-          </Button>
+          </Tooltip>
         }
       />
     </Suspense>

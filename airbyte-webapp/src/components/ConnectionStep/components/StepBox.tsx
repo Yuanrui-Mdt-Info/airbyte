@@ -8,8 +8,9 @@ interface StepProps {
   onClick?: (id: string) => void;
   isActive?: boolean;
   isPartialSuccess?: boolean;
-  num: number;
+  stepNumber: number;
   status?: string;
+  currentStepNumber: number;
 }
 
 export const StepBlock = styled.div`
@@ -30,7 +31,7 @@ export const StepContent = styled.div<{
   cursor: ${({ nonClickable }) => (nonClickable ? "default" : "pointer")};
 `;
 
-export const StepCircle = styled.div<{
+export const CircleNumber = styled.div<{
   isActive?: boolean;
 }>`
   display: flex;
@@ -51,15 +52,24 @@ export const StepLine = styled.div<{
   margin: 0 30px;
 `;
 
-const StepBox: React.FC<StepProps> = ({ name, id, isActive, onClick, num, lightMode, status }) => {
+const Image = styled.img`
+  width: 38px;
+  height: 38px;
+  display: inline-block;
+  margin-right: 16px;
+`;
+
+const StepBox: React.FC<StepProps> = ({ name, id, isActive, onClick, stepNumber, lightMode, currentStepNumber }) => {
   const onItemClickItem = () => {
     if (onClick) {
       onClick(id);
     }
   };
+
+  stepNumber++;
   return (
     <StepBlock>
-      {num > 1 ? <StepLine isActive={isActive} /> : null}
+      {stepNumber > 1 ? <StepLine isActive={isActive} /> : null}
       <StepContent
         data-id={`${id.toLowerCase()}-step`}
         nonClickable={!onClick}
@@ -67,10 +77,10 @@ const StepBox: React.FC<StepProps> = ({ name, id, isActive, onClick, num, lightM
         isActive={isActive}
         lightMode={lightMode}
       >
-        {status === "success" ? (
-          <img src="/icons/checkbox-checked.png" alt="checkbox-checked" />
+        {currentStepNumber > stepNumber ? (
+          <Image src="/icons/step-success.png" alt="success-icon" />
         ) : (
-          <StepCircle isActive={isActive}>{num > 9 ? num : `0${num}`}</StepCircle>
+          <CircleNumber isActive={isActive}>{stepNumber > 9 ? stepNumber : `0${stepNumber}`}</CircleNumber>
         )}
         {name}
       </StepContent>

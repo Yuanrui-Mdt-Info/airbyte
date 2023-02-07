@@ -56,7 +56,7 @@ const SelectNewSourceCard: React.FC = () => {
   };
   return (
     <>
-      <ConnectionStep lightMode type="source" />
+      <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <Container>
         <DataPanel onSelect={afterSelect} data={sourceDefinitions} value={definitionId} type="source" />
         <ButtonRows>

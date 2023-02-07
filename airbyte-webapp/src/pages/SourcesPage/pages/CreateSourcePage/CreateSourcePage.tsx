@@ -68,7 +68,7 @@ const CreateSourcePage: React.FC = () => {
   return (
     <>
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
-      <ConnectionStep lightMode type="source" />
+      <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <ConnectorDocumentationWrapper>
         {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="sources.newSourceTitle" />} /> */}
         <FormPageContent>

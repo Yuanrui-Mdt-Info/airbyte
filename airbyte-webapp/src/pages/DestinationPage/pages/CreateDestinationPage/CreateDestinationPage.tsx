@@ -70,7 +70,7 @@ export const CreateDestinationPage: React.FC = () => {
   return (
     <>
       <HeadTitle titles={[{ id: "destinations.newDestinationTitle" }]} />
-      <ConnectionStep lightMode type="destination" />
+      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
       <ConnectorDocumentationWrapper>
         {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="destinations.newDestinationTitle" />} /> */}
         <FormPageContent>

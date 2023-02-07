@@ -12,9 +12,10 @@ interface CreateControlsProps {
 
 const ButtonContainer = styled.div`
   padding: 15px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  // display: flex;
+  // align-items: center;
+  // justify-content: space-between;
+  // flex-direction: column;
 `;
 
 const LoadingContainer = styled(ButtonContainer)`
@@ -44,7 +45,7 @@ const Error = styled(Success)`
 
 const ErrorBlock = styled.div`
   display: flex;
-  justify-content: right;
+  justify-content: left;
   align-items: center;
   font-weight: 600;
   font-size: 12px;
@@ -56,6 +57,37 @@ const ErrorText = styled.div`
   font-weight: normal;
   color: ${({ theme }) => theme.dangerColor};
   max-width: 400px;
+`;
+
+const SubmitButton = styled(Button)`
+  // margin-left: auto;
+  width: 264px;
+  height: 68px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+`;
+
+const BackButton = styled(Button)`
+  // margin-left: auto;
+  width: 264px;
+  height: 68px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  background: #fff;
+  color: #6b6b6f;
+  border-color: #d1d5db;
+`;
+
+const ButtonRows = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 40px;
+  width: 100%;
 `;
 
 const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMessage, isValid }) => {
@@ -70,6 +102,10 @@ const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMess
     );
   }
 
+  const goBack = () => {
+    console.log("goBack");
+  };
+
   return (
     <ButtonContainer>
       {errorMessage ? (
@@ -83,11 +119,14 @@ const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMess
       ) : (
         <div />
       )}
-      <div>
-        <Button type="submit" disabled={isSubmitting || !isValid}>
+      <ButtonRows>
+        <BackButton type="button" onClick={goBack}>
+          <FormattedMessage id="form.button.back" />
+        </BackButton>
+        <SubmitButton type="submit" disabled={isSubmitting || !isValid}>
           <FormattedMessage id="onboarding.setUpConnection" />
-        </Button>
-      </div>
+        </SubmitButton>
+      </ButtonRows>
     </ButtonContainer>
   );
 };

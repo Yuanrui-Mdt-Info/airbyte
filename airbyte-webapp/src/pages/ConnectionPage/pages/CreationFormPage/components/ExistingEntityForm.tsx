@@ -1,5 +1,5 @@
 import { Field, FieldProps, Form, Formik } from "formik";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { FormattedMessage } from "react-intl"; // useIntl
 import styled from "styled-components";
 import * as yup from "yup";
@@ -54,16 +54,8 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
   // const { formatMessage } = useIntl();
   const { sources } = useSourceList();
   const { sourceDefinitions } = useSourceDefinitionList();
-
   const { destinations } = useDestinationList();
-
   const { destinationDefinitions } = useDestinationDefinitionList();
-
-  // const {resetForm}  = useFormikContext()
-
-  useEffect(() => {
-    // formikHelpers.resetForm({ entityId: value });
-  }, [value]);
 
   const dropDownData = useMemo(() => {
     if (type === "source") {
@@ -94,7 +86,7 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
     return null;
   }
 
-  const initialValues = { entityId: "" };
+  const initialValues = { entityId: value };
   return (
     <>
       {/* <Card title={<FormattedMessage id={`connectionForm.${type}Existing`} />}> */}
@@ -124,9 +116,9 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
                     {...field}
                     className={style.selectDropdown}
                     options={dropDownData}
-                    placeholder="Select a Source"
+                    placeholder={`Select a ${type}`}
                     onChange={(item: { value: string }) => {
-                      console.log("onChange", field.name, item.value);
+                      onSubmit(item.value);
                       setFieldValue(field.name, item.value);
                     }}
                   />

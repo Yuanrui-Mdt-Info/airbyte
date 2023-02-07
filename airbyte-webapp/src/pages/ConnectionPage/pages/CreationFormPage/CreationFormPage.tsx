@@ -53,6 +53,14 @@ const hasDestinationId = (state: unknown): state is { destinationId: string } =>
   );
 };
 
+const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
+  return (
+    typeof state === "object" &&
+    state !== null &&
+    typeof (state as { currentStepNumber?: number }).currentStepNumber === "number"
+  );
+};
+
 function usePreloadData(): {
   sourceDefinition?: SourceDefinitionRead;
   destination?: DestinationRead;
@@ -60,14 +68,10 @@ function usePreloadData(): {
   destinationDefinition?: DestinationDefinitionRead;
 } {
   const { location } = useRouter();
-
   const source = useGetSource(hasSourceId(location.state) ? location.state.sourceId : null);
-
   const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
-
   const destination = useGetDestination(hasDestinationId(location.state) ? location.state.destinationId : null);
   const destinationDefinition = useDestinationDefinition(destination?.destinationDefinitionId);
-
   return { source, sourceDefinition, destination, destinationDefinition };
 }
 
@@ -75,6 +79,9 @@ export const CreationFormPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_NEW);
   const { location, push } = useRouter();
   const { clearAllFormChanges } = useFormChangeTrackerService();
+  const [currentStepNumber] = useState<number>(
+    hasCurrentStepNumber(location.state) ? location.state.currentStepNumber : 1
+  ); // 1,2,3,4 setCurrentStepNumber
   const useNewUI = true;
 
   // TODO: Probably there is a better way to figure it out instead of just checking third elem
@@ -127,6 +134,7 @@ export const CreationFormPage: React.FC = () => {
   };
 
   const renderStep = () => {
+    console.log(currentStep === StepsTypes.CREATE_ENTITY || currentStep === StepsTypes.CREATE_CONNECTOR);
     if (currentStep === StepsTypes.CREATE_ENTITY || currentStep === StepsTypes.CREATE_CONNECTOR) {
       if (currentEntityStep === EntityStepsTypes.SOURCE) {
         return (
@@ -236,7 +244,7 @@ export const CreationFormPage: React.FC = () => {
   return (
     <>
       {/* <HeadTitle titles={[{ id: "connection.newConnectionTitle" }]} /> */}
-      <ConnectionStep lightMode type="source" />
+      <ConnectionStep lightMode type="source" currentStepNumber={currentStepNumber} />
       <ConnectorDocumentationWrapper>
         {!useNewUI && (
           <PageTitle
