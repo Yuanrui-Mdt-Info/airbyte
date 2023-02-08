@@ -26,6 +26,7 @@ interface DestinationFormProps {
   hasSuccess?: boolean;
   error?: FormError | null;
   onClickBtn?: (params: SwitchStepParams) => void;
+  onBack?: () => void;
 }
 
 const hasDestinationDefinitionId = (state: unknown): state is { destinationDefinitionId: string } => {
@@ -43,17 +44,18 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
   hasSuccess,
   afterSelectConnector,
   onClickBtn,
+  onBack,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { formValues, selectDefinition } = useDataCardContext();
+  const { formValues } = useDataCardContext();
 
-  if (!selectDefinition.definitionId) {
-    // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
-  }
+  // if (!selectDefinition.definitionId) {
+  //   // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+  // }
 
   const [destinationDefinitionId, setDestinationDefinitionId] = useState(
-    hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : selectDefinition.definitionId // null
+    hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : null
   );
 
   const {
@@ -103,6 +105,7 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
       title={<FormattedMessage id="onboarding.destinationSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
       onClickBtn={onClickBtn}
+      onBack={onBack}
     />
   );
 };

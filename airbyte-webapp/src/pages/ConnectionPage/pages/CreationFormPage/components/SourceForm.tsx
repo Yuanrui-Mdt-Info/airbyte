@@ -4,14 +4,21 @@ import { ConnectionConfiguration } from "core/domain/connection";
 import { useCreateSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
 import { SourceForm } from "pages/SourcesPage/pages/CreateSourcePage/components/SourceForm";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 
 interface ConnectionCreateSourceFormProps {
   afterSubmit: () => void;
+  onClickBtn?: (params: SwitchStepParams) => void;
+  onBack?: () => void;
 }
 
-export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProps> = ({ afterSubmit }) => {
+export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProps> = ({
+  afterSubmit,
+  onClickBtn,
+  onBack,
+}) => {
   const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const { sourceDefinitions } = useSourceDefinitionList();
@@ -52,5 +59,13 @@ export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProp
     };
   }, [setDocumentationPanelOpen]);
 
-  return <SourceForm onSubmit={onSubmitSourceStep} sourceDefinitions={sourceDefinitions} hasSuccess={successRequest} />;
+  return (
+    <SourceForm
+      onSubmit={onSubmitSourceStep}
+      sourceDefinitions={sourceDefinitions}
+      hasSuccess={successRequest}
+      onClickBtn={onClickBtn}
+      onBack={onBack}
+    />
+  );
 };

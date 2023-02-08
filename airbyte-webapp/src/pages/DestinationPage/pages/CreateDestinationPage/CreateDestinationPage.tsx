@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-// import { FormattedMessage } from "react-intl";
 
+// import { FormattedMessage } from "react-intl";
 import ConnectionStep from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
 import HeadTitle from "components/HeadTitle";
@@ -9,6 +9,8 @@ import HeadTitle from "components/HeadTitle";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateDestination } from "hooks/services/useDestinationHook";
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
 // import useRouter from "hooks/useRouter";
 import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
@@ -29,7 +31,7 @@ export interface SwitchStepParams {
 export const CreateDestinationPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.DESTINATION_NEW);
 
-  // const { push } = useRouter();
+  const { push } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const { destinationDefinitions } = useDestinationDefinitionList();
   const { mutateAsync: createDestination } = useCreateDestination();
@@ -67,6 +69,10 @@ export const CreateDestinationPage: React.FC = () => {
     // }
   };
 
+  const handleBackButton = () => {
+    push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`);
+  };
+
   return (
     <>
       <HeadTitle titles={[{ id: "destinations.newDestinationTitle" }]} />
@@ -83,6 +89,7 @@ export const CreateDestinationPage: React.FC = () => {
               destinationDefinitions={destinationDefinitions}
               hasSuccess={successRequest}
               onClickBtn={clickBtnHandleStep}
+              onBack={handleBackButton}
               error={fetchingConnectorError}
             />
           )}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
@@ -54,9 +54,31 @@ export const SingleText = styled.div`
   line-height: 30px;
 `;
 
-const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, currentStepNumber }) => {
+export const hasSourceId = (state: unknown): state is { sourceId: string } => {
+  return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
+};
+
+export const hasDestinationId = (state: unknown): state is { destinationId: string } => {
+  return (
+    typeof state === "object" &&
+    state !== null &&
+    typeof (state as { destinationId?: string }).destinationId === "string"
+  );
+};
+
+export const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
+  return (
+    typeof state === "object" &&
+    state !== null &&
+    typeof (state as { currentStepNumber?: number }).currentStepNumber === "number"
+  );
+};
+
+const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
   const { location } = useRouter(); // push
   const locationType = location.pathname.split("/")[1];
+
+  console.log(location.state);
 
   const type: EntityStepsTypes =
     locationType === "connections"
@@ -65,17 +87,28 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, currentStepNumb
       ? EntityStepsTypes.DESTINATION
       : EntityStepsTypes.SOURCE;
 
-  // const hasSourceId = (state: unknown): state is { sourceId: string } => {
-  //   return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
-  // };
+  const [currentStep, setCurrentStep] = useState<number>(1);
 
-  // const hasDestinationId = (state: unknown): state is { destinationId: string } => {
-  //   return (
-  //     typeof state === "object" &&
-  //     state !== null &&
-  //     typeof (state as { destinationId?: string }).destinationId === "string"
-  //   );
-  // };
+  // hasSourceId(location.state) && hasDestinationId(location.state)
+  //   ? StepsTypes.CREATE_CONNECTION
+  //   : hasSourceId(location.state) && !hasDestinationId(location.state)
+  //   ? StepsTypes.CREATE_CONNECTOR
+  //   : StepsTypes.CREATE_ENTITY
+
+  useEffect(() => {
+    setCurrentStep(
+      hasCurrentStepNumber(location.state)
+        ? location.state.currentStepNumber
+        : hasSourceId(location.state)
+        ? 2
+        : hasDestinationId(location.state)
+        ? 3
+        : 1
+    );
+    console.log("change currentStep", currentStep);
+  }, [hasSourceId, hasDestinationId, hasCurrentStepNumber, location]);
+
+  console.log("currentStep", currentStep);
 
   // const [currentStep] = useState(
   //   // setCurrentStep
@@ -140,9 +173,9 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, currentStepNumb
               stepNumber={key}
               {...item}
               onClick={onSelect || item.onSelect}
-              currentStepNumber={currentStepNumber}
+              currentStepNumber={currentStep}
               // isActive={currentStep === item.id}
-              isActive={key < currentStepNumber}
+              isActive={key < currentStep}
             />
           ))}
         </>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-// import { FormattedMessage } from "react-intl";
 
+// import { FormattedMessage } from "react-intl";
 import ConnectionStep from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
 import HeadTitle from "components/HeadTitle";
@@ -9,6 +9,8 @@ import HeadTitle from "components/HeadTitle";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateSource } from "hooks/services/useSourceHook";
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
 import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
@@ -27,6 +29,7 @@ export interface SwitchStepParams {
 
 const CreateSourcePage: React.FC = () => {
   useTrackPage(PageTrackingCodes.SOURCE_NEW);
+  const { push } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
@@ -65,6 +68,10 @@ const CreateSourcePage: React.FC = () => {
     // }
   };
 
+  const handleBackButton = () => {
+    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+  };
+
   return (
     <>
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
@@ -83,6 +90,7 @@ const CreateSourcePage: React.FC = () => {
               hasSuccess={successRequest}
               onClickBtn={clickBtnHandleStep}
               error={fetchingConnectorError}
+              onBack={handleBackButton}
             />
           )}
         </FormPageContent>

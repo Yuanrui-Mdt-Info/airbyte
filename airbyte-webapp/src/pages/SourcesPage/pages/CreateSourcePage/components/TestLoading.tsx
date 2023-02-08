@@ -81,8 +81,8 @@ const TestLoading: React.FC<Iprops> = ({ isLoading, type, onClickBtn }) => {
         {!isLoading && <Image src="/icons/finish-icon.png" alt="finish-icon" />}
       </Container>
       <ButtonRows>
-        <Button btnText="form.back" onClick={clickButton} type="cancel" />
-        <Button btnText="form.finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
+        <Button btnText="back" onClick={clickButton} type="cancel" />
+        <Button btnText="finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
       </ButtonRows>
     </>
   );

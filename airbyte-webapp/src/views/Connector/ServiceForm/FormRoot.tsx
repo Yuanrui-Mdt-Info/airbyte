@@ -41,6 +41,7 @@ interface FormRootProps {
   onStopTestingConnector?: () => void;
   onClickBtn?: (params: SwitchStepParams) => void;
   formValues?: Partial<ServiceFormValues>;
+  onBack?: () => void;
 }
 
 const FormRoot: React.FC<FormRootProps> = ({
@@ -54,6 +55,7 @@ const FormRoot: React.FC<FormRootProps> = ({
   onStopTestingConnector,
   onClickBtn,
   formValues,
+  onBack,
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
@@ -81,6 +83,7 @@ const FormRoot: React.FC<FormRootProps> = ({
           disabled={!(isValid && dirty)}
           formValues={formValues}
           formType={formType}
+          onBack={onBack}
         />
       )}
 

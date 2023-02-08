@@ -24,12 +24,16 @@ interface CreateConnectionContentProps {
   source: SourceRead;
   destination: DestinationRead;
   afterSubmitConnection?: (connection: WebBackendConnectionRead) => void;
+  onBack?: () => void;
+  onListenAfterSubmit?: (isSuccess: boolean) => void;
 }
 
 const CreateConnectionContent: React.FC<CreateConnectionContentProps> = ({
   source,
   destination,
   afterSubmitConnection,
+  onBack,
+  onListenAfterSubmit,
 }) => {
   const { mutateAsync: createConnection } = useCreateConnection();
   const analyticsService = useAnalyticsService();
@@ -107,6 +111,8 @@ const CreateConnectionContent: React.FC<CreateConnectionContentProps> = ({
         connection={connection}
         onDropDownSelect={onSelectFrequency}
         onSubmit={onSubmitConnectionStep}
+        onBack={onBack}
+        onListenAfterSubmit={onListenAfterSubmit}
         additionalSchemaControl={
           <Tooltip
             control={

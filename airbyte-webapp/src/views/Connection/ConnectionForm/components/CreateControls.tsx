@@ -8,6 +8,7 @@ interface CreateControlsProps {
   isSubmitting: boolean;
   isValid: boolean;
   errorMessage?: React.ReactNode;
+  onBack?: () => void;
 }
 
 const ButtonContainer = styled.div`
@@ -90,7 +91,7 @@ const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMessage, isValid }) => {
+const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMessage, isValid, onBack }) => {
   if (isSubmitting) {
     return (
       <LoadingContainer>
@@ -101,11 +102,6 @@ const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMess
       </LoadingContainer>
     );
   }
-
-  const goBack = () => {
-    console.log("goBack");
-  };
-
   return (
     <ButtonContainer>
       {errorMessage ? (
@@ -120,11 +116,11 @@ const CreateControls: React.FC<CreateControlsProps> = ({ isSubmitting, errorMess
         <div />
       )}
       <ButtonRows>
-        <BackButton type="button" onClick={goBack}>
+        <BackButton type="button" onClick={onBack}>
           <FormattedMessage id="form.button.back" />
         </BackButton>
         <SubmitButton type="submit" disabled={isSubmitting || !isValid}>
-          <FormattedMessage id="onboarding.setUpConnection" />
+          <FormattedMessage id="form.button.finishSetup" />
         </SubmitButton>
       </ButtonRows>
     </ButtonContainer>

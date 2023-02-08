@@ -189,6 +189,8 @@
   "form.button.back": "Back",
   "form.button.cancel": "Cancel",
   "form.button.finish": "Finish",
+  "form.button.finishSetup": "Finish Setup",
+  "form.button.returnToDashoard": "Return to Dashboard",
   "form.testing": "Testing your connection...",
   "form.source.validated": "Source validated!",
   "form.destination.validated": "Destination validated!",
@@ -198,6 +200,8 @@
   "form.header.subTitle": "Following the setup guide on the right to connect your data source to Daspire.",
   "form.select.existing.source": "Select from existing data source",
   "form.select.existing.destination": "Select from existing data destination",
+  "form.select.placeholder.source": "Select a source",
+  "form.select.placeholder.destination": "Select a destination",
 
   "preferences.headTitle": "Preferences",
   "preferences.title": "Specify your preferences",
@@ -379,6 +383,7 @@
   "connection.cancelSync": "Cancel Sync",
   "connection.cancelReset": "Cancel Reset",
   "connection.canceling": "Canceling...",
+  "connection.select.source": "Select your data source",
 
   "form.frequency": "Replication frequency",
   "form.frequency.placeholder": "Select a frequency",

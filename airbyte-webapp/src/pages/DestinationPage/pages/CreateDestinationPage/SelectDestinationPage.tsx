@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
@@ -31,6 +32,7 @@ export const ButtonRows = styled.div`
 
 const SelectDestinationCard: React.FC = () => {
   const { push } = useRouter();
+  const { formatMessage } = useIntl();
   const { selectDefinition, clearFormValues } = useDataCardContext();
   const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
 
@@ -45,7 +47,11 @@ const SelectDestinationCard: React.FC = () => {
       return;
     }
     clearFormValues();
-    push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`);
+    push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`, {
+      state: {
+        destinationDefinitionId: definitionId,
+      },
+    });
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
@@ -60,7 +66,15 @@ const SelectDestinationCard: React.FC = () => {
     <>
       <ConnectionStep lightMode type="destination" currentStepNumber={1} />
       <Container>
-        <DataPanel onSelect={afterSelect} data={destinationDefinitions} value={definitionId} type="destination" />
+        <DataPanel
+          onSelect={afterSelect}
+          data={destinationDefinitions}
+          value={definitionId}
+          type="destination"
+          title={formatMessage({
+            id: "form.setup.destination",
+          })}
+        />
         <ButtonRows>
           {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
           <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />

@@ -143,6 +143,8 @@ export interface ConnectionFormProps {
   successMessage?: React.ReactNode;
   onDropDownSelect?: (item: DropDownRow.IDataItem) => void;
   onCancel?: () => void;
+  onBack?: () => void;
+  onListenAfterSubmit?: (isSuccess: boolean) => void;
   onFormDirtyChanges?: (dirty: boolean) => void;
 
   /** Should be passed when connection is updated with withRefreshCatalog flag */
@@ -164,6 +166,8 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
   additionalSchemaControl,
   connection,
   onFormDirtyChanges,
+  onBack,
+  onListenAfterSubmit,
 }) => {
   const destDefinition = useGetDestinationDefinitionSpecification(connection.destination.destinationDefinitionId);
   const { clearFormChange } = useFormChangeTrackerService();
@@ -191,6 +195,7 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
       formValues.operations = mapFormPropsToOperation(values, connection.operations, workspace.workspaceId);
 
       setSubmitError(null);
+      onListenAfterSubmit && onListenAfterSubmit(true);
       try {
         const result = await onSubmit(formValues);
 
@@ -203,6 +208,7 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
 
         result?.onSubmitComplete?.();
       } catch (e) {
+        onListenAfterSubmit && onListenAfterSubmit(false);
         setSubmitError(e);
       }
     },
@@ -391,6 +397,7 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
                 errorMessage={
                   errorMessage || !isValid ? formatMessage({ id: "connectionForm.validation.error" }) : null
                 }
+                onBack={onBack}
               />
             </>
           )}

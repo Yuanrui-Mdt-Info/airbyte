@@ -137,6 +137,7 @@ export interface ServiceFormProps {
   isTestConnectionInProgress?: boolean;
   onStopTesting?: () => void;
   testConnector?: (v?: ServiceFormValues) => Promise<CheckConnectionRead>;
+  onBack?: () => void;
 }
 
 const ServiceForm: React.FC<ServiceFormProps> = (props) => {
@@ -158,6 +159,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     testConnector,
     selectedConnectorDefinitionSpecification,
     availableServices,
+    onBack,
   } = props;
 
   const specifications = useBuildInitialSchema(selectedConnectorDefinitionSpecification);
@@ -296,6 +298,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
             onRetest={testConnector ? async () => await testConnector() : undefined}
             formFields={formFields}
             formValues={formValues}
+            onBack={onBack}
           />
 
           {isOpenRequestModal && (

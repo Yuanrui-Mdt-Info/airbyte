@@ -5,8 +5,8 @@ import styled from "styled-components";
 import { Button } from "components";
 
 // import Button from "components/ButtonGroup/components/Button";
-import useRouter from "hooks/useRouter";
-import { RoutePaths } from "pages/routePaths";
+// import useRouter from "hooks/useRouter";
+// import { RoutePaths } from "pages/routePaths";
 import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 
 // import { useServiceForm } from "../serviceFormContext";
@@ -27,6 +27,7 @@ interface FormRootProps {
   // onCancelTesting?: () => void;
   currentStep: string; // selecting|creating|Testing
   onClickBtn?: (params: SwitchStepParams) => void;
+  onBack?: () => void;
 }
 
 const ButtonContainer = styled.div`
@@ -71,17 +72,18 @@ export const ButtonRows = styled.div`
 const FormRootNew: React.FC<FormRootProps> = ({
   // isTestConnectionInProgress,
   isSubmitting,
-  formType,
+  // formType,
   hasSuccess,
   errorMessage,
   fetchingConnectorError,
   disabled,
+  onBack,
   // onCancelTesting,
   // currentStep,
   // onClickBtn,
   // formValues,
 }) => {
-  const { push } = useRouter();
+  // const { push } = useRouter();
 
   if (isSubmitting) {
     //  return <TestingConnectionSpinner isCancellable={isTestConnectionInProgress} onCancelTesting={onCancelTesting} />;
@@ -94,13 +96,14 @@ const FormRootNew: React.FC<FormRootProps> = ({
   if (errorMessage) {
   }
 
-  const goBack = () => {
-    const path =
-      formType === "source"
-        ? `/${RoutePaths.Source}/${RoutePaths.SelectSource}`
-        : `/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`;
-    push(path);
-  };
+  // const goBack = () => {
+  //   // const path =
+  //   //   formType === "source"
+  //   //     ? `/${RoutePaths.Source}/${RoutePaths.SelectSource}`
+  //   //     : `/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`;
+  //   // push(path);
+  //   onBack&&onBack()
+  // };
 
   // id={`onboarding.${formType}SetUp.buttonText`}
   return (
@@ -108,7 +111,7 @@ const FormRootNew: React.FC<FormRootProps> = ({
       {errorMessage && !fetchingConnectorError && <TestingConnectionError errorMessage={errorMessage} />}
       {fetchingConnectorError && <FetchingConnectorError />}
       <ButtonRows>
-        <BackButton type="button" onClick={goBack}>
+        <BackButton type="button" onClick={onBack}>
           <FormattedMessage id="form.button.back" />
         </BackButton>
         <SubmitButton type="submit" disabled={disabled}>

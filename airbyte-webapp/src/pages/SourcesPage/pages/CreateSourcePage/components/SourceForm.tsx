@@ -28,6 +28,7 @@ interface SourceFormProps {
   hasSuccess?: boolean;
   error?: FormError | null;
   onClickBtn?: (params: SwitchStepParams) => void;
+  onBack?: () => void;
 }
 
 const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
@@ -45,16 +46,17 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   hasSuccess,
   afterSelectConnector,
   onClickBtn,
+  onBack,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { formValues, selectDefinition } = useDataCardContext();
-  if (!selectDefinition.definitionId) {
-    // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
-  }
+  const { formValues } = useDataCardContext();
+  // if (!selectDefinition.definitionId) {
+  //   // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+  // }
 
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
-    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : selectDefinition.definitionId // null
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
   );
 
   const {
@@ -105,6 +107,7 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       title={<FormattedMessage id="onboarding.sourceSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
       onClickBtn={onClickBtn}
+      onBack={onBack}
     />
   );
 };

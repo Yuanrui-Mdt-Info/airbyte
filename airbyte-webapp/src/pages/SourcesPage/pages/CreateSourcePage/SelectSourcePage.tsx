@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
@@ -31,6 +32,7 @@ export const ButtonRows = styled.div`
 
 const SelectNewSourceCard: React.FC = () => {
   const { push } = useRouter();
+  const { formatMessage } = useIntl();
   const { selectDefinition, clearFormValues } = useDataCardContext();
   const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
   const { sourceDefinitions } = useSourceDefinitionList();
@@ -44,7 +46,11 @@ const SelectNewSourceCard: React.FC = () => {
       return;
     }
     clearFormValues();
-    push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`);
+    push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`, {
+      state: {
+        sourceDefinitionId: definitionId,
+      },
+    });
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
@@ -58,7 +64,15 @@ const SelectNewSourceCard: React.FC = () => {
     <>
       <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <Container>
-        <DataPanel onSelect={afterSelect} data={sourceDefinitions} value={definitionId} type="source" />
+        <DataPanel
+          onSelect={afterSelect}
+          data={sourceDefinitions}
+          value={definitionId}
+          type="source"
+          title={formatMessage({
+            id: "form.setup.source",
+          })}
+        />
         <ButtonRows>
           {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
           <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />

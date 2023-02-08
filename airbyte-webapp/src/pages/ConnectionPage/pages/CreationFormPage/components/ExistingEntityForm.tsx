@@ -1,10 +1,10 @@
-import { Field, FieldProps, Form, Formik } from "formik";
+// import { Field, FieldProps, Form, Formik } from "formik";
 import React, { useMemo } from "react";
 import { FormattedMessage } from "react-intl"; // useIntl
 import styled from "styled-components";
-import * as yup from "yup";
+// import * as yup from "yup";
 
-import { ControlLabels, DropDown } from "components"; // Button
+import { DropDown } from "components"; // Button ,ControlLabels
 // import { Card } from "components/base/Card";
 import { ConnectorIcon } from "components/ConnectorIcon";
 
@@ -19,18 +19,19 @@ interface IProps {
   type: "source" | "destination";
   onSubmit: (id: string) => void;
   value: string;
+  placeholder?: string;
 }
 
-const FormContent = styled(Form)`
-  padding: 22px 27px 23px 0px;
-`;
+// const FormContent = styled(Form)`
+//   padding: 22px 27px 23px 0px;
+// `;
 
 const FormTitle = styled.div`
   font-size: 24px;
   line-height: 30px;
   color: #27272a;
   font-weight: 500;
-  margin-top: 38px;
+  margin: 38px 0 20px 0;
 `;
 
 // const BottomBlock = styled.div`
@@ -46,11 +47,11 @@ const FormTitle = styled.div`
 //   line-height: 18px;
 // `;
 
-const existingEntityValidationSchema = yup.object().shape({
-  entityId: yup.string().required("form.empty.error"),
-});
+// const existingEntityValidationSchema = yup.object().shape({
+//   entityId: yup.string().required("form.empty.error"),
+// });
 
-const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
+const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value, placeholder }) => {
   // const { formatMessage } = useIntl();
   const { sources } = useSourceList();
   const { sourceDefinitions } = useSourceDefinitionList();
@@ -86,13 +87,16 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
     return null;
   }
 
-  const initialValues = { entityId: value };
+  // const initialValues = { entityId: value };
   return (
     <>
       {/* <Card title={<FormattedMessage id={`connectionForm.${type}Existing`} />}> */}
       <FormTitle>
         <FormattedMessage id={`form.select.existing.${type}`} />
       </FormTitle>
+
+      {/*
+      TODO: Anet => The Select Value cannot be reset outside the form, so the Formik component is deprecated.
       <Formik
         initialValues={initialValues}
         validationSchema={existingEntityValidationSchema}
@@ -111,28 +115,29 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value }) => {
                 // label={formatMessage({
                 //   id: `connectionForm.${type}Title`,
                 // })}
-                >
-                  <DropDown
-                    {...field}
-                    className={style.selectDropdown}
-                    options={dropDownData}
-                    placeholder={`Select a ${type}`}
-                    onChange={(item: { value: string }) => {
-                      onSubmit(item.value);
-                      setFieldValue(field.name, item.value);
-                    }}
-                  />
-                </ControlLabels>
+                > */}
+      <DropDown
+        // {...field}
+        value={value}
+        className={style.selectDropdown}
+        options={dropDownData}
+        placeholder={placeholder}
+        onChange={(item: { value: string }) => {
+          onSubmit(item.value);
+          //  setFieldValue(field.name, item.value);
+        }}
+      />
+      {/* </ControlLabels>
               )}
-            </Field>
-            {/* <BottomBlock>
+            </Field> */}
+      {/* <BottomBlock>
                 <Button disabled={isSubmitting} type="submit">
                   <FormattedMessage id={`connectionForm.${type}Use`} />
                 </Button>
               </BottomBlock> */}
-          </FormContent>
+      {/* </FormContent>
         )}
-      </Formik>
+      </Formik> */}
       {/* </Card> */}
       {/* <PaddingBlock> <FormattedMessage id="onboarding.or" /> </PaddingBlock>*/}
     </>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { LoadingPage, PageTitle } from "components";
-import ConnectionBlock from "components/ConnectionBlock";
+// import ConnectionBlock from "components/ConnectionBlock";
 import ConnectionStep from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
 import CreateConnectionContent from "components/CreateConnectionContent";
@@ -14,6 +14,8 @@ import { useFormChangeTrackerService } from "hooks/services/FormChangeTracker";
 import { useGetDestination } from "hooks/services/useDestinationHook";
 import { useGetSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
+import TestLoading from "pages/ConnectionPage/pages/CreationFormPage/components/TestLoading";
+import { RoutePaths } from "pages/routePaths";
 import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
 import { useSourceDefinition } from "services/connector/SourceDefinitionService";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
@@ -33,6 +35,7 @@ export enum StepsTypes {
   CREATE_ENTITY = "createEntity",
   CREATE_CONNECTOR = "createConnector",
   CREATE_CONNECTION = "createConnection",
+  TEST_CONNECTION = "testConnection",
 }
 
 export enum EntityStepsTypes {
@@ -107,7 +110,9 @@ export const CreationFormPage: React.FC = () => {
     hasSourceId(location.state) ? EntityStepsTypes.DESTINATION : EntityStepsTypes.SOURCE
   );
 
-  const { destinationDefinition, sourceDefinition, source, destination } = usePreloadData();
+  const [isLoading, setLoadingStatus] = useState(true);
+
+  const { source, destination } = usePreloadData(); // destinationDefinition, sourceDefinition,
 
   const onSelectExistingSource = (id: string) => {
     clearAllFormChanges();
@@ -133,8 +138,18 @@ export const CreationFormPage: React.FC = () => {
     setCurrentStep(StepsTypes.CREATE_CONNECTION);
   };
 
+  const handleBackButton = () => {
+    push(`../${RoutePaths.SelectConnection}`, {
+      state: {
+        sourceId: source?.sourceId,
+        destinationId: destination?.destinationId,
+        currentStepNumber: 2,
+      },
+    });
+  };
+
   const renderStep = () => {
-    console.log(currentStep === StepsTypes.CREATE_ENTITY || currentStep === StepsTypes.CREATE_CONNECTOR);
+    console.log("currentStep", currentStep, "currentEntityStep", currentEntityStep);
     if (currentStep === StepsTypes.CREATE_ENTITY || currentStep === StepsTypes.CREATE_CONNECTOR) {
       if (currentEntityStep === EntityStepsTypes.SOURCE) {
         return (
@@ -152,6 +167,12 @@ export const CreationFormPage: React.FC = () => {
                   setCurrentEntityStep(EntityStepsTypes.CONNECTION);
                   setCurrentStep(StepsTypes.CREATE_CONNECTION);
                 }
+              }}
+              onClickBtn={() => {
+                console.log(222);
+              }}
+              onBack={() => {
+                console.log("onBack");
               }}
             />
           </>
@@ -174,6 +195,9 @@ export const CreationFormPage: React.FC = () => {
     }
 
     const afterSubmitConnection = (connection: WebBackendConnectionRead) => {
+      setLoadingStatus(false);
+
+      return;
       switch (type) {
         case EntityStepsTypes.DESTINATION:
           push(`../${source?.sourceId}`);
@@ -187,16 +211,39 @@ export const CreationFormPage: React.FC = () => {
       }
     };
 
+    const onListenAfterSubmit = (isSuccess: boolean) => {
+      if (isSuccess) {
+        setCurrentStep(StepsTypes.TEST_CONNECTION);
+        setLoadingStatus(true);
+      }
+      console.log("isSuccess", isSuccess);
+    };
+
+    const hanldeFinishButton = () => {
+      if (currentStep === StepsTypes.TEST_CONNECTION) {
+        push(`/${RoutePaths.Connections}`);
+      }
+    };
+
     if (!source || !destination) {
       console.error("unexpected state met");
       return <LoadingPage />;
     }
 
+    if (
+      currentStepNumber === 3 &&
+      (currentStep === StepsTypes.TEST_CONNECTION || currentEntityStep === EntityStepsTypes.CONNECTION)
+    ) {
+      return <TestLoading type={type} isLoading={isLoading} onBack={handleBackButton} onFinish={hanldeFinishButton} />;
+    }
+
     return (
       <CreateConnectionContent
+        onBack={handleBackButton}
         source={source}
         destination={destination}
         afterSubmitConnection={afterSubmitConnection}
+        onListenAfterSubmit={onListenAfterSubmit}
       />
     );
   };
@@ -253,7 +300,7 @@ export const CreationFormPage: React.FC = () => {
           />
         )}
         <FormPageContent big={currentStep === StepsTypes.CREATE_CONNECTION}>
-          {currentStep !== StepsTypes.CREATE_CONNECTION && (!!source || !!destination) && (
+          {/* {currentStep !== StepsTypes.CREATE_CONNECTION && (!!source || !!destination) && (
             <ConnectionBlock
               itemFrom={source ? { name: source.name, icon: sourceDefinition?.icon } : undefined}
               itemTo={
@@ -265,7 +312,7 @@ export const CreationFormPage: React.FC = () => {
                   : undefined
               }
             />
-          )}
+          )} */}
           {renderStep()}
         </FormPageContent>
       </ConnectorDocumentationWrapper>
