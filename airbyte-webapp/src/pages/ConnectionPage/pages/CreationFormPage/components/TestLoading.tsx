@@ -81,7 +81,7 @@ const TestLoading: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) =>
         )}
         {((!isLoading && type === "connection") || type !== "connection") && (
           <Button
-            btnText={type === "connection" ? "returnToDashoard" : "finish"}
+            btnText={type === "connection" ? "returnToDashoard" : "continue"}
             onClick={onFinish}
             type={!isLoading ? "active" : "disabled"}
           />

@@ -283,7 +283,7 @@ const SelectNewConnectionCard: React.FC = () => {
         )}
 
         <ButtonRows>
-          {currentStepNumber === 2 && <Button btnText="cancel" onClick={clickCancel} type="cancel" />}
+          {currentStepNumber === 2 && <Button btnText="back" onClick={clickCancel} type="cancel" />}
           <Button
             btnText="selectContinue"
             onClick={clickSelect}

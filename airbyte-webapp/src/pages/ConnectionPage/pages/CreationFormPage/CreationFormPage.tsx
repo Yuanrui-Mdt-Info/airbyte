@@ -264,6 +264,11 @@ export const CreationFormPage: React.FC = () => {
 
     const afterSubmitConnection = (connection: WebBackendConnectionRead) => {
       setLoadingStatus(false);
+      push("", {
+        state: {
+          currentStepNumber: 4,
+        },
+      });
 
       return;
       switch (type) {

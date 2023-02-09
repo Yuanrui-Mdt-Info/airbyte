@@ -54,11 +54,11 @@ export const SingleText = styled.div`
   line-height: 30px;
 `;
 
-export const hasSourceId = (state: unknown): state is { sourceId: string } => {
+const hasSourceId = (state: unknown): state is { sourceId: string } => {
   return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
 };
 
-export const hasDestinationId = (state: unknown): state is { destinationId: string } => {
+const hasDestinationId = (state: unknown): state is { destinationId: string } => {
   return (
     typeof state === "object" &&
     state !== null &&
@@ -66,7 +66,7 @@ export const hasDestinationId = (state: unknown): state is { destinationId: stri
   );
 };
 
-export const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
+const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
   return (
     typeof state === "object" &&
     state !== null &&
@@ -150,10 +150,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
                 <FormattedMessage id="onboarding.addSource" />
               ),
           },
-          // {
-          //   id: StepsTypes.CREATE_CONNECTION,
-          //   name: <FormattedMessage id="onboarding.configurations" />,
-          // },
         ];
 
   const StepComponents = () => {

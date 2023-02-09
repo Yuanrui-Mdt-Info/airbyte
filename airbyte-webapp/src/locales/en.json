@@ -191,6 +191,7 @@
   "form.button.finish": "Finish",
   "form.button.finishSetup": "Finish Setup",
   "form.button.returnToDashoard": "Return to Dashboard",
+  "form.button.continue": "Continue",
   "form.testing": "Testing your connection...",
   "form.source.validated": "Source validated!",
   "form.destination.validated": "Destination validated!",
