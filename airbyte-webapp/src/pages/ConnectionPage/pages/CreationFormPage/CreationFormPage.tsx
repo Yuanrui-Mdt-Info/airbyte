@@ -16,8 +16,10 @@ import { useGetSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
 import TestLoading from "pages/ConnectionPage/pages/CreationFormPage/components/TestLoading";
 import { RoutePaths } from "pages/routePaths";
-import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
-import { useSourceDefinition } from "services/connector/SourceDefinitionService";
+// import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
+// import { useSourceDefinition } from "services/connector/SourceDefinitionService";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
+import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 
 import {
@@ -72,15 +74,17 @@ function usePreloadData(): {
 } {
   const { location } = useRouter();
   const source = useGetSource(hasSourceId(location.state) ? location.state.sourceId : null);
-  const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
+
+  // const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
   const destination = useGetDestination(hasDestinationId(location.state) ? location.state.destinationId : null);
-  const destinationDefinition = useDestinationDefinition(destination?.destinationDefinitionId);
-  return { source, sourceDefinition, destination, destinationDefinition };
+  // const destinationDefinition = useDestinationDefinition(destination?.destinationDefinitionId);
+  return { source, destination }; // sourceDefinition,destinationDefinition
 }
 
 export const CreationFormPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_NEW);
   const { location, push } = useRouter();
+  console.warn("CreationFormPage ----------- ", location.state);
   const { clearAllFormChanges } = useFormChangeTrackerService();
   const [currentStepNumber] = useState<number>(
     hasCurrentStepNumber(location.state) ? location.state.currentStepNumber : 1
@@ -107,10 +111,16 @@ export const CreationFormPage: React.FC = () => {
   );
 
   const [currentEntityStep, setCurrentEntityStep] = useState(
-    hasSourceId(location.state) ? EntityStepsTypes.DESTINATION : EntityStepsTypes.SOURCE
+    // hasSourceId(location.state) ? EntityStepsTypes.DESTINATION : EntityStepsTypes.SOURCE
+    currentStepNumber === 1
+      ? EntityStepsTypes.SOURCE
+      : currentStepNumber === 2
+      ? EntityStepsTypes.DESTINATION
+      : EntityStepsTypes.CONNECTION
   );
 
   const [isLoading, setLoadingStatus] = useState(true);
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
 
   const { source, destination } = usePreloadData(); // destinationDefinition, sourceDefinition,
 
@@ -139,13 +149,23 @@ export const CreationFormPage: React.FC = () => {
   };
 
   const handleBackButton = () => {
-    push(`../${RoutePaths.SelectConnection}`, {
-      state: {
-        sourceId: source?.sourceId,
-        destinationId: destination?.destinationId,
-        currentStepNumber: 2,
-      },
-    });
+    if (currentEntityStep === EntityStepsTypes.SOURCE || currentEntityStep === EntityStepsTypes.DESTINATION) {
+      setCurrentStep(StepsTypes.CREATE_ENTITY);
+      push("", {
+        state: {
+          ...(location.state as Record<string, unknown>),
+        },
+      });
+    }
+
+    if (currentEntityStep === EntityStepsTypes.CONNECTION) {
+      push(`../${RoutePaths.SelectConnection}`, {
+        state: {
+          ...(location.state as Record<string, unknown>),
+          currentStepNumber: 2,
+        },
+      });
+    }
   };
 
   const renderStep = () => {
@@ -159,20 +179,44 @@ export const CreationFormPage: React.FC = () => {
             )}
 
             <ConnectionCreateSourceForm
+              fetchingConnectorError={fetchingConnectorError}
               afterSubmit={() => {
-                if (type === "connection") {
-                  setCurrentEntityStep(EntityStepsTypes.DESTINATION);
-                  setCurrentStep(StepsTypes.CREATE_CONNECTOR);
-                } else {
-                  setCurrentEntityStep(EntityStepsTypes.CONNECTION);
-                  setCurrentStep(StepsTypes.CREATE_CONNECTION);
+                setLoadingStatus(false);
+                // push("", {
+                //   state: {
+                //     ...(location.state as Record<string, unknown>),
+                //     // sourceDefinitionId: sourceDefinition?.sourceDefinitionId,
+                //     currentStepNumber: 1,
+                //   },
+                // });
+                // if (type === "connection") {
+                //   setCurrentEntityStep(EntityStepsTypes.DESTINATION);
+                //   setCurrentStep(StepsTypes.CREATE_CONNECTOR);
+                // } else {
+                //   setCurrentEntityStep(EntityStepsTypes.CONNECTION);
+                //   setCurrentStep(StepsTypes.CREATE_CONNECTION);
+                // }
+              }}
+              onClickBtn={({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
+                console.log("onClickBtn----------------------", currentStep, isLoading, fetchingConnectorError);
+                // setCurrentEntityStep(EntityStepsTypes.DESTINATION);
+                if (currentStep === "testing") {
+                  setCurrentStep(StepsTypes.TEST_CONNECTION);
+                  setLoadingStatus(true);
+                }
+                if (currentStep === "creating") {
+                  setCurrentStep(StepsTypes.CREATE_ENTITY);
+                  setFetchingConnectorError(fetchingConnectorError || null);
                 }
               }}
-              onClickBtn={() => {
-                console.log(222);
-              }}
               onBack={() => {
-                console.log("onBack");
+                push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
+                  state: {
+                    ...(location.state as Record<string, unknown>),
+                    // sourceDefinitionId: sourceDefinition?.sourceDefinitionId,
+                    currentStepNumber: 1,
+                  },
+                });
               }}
             />
           </>
@@ -184,9 +228,33 @@ export const CreationFormPage: React.FC = () => {
               <ExistingEntityForm type="destination" onSubmit={onSelectExistingDestination} value="" />
             )}
             <ConnectionCreateDestinationForm
+              fetchingConnectorError={fetchingConnectorError}
               afterSubmit={() => {
-                setCurrentEntityStep(EntityStepsTypes.CONNECTION);
-                setCurrentStep(StepsTypes.CREATE_CONNECTION);
+                setLoadingStatus(false);
+                // setCurrentEntityStep(EntityStepsTypes.CONNECTION);
+                // setCurrentStep(StepsTypes.CREATE_CONNECTION);
+              }}
+              onClickBtn={({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
+                console.log("onClickBtn----------------------", currentStep, isLoading, fetchingConnectorError);
+                //  setCurrentEntityStep(EntityStepsTypes.DESTINATION);
+                if (currentStep === "testing") {
+                  setCurrentStep(StepsTypes.TEST_CONNECTION);
+                  setLoadingStatus(true);
+                }
+                if (currentStep === "creating") {
+                  setCurrentStep(StepsTypes.CREATE_ENTITY);
+                  setFetchingConnectorError(fetchingConnectorError || null);
+                }
+              }}
+              onBack={() => {
+                push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
+                  state: {
+                    // destinationDefinitionId: destinationDefinition?.destinationDefinitionId,
+                    // sourceDefinitionId: sourceDefinition?.sourceDefinitionId,
+                    ...(location.state as Record<string, unknown>),
+                    currentStepNumber: 2,
+                  },
+                });
               }}
             />
           </>
@@ -220,21 +288,47 @@ export const CreationFormPage: React.FC = () => {
     };
 
     const hanldeFinishButton = () => {
-      if (currentStep === StepsTypes.TEST_CONNECTION) {
+      if (currentEntityStep === EntityStepsTypes.SOURCE) {
+        push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
+          state: {
+            ...(location.state as Record<string, unknown>),
+            // sourceDefinitionId: sourceDefinition?.sourceDefinitionId,
+            currentStepNumber: 2,
+          },
+        });
+      }
+
+      if (currentEntityStep === EntityStepsTypes.DESTINATION) {
+        setCurrentStep(StepsTypes.CREATE_CONNECTION);
+        setCurrentEntityStep(EntityStepsTypes.CONNECTION);
+        push("", {
+          state: {
+            ...(location.state as Record<string, unknown>),
+            // sourceDefinitionId: sourceDefinition?.sourceDefinitionId,
+            currentStepNumber: 3,
+          },
+        });
+      }
+
+      if (currentEntityStep === EntityStepsTypes.CONNECTION) {
         push(`/${RoutePaths.Connections}`);
       }
     };
 
+    if (currentStep === StepsTypes.TEST_CONNECTION) {
+      return (
+        <TestLoading
+          type={currentEntityStep}
+          isLoading={isLoading}
+          onBack={handleBackButton}
+          onFinish={hanldeFinishButton}
+        />
+      );
+    }
+
     if (!source || !destination) {
       console.error("unexpected state met");
       return <LoadingPage />;
-    }
-
-    if (
-      currentStepNumber === 3 &&
-      (currentStep === StepsTypes.TEST_CONNECTION || currentEntityStep === EntityStepsTypes.CONNECTION)
-    ) {
-      return <TestLoading type={type} isLoading={isLoading} onBack={handleBackButton} onFinish={hanldeFinishButton} />;
     }
 
     return (

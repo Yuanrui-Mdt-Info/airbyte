@@ -21,7 +21,7 @@ import styles from "./DocumentationPanel.module.scss";
 export const DocumentationPanel: React.FC = () => {
   const { formatMessage } = useIntl();
   const config = useConfig();
-  const { setDocumentationPanelOpen, documentationUrl } = useDocumentationPanelContext();
+  const { setDocumentationPanelOpen, documentationUrl, formType } = useDocumentationPanelContext();
   const { data: docs, isLoading } = useDocumentation(documentationUrl);
 
   // @ts-expect-error rehype-slug currently has type conflicts due to duplicate vfile dependencies
@@ -49,7 +49,8 @@ export const DocumentationPanel: React.FC = () => {
     setDocumentationPanelOpen(false);
   }, [setDocumentationPanelOpen, location.pathname]);
 
-  const { selectDefinition } = useDataCardContext();
+  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
+  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
 
   return isLoading || documentationUrl === "" ? (
     <LoadingPage />

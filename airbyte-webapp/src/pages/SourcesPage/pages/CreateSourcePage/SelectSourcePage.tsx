@@ -33,8 +33,8 @@ export const ButtonRows = styled.div`
 const SelectNewSourceCard: React.FC = () => {
   const { push } = useRouter();
   const { formatMessage } = useIntl();
-  const { selectDefinition, clearFormValues } = useDataCardContext();
-  const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
+  const { selectSourceDefinition, clearSourceServiceValues } = useDataCardContext();
+  const [definitionId, setDefinitionId] = useState<string>(selectSourceDefinition.definitionId);
   const { sourceDefinitions } = useSourceDefinitionList();
 
   // const clickCancel = () => {
@@ -45,7 +45,7 @@ const SelectNewSourceCard: React.FC = () => {
     if (!definitionId) {
       return;
     }
-    clearFormValues();
+    clearSourceServiceValues();
     push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`, {
       state: {
         sourceDefinitionId: definitionId,

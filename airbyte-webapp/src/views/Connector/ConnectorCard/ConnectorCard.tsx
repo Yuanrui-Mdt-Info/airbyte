@@ -52,7 +52,7 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   // const [errorStatusRequest, setErrorStatusRequest] = useState<Error | null>(null);
 
   const { testConnector, isTestConnectionInProgress, onStopTesting, error, reset } = useTestConnector(props);
-  const { setFormValues } = useDataCardContext();
+  const { setSourceServiceValues, setDestinationServiceValues } = useDataCardContext();
   // const { push } = useRouter();
 
   useEffect(() => {
@@ -70,7 +70,11 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
         currentStep: "testing",
       });
 
-    setFormValues(values);
+    if (props.formType === "source") {
+      setSourceServiceValues(values);
+    } else {
+      setDestinationServiceValues(values);
+    }
 
     // setErrorStatusRequest(null);
 

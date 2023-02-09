@@ -52,9 +52,9 @@ export const Image = styled(ConnectorIcon)`
   border-radius: 18px;
 `;
 
-const FormHeaderBox: React.FC<BoxProps> = () => {
-  const { selectDefinition } = useDataCardContext();
-
+const FormHeaderBox: React.FC<BoxProps> = ({ formType }) => {
+  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
+  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
   return (
     <FormHeader>
       <ImageBox>

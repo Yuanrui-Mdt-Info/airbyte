@@ -5,7 +5,7 @@ export type DocumentationPanelContext = ReturnType<typeof useDocumentationPanelS
 export const useDocumentationPanelState = () => {
   const [documentationPanelOpen, setDocumentationPanelOpen] = useState(false);
   const [documentationUrl, setDocumentationUrlState] = useState("");
-
+  const [formType, setFormType] = useState<string>("source");
   /* Ad blockers prevent the Google Ads docs .md file from rendering.  Because these URLs are
    * standardized, we work around this without changing the main file URL by:
    *   1. Changing the name of the .md in the Gradle build
@@ -23,6 +23,8 @@ export const useDocumentationPanelState = () => {
     setDocumentationPanelOpen,
     documentationUrl,
     setDocumentationUrl,
+    formType,
+    setFormType,
   };
 };
 

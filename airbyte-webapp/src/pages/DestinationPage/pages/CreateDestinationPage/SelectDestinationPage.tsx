@@ -33,8 +33,8 @@ export const ButtonRows = styled.div`
 const SelectDestinationCard: React.FC = () => {
   const { push } = useRouter();
   const { formatMessage } = useIntl();
-  const { selectDefinition, clearFormValues } = useDataCardContext();
-  const [definitionId, setDefinitionId] = useState<string>(selectDefinition.definitionId);
+  const { selectDestinationDefinition, clearDestinationServiceValues } = useDataCardContext();
+  const [definitionId, setDefinitionId] = useState<string>(selectDestinationDefinition.definitionId);
 
   const { destinationDefinitions } = useDestinationDefinitionList();
 
@@ -46,7 +46,7 @@ const SelectDestinationCard: React.FC = () => {
     if (!definitionId) {
       return;
     }
-    clearFormValues();
+    clearDestinationServiceValues();
     push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`, {
       state: {
         destinationDefinitionId: definitionId,

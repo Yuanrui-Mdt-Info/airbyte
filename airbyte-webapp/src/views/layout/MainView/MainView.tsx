@@ -40,7 +40,8 @@ const MainView: React.FC = (props) => {
   const isSidebar =
     !pathname.split("/").includes(RoutePaths.Payment) &&
     !pathname.split("/").includes(RoutePaths.PaymentError) &&
-    !pathname.split("/").includes(RoutePaths.SourceNew);
+    !pathname.split("/").includes(RoutePaths.SourceNew) &&
+    !pathname.split("/").includes(RoutePaths.ConnectionNew);
 
   const isUpgradePlanBar = (): boolean => {
     let showUpgradePlanBar = false;

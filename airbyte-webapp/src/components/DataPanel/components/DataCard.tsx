@@ -9,6 +9,7 @@ import { Connector, ConnectorDefinition } from "core/domain/connector";
 interface CardProps {
   checked: boolean;
   data: ConnectorDefinition;
+  type: "source" | "destination";
   onClick: (data: ConnectorDefinition) => void;
 }
 
@@ -44,8 +45,8 @@ export const Image = styled(ConnectorIcon)`
   margin-bottom: 6px;
 `;
 
-const DataCard: React.FC<CardProps> = ({ data, onClick, checked }) => {
-  const { setSelectDefinition } = useDataCardContext();
+const DataCard: React.FC<CardProps> = ({ data, onClick, checked, type }) => {
+  const { setSourceSelectDefinition, setDestinationSelectDefinition } = useDataCardContext();
 
   const clickBox = () => {
     onClick(data);
@@ -54,7 +55,11 @@ const DataCard: React.FC<CardProps> = ({ data, onClick, checked }) => {
       icon: data.icon,
       name: data.name,
     };
-    setSelectDefinition(obj);
+    if (type === "source") {
+      setSourceSelectDefinition(obj);
+    } else {
+      setDestinationSelectDefinition(obj);
+    }
   };
 
   return (

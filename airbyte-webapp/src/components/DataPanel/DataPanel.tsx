@@ -8,7 +8,7 @@ import DataCard from "./components/DataCard";
 interface SourcePanelProps {
   value?: string;
   onSelect: (data: ConnectorDefinition) => void;
-  type: "destination" | "source";
+  type: "source" | "destination";
   data: ConnectorDefinition[];
   title?: string;
 }
@@ -31,13 +31,19 @@ export const BoxList = styled.div`
   flex-wrap: wrap;
 `;
 
-const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title }) => {
+const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title, type }) => {
   return (
     <Panel>
       <PanelTitle>{title}</PanelTitle>
       <BoxList>
         {data.map((item) => (
-          <DataCard data={item} key={Connector.id(item)} onClick={onSelect} checked={Connector.id(item) === value} />
+          <DataCard
+            type={type}
+            data={item}
+            key={Connector.id(item)}
+            onClick={onSelect}
+            checked={Connector.id(item) === value}
+          />
         ))}
       </BoxList>
     </Panel>

@@ -78,8 +78,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
   const { location } = useRouter(); // push
   const locationType = location.pathname.split("/")[1];
 
-  console.log(location.state);
-
   const type: EntityStepsTypes =
     locationType === "connections"
       ? EntityStepsTypes.CONNECTION
@@ -105,10 +103,8 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
         ? 3
         : 1
     );
-    console.log("change currentStep", currentStep);
+    // console.log("change currentStep", currentStep);
   }, [hasSourceId, hasDestinationId, hasCurrentStepNumber, location]);
-
-  console.log("currentStep", currentStep);
 
   // const [currentStep] = useState(
   //   // setCurrentStep

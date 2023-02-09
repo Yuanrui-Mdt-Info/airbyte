@@ -5,14 +5,24 @@ import { ConnectionConfiguration } from "core/domain/connection";
 import { useCreateDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
 import { DestinationForm } from "pages/DestinationPage/pages/CreateDestinationPage/components/DestinationForm";
+import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
+import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 
 interface ConnectionCreateDestinationFormProps {
   afterSubmit: () => void;
+  onBack?: () => void;
+  onClickBtn?: (params: SwitchStepParams) => void;
+  fetchingConnectorError?: FormError | null;
 }
 
-export const ConnectionCreateDestinationForm: React.FC<ConnectionCreateDestinationFormProps> = ({ afterSubmit }) => {
+export const ConnectionCreateDestinationForm: React.FC<ConnectionCreateDestinationFormProps> = ({
+  afterSubmit,
+  onBack,
+  onClickBtn,
+  fetchingConnectorError,
+}) => {
   const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
 
@@ -58,6 +68,9 @@ export const ConnectionCreateDestinationForm: React.FC<ConnectionCreateDestinati
       onSubmit={onSubmitDestinationForm}
       destinationDefinitions={destinationDefinitions}
       hasSuccess={successRequest}
+      onBack={onBack}
+      error={fetchingConnectorError}
+      onClickBtn={onClickBtn}
     />
   );
 };

@@ -10,32 +10,57 @@ export interface SelectDefinition {
 
 export type DataCardContext = ReturnType<typeof useDataCardState>;
 export const useDataCardState = () => {
-  const [formValues, setFormValues] = useState<Partial<ServiceFormValues>>();
-  const [selectDefinition, setSelectDefinition] = useState<SelectDefinition>({
+  const [destinationServiceValues, setDestinationServiceValues] = useState<Partial<ServiceFormValues>>();
+  const [sourceServiceValues, setSourceServiceValues] = useState<Partial<ServiceFormValues>>();
+  const [selectSourceDefinition, setSourceSelectDefinition] = useState<SelectDefinition>({
     definitionId: "",
     icon: "",
     name: "",
   });
 
-  const clearFormValues = useCallback(() => {
-    setFormValues({});
-  }, [setFormValues]);
+  const [selectDestinationDefinition, setDestinationSelectDefinition] = useState<SelectDefinition>({
+    definitionId: "",
+    icon: "",
+    name: "",
+  });
 
-  const clearSelectDefinition = useCallback(() => {
-    setSelectDefinition({
+  const clearSourceServiceValues = useCallback(() => {
+    setSourceServiceValues({});
+  }, [setSourceServiceValues]);
+
+  const clearDestinationServiceValues = useCallback(() => {
+    setDestinationServiceValues({});
+  }, [setDestinationServiceValues]);
+
+  const clearSourceSelectDefinition = useCallback(() => {
+    setSourceSelectDefinition({
       definitionId: "",
       icon: "",
       name: "",
     });
-  }, [setFormValues]);
+  }, [setSourceSelectDefinition]);
+
+  const clearDestinationSelectDefinition = useCallback(() => {
+    setDestinationSelectDefinition({
+      definitionId: "",
+      icon: "",
+      name: "",
+    });
+  }, [setDestinationSelectDefinition]);
 
   return {
-    selectDefinition,
-    setSelectDefinition,
-    formValues,
-    setFormValues,
-    clearFormValues,
-    clearSelectDefinition,
+    selectSourceDefinition,
+    selectDestinationDefinition,
+    sourceServiceValues,
+    destinationServiceValues,
+    setSourceSelectDefinition,
+    setDestinationSelectDefinition,
+    clearSourceSelectDefinition,
+    clearDestinationSelectDefinition,
+    clearSourceServiceValues,
+    clearDestinationServiceValues,
+    setDestinationServiceValues,
+    setSourceServiceValues,
   };
 };
 

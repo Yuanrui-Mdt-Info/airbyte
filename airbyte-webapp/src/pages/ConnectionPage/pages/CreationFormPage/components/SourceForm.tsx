@@ -6,18 +6,21 @@ import useRouter from "hooks/useRouter";
 import { SourceForm } from "pages/SourcesPage/pages/CreateSourcePage/components/SourceForm";
 import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
+import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 
 interface ConnectionCreateSourceFormProps {
   afterSubmit: () => void;
   onClickBtn?: (params: SwitchStepParams) => void;
   onBack?: () => void;
+  fetchingConnectorError?: FormError | null;
 }
 
 export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProps> = ({
   afterSubmit,
   onClickBtn,
   onBack,
+  fetchingConnectorError,
 }) => {
   const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
@@ -66,6 +69,7 @@ export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProp
       hasSuccess={successRequest}
       onClickBtn={onClickBtn}
       onBack={onBack}
+      error={fetchingConnectorError}
     />
   );
 };

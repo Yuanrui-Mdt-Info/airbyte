@@ -96,11 +96,11 @@ const RevalidateOnValidationSchemaChange: React.FC<{ validationSchema: unknown }
  * A component that will observe whenever the serviceType (selected connector)
  * changes and set the name of the connector to match the connector definition name.
  */
-const SetDefaultName: React.FC = () => {
+const SetDefaultName: React.FC<{ formType: string }> = ({ formType }) => {
   const { setFieldValue } = useFormikContext();
   // const { selectedService } = useServiceForm();
-  const { selectDefinition } = useDataCardContext();
-
+  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
+  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
   useEffect(() => {
     if (!selectDefinition) {
       // selectedService
@@ -147,7 +147,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
 
   const [isOpenRequestModal, toggleOpenRequestModal] = useToggle(false);
   const [initialRequestName] = useState<string>(); // setInitialRequestName
-  const { selectDefinition } = useDataCardContext();
+  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
 
   const {
     formType,
@@ -183,7 +183,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
 
   const { formFields, initialValues } = useBuildForm(jsonSchema, formValues);
 
-  const { setDocumentationUrl, setDocumentationPanelOpen } = useDocumentationPanelContext();
+  const { setDocumentationUrl, setDocumentationPanelOpen, setFormType } = useDocumentationPanelContext();
 
   useEffect(() => {
     if (!selectedConnectorDefinitionSpecification) {
@@ -205,6 +205,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       );
     });
     setDocumentationUrl(selectedServiceDefinition?.documentationUrl ?? "");
+    setFormType(formType);
     setDocumentationPanelOpen(true);
   }, [availableServices, selectedConnectorDefinitionSpecification, setDocumentationPanelOpen, setDocumentationUrl]);
 
@@ -256,6 +257,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       const valuesToSend = getValues(values);
       setDocumentationPanelOpen(false);
       //  await onSubmit(valuesToSend);
+      const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
       await onSubmit({ ...valuesToSend, serviceType: selectDefinition.definitionId });
       clearFormChange(formId);
     },
@@ -284,7 +286,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
           isLoadingSchema={props.isLoading}
           validationSchema={validationSchema}
         >
-          {!props.isEditMode && <SetDefaultName />}
+          {!props.isEditMode && <SetDefaultName formType={formType} />}
           <RevalidateOnValidationSchemaChange validationSchema={validationSchema} />
           <FormikPatch />
           <FormChangeTracker changed={dirty} formId={formId} />

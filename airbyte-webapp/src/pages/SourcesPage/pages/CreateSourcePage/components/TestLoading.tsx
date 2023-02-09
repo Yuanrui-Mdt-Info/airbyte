@@ -56,12 +56,16 @@ const Image = styled.img`
 
 const TestLoading: React.FC<Iprops> = ({ isLoading, type, onClickBtn }) => {
   const { push } = useRouter();
-  const { clearSelectDefinition } = useDataCardContext();
+  const { clearSourceSelectDefinition, clearDestinationSelectDefinition } = useDataCardContext();
   const clickButton = (btnType: string) => {
     if (btnType === "active") {
       const path = type === "source" ? `/${RoutePaths.Source}` : `/${RoutePaths.Destination}`;
       push(path);
-      clearSelectDefinition();
+      if (type === "source") {
+        clearSourceSelectDefinition();
+      } else {
+        clearDestinationSelectDefinition();
+      }
       return;
     }
     onClickBtn({

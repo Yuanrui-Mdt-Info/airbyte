@@ -65,6 +65,7 @@ const LoadingImage = styled.img`
 `;
 
 const TestLoading: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
+  console.log("loading-page-------------------", isLoading, `type:${type}`);
   return (
     <>
       <Container>

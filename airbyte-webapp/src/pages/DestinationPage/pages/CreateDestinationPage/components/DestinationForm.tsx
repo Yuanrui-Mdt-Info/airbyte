@@ -48,11 +48,7 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { formValues } = useDataCardContext();
-
-  // if (!selectDefinition.definitionId) {
-  //   // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
-  // }
+  const { destinationServiceValues } = useDataCardContext();
 
   const [destinationDefinitionId, setDestinationDefinitionId] = useState(
     hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : null
@@ -100,7 +96,7 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
       hasSuccess={hasSuccess}
       errorMessage={errorMessage}
       isLoading={isLoading}
-      formValues={formValues}
+      formValues={destinationServiceValues}
       // formValues={destinationDefinitionId ? { serviceType: destinationDefinitionId } : undefined}
       title={<FormattedMessage id="onboarding.destinationSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}

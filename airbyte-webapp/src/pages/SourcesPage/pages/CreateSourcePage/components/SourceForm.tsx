@@ -50,10 +50,7 @@ export const SourceForm: React.FC<SourceFormProps> = ({
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { formValues } = useDataCardContext();
-  // if (!selectDefinition.definitionId) {
-  //   // push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
-  // }
+  const { sourceServiceValues } = useDataCardContext();
 
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
     hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
@@ -103,7 +100,7 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       isLoading={isLoading}
       // formValues={sourceDefinitionId ? { serviceType: sourceDefinitionId, name: "" } : undefined}
       //  formValues={formValue && formValue.serviceType ? formValue : {}}
-      formValues={formValues}
+      formValues={sourceServiceValues}
       title={<FormattedMessage id="onboarding.sourceSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
       onClickBtn={onClickBtn}
