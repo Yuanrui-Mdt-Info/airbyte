@@ -3,11 +3,8 @@ import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { ConnectorIcon } from "components/ConnectorIcon";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
-interface BoxProps {
-  formType?: "source" | "destination";
-}
+import { useServiceForm } from "views/Connector/ServiceForm/serviceFormContext";
 
 const FormHeader = styled.div`
   display: flex;
@@ -52,16 +49,15 @@ export const Image = styled(ConnectorIcon)`
   border-radius: 18px;
 `;
 
-const FormHeaderBox: React.FC<BoxProps> = ({ formType }) => {
-  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
-  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
+const FormHeaderBox: React.FC = () => {
+  const { selectedService } = useServiceForm();
   return (
     <FormHeader>
       <ImageBox>
-        <Image icon={selectDefinition.icon || ""} />
+        <Image icon={selectedService?.icon || ""} />
       </ImageBox>
       <Content>
-        <Title>{selectDefinition.name}</Title>
+        <Title>{selectedService?.name}</Title>
         <Text>
           <FormattedMessage id="form.header.subTitle" />{" "}
         </Text>

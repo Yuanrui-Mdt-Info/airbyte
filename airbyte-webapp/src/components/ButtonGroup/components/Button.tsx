@@ -7,14 +7,15 @@ import styles from "./Button.module.scss";
 interface CardProps {
   btnText: string;
   type: "cancel" | "disabled" | "active";
+  disabled?: boolean;
   onClick: (btnType: string) => void;
 }
 
-const Button: React.FC<CardProps> = ({ btnText, type, onClick }) => {
+const Button: React.FC<CardProps> = ({ btnText, type, onClick, disabled }) => {
   const buttonClassName = classnames(
     styles.button,
     { [styles.active]: type === "active" },
-    { [styles.disabled]: type === "disabled" }
+    { [styles.disabled]: type === "disabled" || disabled }
   );
   return (
     <div

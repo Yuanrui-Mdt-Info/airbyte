@@ -1,20 +1,14 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
-
-import useRouter from "hooks/useRouter";
-import { RoutePaths } from "pages/routePaths";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
-
-import style from "./TestLoading.module.scss";
 
 interface Iprops {
   isLoading: boolean;
   type: "destination" | "source";
-  onClickBtn: (params: SwitchStepParams) => void;
+  onFinish: () => void;
+  onBack: () => void;
 }
 
 const Container = styled.div`
@@ -43,6 +37,24 @@ const Image = styled.img`
   width: 126px;
   height: 126px;
 `;
+
+const Loading = keyframes`
+0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const LoadingImage = styled.img`
+  width: 120px;
+  height: 120px;
+  display: inline-block;
+  animation: ${Loading} 1.8s linear infinite;
+`;
+
 // .loadingDiv {
 //     display: inline-block;
 //     border: 4px solid rgba(#4F46E5,0.1);
@@ -54,39 +66,19 @@ const Image = styled.img`
 //     margin-top: 40px;
 // }
 
-const TestLoading: React.FC<Iprops> = ({ isLoading, type, onClickBtn }) => {
-  const { push } = useRouter();
-  const { clearSourceSelectDefinition, clearDestinationSelectDefinition } = useDataCardContext();
-  const clickButton = (btnType: string) => {
-    if (btnType === "active") {
-      const path = type === "source" ? `/${RoutePaths.Source}` : `/${RoutePaths.Destination}`;
-      push(path);
-      if (type === "source") {
-        clearSourceSelectDefinition();
-      } else {
-        clearDestinationSelectDefinition();
-      }
-      return;
-    }
-    onClickBtn({
-      currentStep: "creating",
-      fetchingConnectorError: null,
-      btnType,
-    });
-  };
-
+const TestLoading: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
   return (
     <>
       <Container>
         <Text>
           {isLoading ? <FormattedMessage id="form.testing" /> : <FormattedMessage id={`form.${type}.validated`} />}
         </Text>
-        {isLoading && <Image src="/icons/loading-icon.png" className={style.loadingIcon} alt="loading-icon" />}
+        {isLoading && <LoadingImage src="/icons/loading-icon.png" alt="loading-icon" />}
         {!isLoading && <Image src="/icons/finish-icon.png" alt="finish-icon" />}
       </Container>
       <ButtonRows>
-        <Button btnText="back" onClick={clickButton} type="cancel" />
-        <Button btnText="finish" onClick={clickButton} type={!isLoading ? "active" : "disabled"} />
+        <Button btnText="back" onClick={onBack} type="cancel" />
+        <Button btnText="finish" onClick={onFinish} type={!isLoading ? "active" : "disabled"} />
       </ButtonRows>
     </>
   );

@@ -18,9 +18,9 @@ import TestLoading from "pages/ConnectionPage/pages/CreationFormPage/components/
 import { RoutePaths } from "pages/routePaths";
 // import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
 // import { useSourceDefinition } from "services/connector/SourceDefinitionService";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 import {
   DestinationDefinitionRead,
@@ -121,6 +121,17 @@ export const CreationFormPage: React.FC = () => {
 
   const [isLoading, setLoadingStatus] = useState(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues>({
+    name: "",
+    serviceType: "",
+    connectionConfiguration: {},
+  });
+
+  const [sourceFormValues, setSourceFormValues] = useState<ServiceFormValues>({
+    name: "",
+    serviceType: "",
+    connectionConfiguration: {},
+  });
 
   const { source, destination } = usePreloadData(); // destinationDefinition, sourceDefinition,
 
@@ -180,6 +191,7 @@ export const CreationFormPage: React.FC = () => {
 
             <ConnectionCreateSourceForm
               fetchingConnectorError={fetchingConnectorError}
+              formValues={sourceFormValues}
               afterSubmit={() => {
                 setLoadingStatus(false);
                 // push("", {
@@ -197,16 +209,16 @@ export const CreationFormPage: React.FC = () => {
                 //   setCurrentStep(StepsTypes.CREATE_CONNECTION);
                 // }
               }}
-              onClickBtn={({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
-                console.log("onClickBtn----------------------", currentStep, isLoading, fetchingConnectorError);
+              onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+                console.log(formValues);
                 // setCurrentEntityStep(EntityStepsTypes.DESTINATION);
-                if (currentStep === "testing") {
+                setSourceFormValues(formValues);
+                if (isLoading) {
                   setCurrentStep(StepsTypes.TEST_CONNECTION);
                   setLoadingStatus(true);
-                }
-                if (currentStep === "creating") {
+                } else {
                   setCurrentStep(StepsTypes.CREATE_ENTITY);
-                  setFetchingConnectorError(fetchingConnectorError || null);
+                  setFetchingConnectorError(error || null);
                 }
               }}
               onBack={() => {
@@ -229,21 +241,22 @@ export const CreationFormPage: React.FC = () => {
             )}
             <ConnectionCreateDestinationForm
               fetchingConnectorError={fetchingConnectorError}
+              formValues={destinationFormValues}
               afterSubmit={() => {
                 setLoadingStatus(false);
                 // setCurrentEntityStep(EntityStepsTypes.CONNECTION);
                 // setCurrentStep(StepsTypes.CREATE_CONNECTION);
               }}
-              onClickBtn={({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
-                console.log("onClickBtn----------------------", currentStep, isLoading, fetchingConnectorError);
+              onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
                 //  setCurrentEntityStep(EntityStepsTypes.DESTINATION);
-                if (currentStep === "testing") {
+                setDestinationFormValues(formValues);
+                console.log(formValues);
+                if (isLoading) {
                   setCurrentStep(StepsTypes.TEST_CONNECTION);
                   setLoadingStatus(true);
-                }
-                if (currentStep === "creating") {
+                } else {
                   setCurrentStep(StepsTypes.CREATE_ENTITY);
-                  setFetchingConnectorError(fetchingConnectorError || null);
+                  setFetchingConnectorError(error || null);
                 }
               }}
               onBack={() => {

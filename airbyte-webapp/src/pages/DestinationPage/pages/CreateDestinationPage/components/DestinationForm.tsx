@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
+// import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import { Action, Namespace } from "core/analytics";
 import { ConnectionConfiguration } from "core/domain/connection";
@@ -9,10 +9,10 @@ import { DestinationDefinitionRead } from "core/request/AirbyteClient";
 import { LogsRequestError } from "core/request/LogsRequestError";
 import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useGetDestinationDefinitionSpecificationAsync } from "services/connector/DestinationDefinitionSpecificationService";
 import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 interface DestinationFormProps {
   onSubmit: (values: {
@@ -25,7 +25,8 @@ interface DestinationFormProps {
   destinationDefinitions: DestinationDefinitionRead[];
   hasSuccess?: boolean;
   error?: FormError | null;
-  onClickBtn?: (params: SwitchStepParams) => void;
+  formValues: ServiceFormValues;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
   onBack?: () => void;
 }
 
@@ -42,13 +43,14 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
   destinationDefinitions,
   error,
   hasSuccess,
+  formValues,
   afterSelectConnector,
-  onClickBtn,
+  onShowLoading,
   onBack,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { destinationServiceValues } = useDataCardContext();
+  // const { destinationServiceValues } = useDataCardContext();
 
   const [destinationDefinitionId, setDestinationDefinitionId] = useState(
     hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : null
@@ -96,11 +98,11 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
       hasSuccess={hasSuccess}
       errorMessage={errorMessage}
       isLoading={isLoading}
-      formValues={destinationServiceValues}
-      // formValues={destinationDefinitionId ? { serviceType: destinationDefinitionId } : undefined}
+      // formValues={destinationServiceValues}
+      formValues={destinationDefinitionId ? { ...formValues, serviceType: destinationDefinitionId } : undefined}
       title={<FormattedMessage id="onboarding.destinationSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
-      onClickBtn={onClickBtn}
+      onShowLoading={onShowLoading}
       onBack={onBack}
     />
   );

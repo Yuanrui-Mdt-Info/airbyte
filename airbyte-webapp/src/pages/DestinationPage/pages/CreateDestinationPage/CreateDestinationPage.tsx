@@ -11,27 +11,18 @@ import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-// import useRouter from "hooks/useRouter";
 import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 import { DestinationForm } from "./components/DestinationForm";
-
-export interface SwitchStepParams {
-  currentStep: string;
-  selectDefinitionId?: string;
-  selectDefinitionName?: string;
-  fetchingConnectorError?: FormError | null;
-  isLoading?: boolean;
-  btnType?: string;
-}
 
 export const CreateDestinationPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.DESTINATION_NEW);
 
-  const { push } = useRouter();
+  const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const { destinationDefinitions } = useDestinationDefinitionList();
   const { mutateAsync: createDestination } = useCreateDestination();
@@ -39,6 +30,11 @@ export const CreateDestinationPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [formValues, setFormValues] = useState<ServiceFormValues>({
+    name: "",
+    serviceType: "",
+    connectionConfiguration: {},
+  });
 
   const onSubmitDestinationForm = async (values: {
     name: string;
@@ -46,7 +42,6 @@ export const CreateDestinationPage: React.FC = () => {
     connectionConfiguration?: ConnectionConfiguration;
   }) => {
     const connector = destinationDefinitions.find((item) => item.destinationDefinitionId === values.serviceType);
-    //  const result =
     await createDestination({
       values,
       destinationConnector: connector,
@@ -59,18 +54,31 @@ export const CreateDestinationPage: React.FC = () => {
     }, 2000);
   };
 
-  const clickBtnHandleStep = ({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
-    setCurrentStep(currentStep);
+  const handleBackButton = () => {
     if (currentStep === "testing") {
-      setLoadingStatus(isLoading || false);
+      setCurrentStep("creating");
+      return;
     }
-    // if (fetchingConnectorError) {
-    setFetchingConnectorError(fetchingConnectorError || null);
-    // }
+    push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`, {
+      state: {
+        ...(location.state as Record<string, unknown>),
+      },
+    });
   };
 
-  const handleBackButton = () => {
-    push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`);
+  const handleFinishButton = () => {
+    push(`/${RoutePaths.Destination}`);
+  };
+
+  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+    if (isLoading) {
+      setCurrentStep("testing");
+    } else {
+      setCurrentStep("creating");
+    }
+    setFormValues(formValues);
+    setLoadingStatus(isLoading || false);
+    setFetchingConnectorError(error || null);
   };
 
   return (
@@ -81,16 +89,22 @@ export const CreateDestinationPage: React.FC = () => {
         {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="destinations.newDestinationTitle" />} /> */}
         <FormPageContent>
           {currentStep === "testing" && (
-            <TestLoading onClickBtn={clickBtnHandleStep} isLoading={isLoading} type="destination" />
+            <TestLoading
+              onBack={handleBackButton}
+              onFinish={handleFinishButton}
+              isLoading={isLoading}
+              type="destination"
+            />
           )}
           {currentStep === "creating" && (
             <DestinationForm
               onSubmit={onSubmitDestinationForm}
               destinationDefinitions={destinationDefinitions}
               hasSuccess={successRequest}
-              onClickBtn={clickBtnHandleStep}
+              onShowLoading={onShowLoading}
               onBack={handleBackButton}
               error={fetchingConnectorError}
+              formValues={formValues}
             />
           )}
         </FormPageContent>

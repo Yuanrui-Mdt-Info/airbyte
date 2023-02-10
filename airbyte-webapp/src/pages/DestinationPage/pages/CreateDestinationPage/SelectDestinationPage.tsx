@@ -5,7 +5,6 @@ import styled from "styled-components";
 import Button from "components/ButtonGroup/components/Button";
 import ConnectionStep from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 import useRouter from "hooks/useRouter";
@@ -30,36 +29,40 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
+const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
+  return (
+    typeof state === "object" &&
+    state !== null &&
+    typeof (state as { sourceDefinitionId?: string }).sourceDefinitionId === "string"
+  );
+};
+
 const SelectDestinationCard: React.FC = () => {
-  const { push } = useRouter();
+  const { push, location } = useRouter();
   const { formatMessage } = useIntl();
-  const { selectDestinationDefinition, clearDestinationServiceValues } = useDataCardContext();
-  const [definitionId, setDefinitionId] = useState<string>(selectDestinationDefinition.definitionId);
+  const [destinationDefinitionId, setDestinationDefinitionId] = useState<string>(
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : ""
+  );
 
   const { destinationDefinitions } = useDestinationDefinitionList();
 
-  // const clickCancel = () => {
-  //   push(`/${RoutePaths.Source}`);
-  // };
-
   const clickSelect = () => {
-    if (!definitionId) {
+    if (!destinationDefinitionId) {
       return;
     }
-    clearDestinationServiceValues();
     push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`, {
       state: {
-        destinationDefinitionId: definitionId,
+        destinationDefinitionId,
       },
     });
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
     const selectId = Connector.id(selectCardData);
-    if (definitionId === selectId) {
-      return setDefinitionId("");
+    if (destinationDefinitionId === selectId) {
+      return setDestinationDefinitionId("");
     }
-    setDefinitionId(selectId);
+    setDestinationDefinitionId(selectId);
   };
 
   return (
@@ -69,15 +72,18 @@ const SelectDestinationCard: React.FC = () => {
         <DataPanel
           onSelect={afterSelect}
           data={destinationDefinitions}
-          value={definitionId}
+          value={destinationDefinitionId}
           type="destination"
           title={formatMessage({
             id: "form.setup.destination",
           })}
         />
         <ButtonRows>
-          {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
-          <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />
+          <Button
+            btnText="selectContinue"
+            onClick={clickSelect}
+            type={destinationDefinitionId ? "active" : "disabled"}
+          />
         </ButtonRows>
       </Container>
     </>

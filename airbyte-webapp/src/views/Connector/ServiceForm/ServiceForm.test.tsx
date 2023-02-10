@@ -24,8 +24,8 @@ jest.mock("../ConnectorDocumentationLayout/DocumentationPanelContext", () => {
     documentationUrl: "",
     setDocumentationPanelOpen: emptyFn,
     setDocumentationUrl: emptyFn,
-    formType: "",
-    setFormType: emptyFn,
+    selectedServiceName: "",
+    setSelectedServiceName: emptyFn,
   });
 
   return {

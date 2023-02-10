@@ -2,9 +2,8 @@ import React from "react";
 import styled from "styled-components";
 
 import { ConnectorIcon } from "components/ConnectorIcon";
-import { useDataCardContext, SelectDefinition } from "components/DataPanel/DataCardContext";
 
-import { Connector, ConnectorDefinition } from "core/domain/connector";
+import { ConnectorDefinition } from "core/domain/connector";
 
 interface CardProps {
   checked: boolean;
@@ -45,29 +44,18 @@ export const Image = styled(ConnectorIcon)`
   margin-bottom: 6px;
 `;
 
-const DataCard: React.FC<CardProps> = ({ data, onClick, checked, type }) => {
-  const { setSourceSelectDefinition, setDestinationSelectDefinition } = useDataCardContext();
-
-  const clickBox = () => {
-    onClick(data);
-    const obj: SelectDefinition = {
-      definitionId: Connector.id(data),
-      icon: data.icon,
-      name: data.name,
-    };
-    if (type === "source") {
-      setSourceSelectDefinition(obj);
-    } else {
-      setDestinationSelectDefinition(obj);
-    }
-  };
-
+const Card: React.FC<CardProps> = ({ data, onClick, checked }) => {
   return (
-    <Box checked={checked} onClick={clickBox}>
+    <Box
+      checked={checked}
+      onClick={() => {
+        onClick(data);
+      }}
+    >
       <Image icon={data.icon} />
       <div>{data.name}</div>
     </Box>
   );
 };
 
-export default DataCard;
+export default Card;

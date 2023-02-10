@@ -3,7 +3,6 @@ import { JSONSchema7 } from "json-schema";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDeepCompareEffect, useToggle } from "react-use";
 
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { FormChangeTracker } from "components/FormChangeTracker";
 
 import { ConnectorDefinition, ConnectorDefinitionSpecification } from "core/domain/connector";
@@ -11,7 +10,6 @@ import { isDestinationDefinitionSpecification } from "core/domain/connector/dest
 import { isSourceDefinition, isSourceDefinitionSpecification } from "core/domain/connector/source";
 import { FormBaseItem, FormComponentOverrideProps } from "core/form/types";
 import { useFormChangeTrackerService, useUniqueFormId } from "hooks/services/FormChangeTracker";
-// import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { isDefined } from "utils/common";
 import RequestConnectorModal from "views/Connector/RequestConnectorModal";
 
@@ -96,26 +94,23 @@ const RevalidateOnValidationSchemaChange: React.FC<{ validationSchema: unknown }
  * A component that will observe whenever the serviceType (selected connector)
  * changes and set the name of the connector to match the connector definition name.
  */
-const SetDefaultName: React.FC<{ formType: string }> = ({ formType }) => {
+const SetDefaultName: React.FC = () => {
   const { setFieldValue } = useFormikContext();
-  // const { selectedService } = useServiceForm();
-  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
-  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
+  const { selectedService } = useServiceForm();
   useEffect(() => {
-    if (!selectDefinition) {
-      // selectedService
+    if (!selectedService) {
       return;
     }
 
     const timeout = setTimeout(() => {
       // We need to push this out one execution slot, so the form isn't still in its
       // initialization status and won't react to this call but would just take the initialValues instead.
-      setFieldValue("name", selectDefinition.name);
+      setFieldValue("name", selectedService.name);
     });
     return () => clearTimeout(timeout);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectDefinition]);
+  }, [selectedService]);
 
   return null;
 };
@@ -147,7 +142,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
 
   const [isOpenRequestModal, toggleOpenRequestModal] = useToggle(false);
   const [initialRequestName] = useState<string>(); // setInitialRequestName
-  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
 
   const {
     formType,
@@ -161,14 +155,13 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     availableServices,
     onBack,
   } = props;
-
   const specifications = useBuildInitialSchema(selectedConnectorDefinitionSpecification);
 
   const jsonSchema: JSONSchema7 = useMemo(
     () => ({
       type: "object",
       properties: {
-        // serviceType: { type: "string" },
+        serviceType: { type: "string" },
         ...(selectedConnectorDefinitionSpecification ? { name: { type: "string" } } : {}),
         ...Object.fromEntries(
           Object.entries({
@@ -176,14 +169,14 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
           }).filter(([, v]) => !!v)
         ),
       },
-      required: ["name"], // "serviceType"
+      required: ["name", "serviceType"],
     }),
     [isLoading, selectedConnectorDefinitionSpecification, specifications]
   );
 
   const { formFields, initialValues } = useBuildForm(jsonSchema, formValues);
 
-  const { setDocumentationUrl, setDocumentationPanelOpen, setFormType } = useDocumentationPanelContext();
+  const { setDocumentationUrl, setDocumentationPanelOpen, setSelectedServiceName } = useDocumentationPanelContext();
 
   useEffect(() => {
     if (!selectedConnectorDefinitionSpecification) {
@@ -205,7 +198,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       );
     });
     setDocumentationUrl(selectedServiceDefinition?.documentationUrl ?? "");
-    setFormType(formType);
+    setSelectedServiceName(selectedServiceDefinition?.name);
     setDocumentationPanelOpen(true);
   }, [availableServices, selectedConnectorDefinitionSpecification, setDocumentationPanelOpen, setDocumentationUrl]);
 
@@ -214,6 +207,12 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
       name: {
         component: (property: FormBaseItem, componentProps: FormComponentOverrideProps) => (
           <ConnectorNameControl property={property} formType={formType} {...componentProps} />
+        ),
+      },
+      serviceType: {
+        component: () => (
+          // property: FormBaseItem, componentProps: FormComponentOverrideProps
+          <></>
         ),
       },
       // serviceType: {
@@ -256,9 +255,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
     async (values: ServiceFormValues) => {
       const valuesToSend = getValues(values);
       setDocumentationPanelOpen(false);
-      //  await onSubmit(valuesToSend);
-      const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
-      await onSubmit({ ...valuesToSend, serviceType: selectDefinition.definitionId });
+      await onSubmit(valuesToSend);
       clearFormChange(formId);
     },
     [clearFormChange, formId, getValues, onSubmit, setDocumentationPanelOpen]
@@ -286,7 +283,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
           isLoadingSchema={props.isLoading}
           validationSchema={validationSchema}
         >
-          {!props.isEditMode && <SetDefaultName formType={formType} />}
+          {!props.isEditMode && <SetDefaultName />}
           <RevalidateOnValidationSchemaChange validationSchema={validationSchema} />
           <FormikPatch />
           <FormChangeTracker changed={dirty} formId={formId} />

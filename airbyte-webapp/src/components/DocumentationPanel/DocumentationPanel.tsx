@@ -9,7 +9,6 @@ import rehypeSlug from "rehype-slug";
 import urls from "rehype-urls";
 
 import { LoadingPage, PageTitle } from "components";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
 import { Markdown } from "components/Markdown";
 
 import { useConfig } from "config";
@@ -21,7 +20,7 @@ import styles from "./DocumentationPanel.module.scss";
 export const DocumentationPanel: React.FC = () => {
   const { formatMessage } = useIntl();
   const config = useConfig();
-  const { setDocumentationPanelOpen, documentationUrl, formType } = useDocumentationPanelContext();
+  const { setDocumentationPanelOpen, documentationUrl, selectedServiceName } = useDocumentationPanelContext();
   const { data: docs, isLoading } = useDocumentation(documentationUrl);
 
   // @ts-expect-error rehype-slug currently has type conflicts due to duplicate vfile dependencies
@@ -49,9 +48,6 @@ export const DocumentationPanel: React.FC = () => {
     setDocumentationPanelOpen(false);
   }, [setDocumentationPanelOpen, location.pathname]);
 
-  const { selectSourceDefinition, selectDestinationDefinition } = useDataCardContext();
-  const selectDefinition = formType === "source" ? selectSourceDefinition : selectDestinationDefinition;
-
   return isLoading || documentationUrl === "" ? (
     <LoadingPage />
   ) : (
@@ -59,7 +55,7 @@ export const DocumentationPanel: React.FC = () => {
       <PageTitle
         withLine
         title={<FormattedMessage id="connector.setupGuide" />}
-        subText={`Follow our setup guide to connect ${selectDefinition.name} to Daspire.`}
+        subText={<FormattedMessage id="connector.setupGuide.subTitle" values={{ value: selectedServiceName }} />}
       />
       <Markdown
         className={styles.content}

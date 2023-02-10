@@ -9,7 +9,7 @@ interface PageTitleProps {
   middleTitleBlock?: React.ReactNode;
   endComponent?: React.ReactNode;
   title: React.ReactNode;
-  subText?: string;
+  subText?: React.ReactNode;
 }
 
 export const MainContainer = styled.div<{ withLine?: boolean }>`

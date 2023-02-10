@@ -1,10 +1,9 @@
 import React from "react";
-// import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 
-import DataCard from "./components/DataCard";
+import DataCard from "./components/Card";
 interface SourcePanelProps {
   value?: string;
   onSelect: (data: ConnectorDefinition) => void;
@@ -13,12 +12,12 @@ interface SourcePanelProps {
   title?: string;
 }
 
-export const Panel = styled.div`
+export const Container = styled.div`
   max-width: 858px;
   margin: 60px auto 200px auto;
 `;
 
-export const PanelTitle = styled.div`
+export const Title = styled.div`
   font-weight: 500;
   font-size: 24px;
   line-height: 30px;
@@ -26,16 +25,16 @@ export const PanelTitle = styled.div`
   margin-bottom: 30px;
 `;
 
-export const BoxList = styled.div`
+export const DataCardList = styled.div`
   display: flex;
   flex-wrap: wrap;
 `;
 
-const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title, type }) => {
+const DefinitionCard: React.FC<SourcePanelProps> = ({ data, onSelect, value, title, type }) => {
   return (
-    <Panel>
-      <PanelTitle>{title}</PanelTitle>
-      <BoxList>
+    <Container>
+      <Title>{title}</Title>
+      <DataCardList>
         {data.map((item) => (
           <DataCard
             type={type}
@@ -45,9 +44,9 @@ const DataPanel: React.FC<SourcePanelProps> = ({ data, onSelect, value, title, t
             checked={Connector.id(item) === value}
           />
         ))}
-      </BoxList>
-    </Panel>
+      </DataCardList>
+    </Container>
   );
 };
 
-export default DataPanel;
+export default DefinitionCard;

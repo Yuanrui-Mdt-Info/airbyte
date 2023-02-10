@@ -5,7 +5,6 @@ import styled from "styled-components";
 import Button from "components/ButtonGroup/components/Button";
 import ConnectionStep from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 import useRouter from "hooks/useRouter";
@@ -82,8 +81,6 @@ const SelectNewConnectionCard: React.FC = () => {
   const { formatMessage } = useIntl();
   const { sourceDefinitions } = useSourceDefinitionList();
   const { destinationDefinitions } = useDestinationDefinitionList();
-  const { clearSourceServiceValues, clearDestinationServiceValues } = useDataCardContext();
-  console.warn("SelectConnection------------------", location.state);
 
   const [sourceId, setSourceId] = useState<string>(hasSourceId(location.state) ? location.state.sourceId : "");
   const [destinationId, setDestinationId] = useState<string>(
@@ -99,8 +96,6 @@ const SelectNewConnectionCard: React.FC = () => {
   const [currentStepNumber, setCurrentStepNumber] = useState<number>(
     hasCurrentStepNumber(location.state) ? location.state.currentStepNumber : 1
   ); // 1,2,3,4
-
-  // const [useNewService, setUseNewService] = useState<boolean>(true);
 
   const clickCancel = () => {
     setCurrentStepNumber(1);
@@ -143,20 +138,14 @@ const SelectNewConnectionCard: React.FC = () => {
       if (sourceDefinitionId) {
         push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
           state: {
-            // ...(location.state as Record<string, unknown>),
-            //  sourceId,
-            // sourceDefinitionId,
             ...locationState,
             currentStepNumber: 1,
           },
         });
-        clearSourceServiceValues();
         setCurrentStepNumber(1);
       } else {
         push("", {
           state: {
-            // ...(location.state as Record<string, unknown>),
-            // sourceId,
             ...locationState,
             currentStepNumber: 2,
           },
@@ -170,24 +159,13 @@ const SelectNewConnectionCard: React.FC = () => {
       if (destinationDefinitionId) {
         push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
           state: {
-            // ...(location.state as Record<string, unknown>),
-            // destinationDefinitionId,
-            // sourceDefinitionId,
-            // sourceId,
-            // destinationId,
             ...locationState,
             currentStepNumber: 2,
           },
         });
-        clearDestinationServiceValues();
       } else {
         push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
           state: {
-            //  ...(location.state as Record<string, unknown>),
-            // sourceId,
-            // destinationId,
-            // destinationDefinitionId,
-            // sourceDefinitionId,
             ...locationState,
             currentStepNumber: 3,
           },
@@ -287,6 +265,7 @@ const SelectNewConnectionCard: React.FC = () => {
           <Button
             btnText="selectContinue"
             onClick={clickSelect}
+            disabled
             type={
               (currentStepNumber === 1 && (sourceId || sourceDefinitionId)) ||
               (currentStepNumber === 2 && (destinationId || destinationDefinitionId))

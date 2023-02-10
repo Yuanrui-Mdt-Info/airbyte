@@ -5,22 +5,24 @@ import { ConnectionConfiguration } from "core/domain/connection";
 import { useCreateDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
 import { DestinationForm } from "pages/DestinationPage/pages/CreateDestinationPage/components/DestinationForm";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 interface ConnectionCreateDestinationFormProps {
   afterSubmit: () => void;
   onBack?: () => void;
-  onClickBtn?: (params: SwitchStepParams) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
   fetchingConnectorError?: FormError | null;
+  formValues: ServiceFormValues;
 }
 
 export const ConnectionCreateDestinationForm: React.FC<ConnectionCreateDestinationFormProps> = ({
   afterSubmit,
   onBack,
-  onClickBtn,
+  onShowLoading,
+  formValues,
   fetchingConnectorError,
 }) => {
   const { push, location } = useRouter();
@@ -70,7 +72,8 @@ export const ConnectionCreateDestinationForm: React.FC<ConnectionCreateDestinati
       hasSuccess={successRequest}
       onBack={onBack}
       error={fetchingConnectorError}
-      onClickBtn={onClickBtn}
+      onShowLoading={onShowLoading}
+      formValues={formValues}
     />
   );
 };

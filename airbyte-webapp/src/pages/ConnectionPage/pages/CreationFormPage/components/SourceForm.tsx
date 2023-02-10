@@ -4,22 +4,24 @@ import { ConnectionConfiguration } from "core/domain/connection";
 import { useCreateSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
 import { SourceForm } from "pages/SourcesPage/pages/CreateSourcePage/components/SourceForm";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 interface ConnectionCreateSourceFormProps {
   afterSubmit: () => void;
-  onClickBtn?: (params: SwitchStepParams) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
   onBack?: () => void;
   fetchingConnectorError?: FormError | null;
+  formValues: ServiceFormValues;
 }
 
 export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProps> = ({
   afterSubmit,
-  onClickBtn,
+  onShowLoading,
   onBack,
+  formValues,
   fetchingConnectorError,
 }) => {
   const { push, location } = useRouter();
@@ -67,9 +69,10 @@ export const ConnectionCreateSourceForm: React.FC<ConnectionCreateSourceFormProp
       onSubmit={onSubmitSourceStep}
       sourceDefinitions={sourceDefinitions}
       hasSuccess={successRequest}
-      onClickBtn={onClickBtn}
+      onShowLoading={onShowLoading}
       onBack={onBack}
       error={fetchingConnectorError}
+      formValues={formValues}
     />
   );
 };

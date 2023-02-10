@@ -5,11 +5,9 @@ import styled from "styled-components";
 import { Spinner } from "components";
 
 import { FormBlock } from "core/form/types";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 
 import CreateControls from "./components/CreateControls";
 import EditControls from "./components/EditControls";
-import FormButtonGroup from "./components/FormButtonGroup";
 import FormHeaderBox from "./components/FormHeaderBox";
 import { FormSection } from "./components/Sections/FormSection";
 import ShowLoadingMessage from "./components/ShowLoadingMessage";
@@ -39,7 +37,6 @@ interface FormRootProps {
   successMessage?: React.ReactNode;
   onRetest?: () => void;
   onStopTestingConnector?: () => void;
-  onClickBtn?: (params: SwitchStepParams) => void;
   formValues?: Partial<ServiceFormValues>;
   onBack?: () => void;
 }
@@ -53,16 +50,13 @@ const FormRoot: React.FC<FormRootProps> = ({
   fetchingConnectorError,
   hasSuccess,
   onStopTestingConnector,
-  onClickBtn,
-  formValues,
   onBack,
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { resetServiceForm, isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm();
-  const useNewUI = true;
   return (
     <FormContainer>
-      <FormHeaderBox formType={formType} />
+      <FormHeaderBox />
       <FormSection blocks={formFields} disabled={isSubmitting || isTestConnectionInProgress} />
       {isLoadingSchema && (
         <LoaderContainer>
@@ -72,24 +66,7 @@ const FormRoot: React.FC<FormRootProps> = ({
           </LoadingMessage>
         </LoaderContainer>
       )}
-
-      {useNewUI && (
-        <FormButtonGroup
-          currentStep="creating"
-          onClickBtn={onClickBtn}
-          isSubmitting={isSubmitting || isTestConnectionInProgress}
-          hasSuccess={hasSuccess}
-          errorMessage={dirty || !isValid ? "" : errorMessage}
-          disabled={!(isValid && dirty)}
-          formValues={formValues}
-          formType={formType}
-          onBack={onBack}
-        />
-      )}
-
-      {useNewUI ? (
-        ""
-      ) : isEditMode ? (
+      {isEditMode ? (
         <EditControls
           isTestConnectionInProgress={isTestConnectionInProgress}
           onCancelTesting={onStopTestingConnector}
@@ -114,6 +91,8 @@ const FormRoot: React.FC<FormRootProps> = ({
           isLoadSchema={isLoadingSchema}
           fetchingConnectorError={fetchingConnectorError}
           hasSuccess={hasSuccess}
+          disabled={!(isValid && dirty)}
+          onBack={onBack}
         />
       )}
     </FormContainer>

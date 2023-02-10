@@ -4,8 +4,7 @@ import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
 import ConnectionStep from "components/ConnectionStep";
-import DataPanel from "components/DataPanel";
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
+import DefinitionCard from "components/DataPanel";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
 import useRouter from "hooks/useRouter";
@@ -30,52 +29,52 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const SelectNewSourceCard: React.FC = () => {
-  const { push } = useRouter();
-  const { formatMessage } = useIntl();
-  const { selectSourceDefinition, clearSourceServiceValues } = useDataCardContext();
-  const [definitionId, setDefinitionId] = useState<string>(selectSourceDefinition.definitionId);
-  const { sourceDefinitions } = useSourceDefinitionList();
+const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
+  return (
+    typeof state === "object" &&
+    state !== null &&
+    typeof (state as { sourceDefinitionId?: string }).sourceDefinitionId === "string"
+  );
+};
 
-  // const clickCancel = () => {
-  //   push(`/${RoutePaths.Source}`);
-  // };
+const SelectNewSourceCard: React.FC = () => {
+  const { push, location } = useRouter();
+  const { formatMessage } = useIntl();
+  const { sourceDefinitions } = useSourceDefinitionList();
+  const [sourceDefinitionId, setSourceDefinitionId] = useState<string>(
+    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : ""
+  );
 
   const clickSelect = () => {
-    if (!definitionId) {
-      return;
-    }
-    clearSourceServiceValues();
     push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`, {
       state: {
-        sourceDefinitionId: definitionId,
+        sourceDefinitionId,
       },
     });
   };
 
   const afterSelect = (selectCardData: ConnectorDefinition) => {
     const selectId = Connector.id(selectCardData);
-    if (definitionId === selectId) {
-      return setDefinitionId("");
+    if (sourceDefinitionId === selectId) {
+      return setSourceDefinitionId("");
     }
-    setDefinitionId(selectId);
+    setSourceDefinitionId(selectId);
   };
   return (
     <>
       <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <Container>
-        <DataPanel
+        <DefinitionCard
           onSelect={afterSelect}
           data={sourceDefinitions}
-          value={definitionId}
+          value={sourceDefinitionId}
           type="source"
           title={formatMessage({
             id: "form.setup.source",
           })}
         />
         <ButtonRows>
-          {/* <Button btnText="Cancel" onClick={clickCancel} type="cancel" /> */}
-          <Button btnText="selectContinue" onClick={clickSelect} type={definitionId ? "active" : "disabled"} />
+          <Button btnText="selectContinue" onClick={clickSelect} type={sourceDefinitionId ? "active" : "disabled"} />
         </ButtonRows>
       </Container>
     </>

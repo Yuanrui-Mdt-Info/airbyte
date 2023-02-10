@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { useDataCardContext } from "components/DataPanel/DataCardContext";
+// import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
 import { Action, Namespace } from "core/analytics";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { LogsRequestError } from "core/request/LogsRequestError";
 import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
-import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
 import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 import { useGetSourceDefinitionSpecificationAsync } from "services/connector/SourceDefinitionSpecificationService";
 import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
-// import { RoutePaths } from "pages/routePaths";
 
 interface SourceFormProps {
   onSubmit: (values: {
@@ -26,8 +24,9 @@ interface SourceFormProps {
   afterSelectConnector?: () => void;
   sourceDefinitions: SourceDefinitionReadWithLatestTag[];
   hasSuccess?: boolean;
+  formValues: ServiceFormValues;
   error?: FormError | null;
-  onClickBtn?: (params: SwitchStepParams) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
   onBack?: () => void;
 }
 
@@ -44,13 +43,14 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   sourceDefinitions,
   error,
   hasSuccess,
+  formValues,
   afterSelectConnector,
-  onClickBtn,
+  onShowLoading,
   onBack,
 }) => {
   const { location } = useRouter();
   const analyticsService = useAnalyticsService();
-  const { sourceServiceValues } = useDataCardContext();
+  // const { sourceServiceValues } = useDataCardContext();
 
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
     hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
@@ -86,7 +86,6 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   };
 
   const errorMessage = error ? generateMessageFromError(error) : null;
-
   return (
     <ConnectorCard
       onServiceSelect={onDropDownSelect}
@@ -98,12 +97,10 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       fetchingConnectorError={sourceDefinitionError instanceof Error ? sourceDefinitionError : null}
       errorMessage={errorMessage}
       isLoading={isLoading}
-      // formValues={sourceDefinitionId ? { serviceType: sourceDefinitionId, name: "" } : undefined}
-      //  formValues={formValue && formValue.serviceType ? formValue : {}}
-      formValues={sourceServiceValues}
+      formValues={sourceDefinitionId ? { ...formValues, serviceType: sourceDefinitionId, name: "" } : undefined}
       title={<FormattedMessage id="onboarding.sourceSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}
-      onClickBtn={onClickBtn}
+      onShowLoading={onShowLoading}
       onBack={onBack}
     />
   );

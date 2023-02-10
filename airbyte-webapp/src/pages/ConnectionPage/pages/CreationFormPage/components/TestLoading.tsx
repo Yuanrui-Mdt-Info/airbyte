@@ -3,21 +3,12 @@ import { FormattedMessage } from "react-intl";
 import styled, { keyframes } from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
-// import { useDataCardContext } from "components/DataPanel/DataCardContext";
-
-// import useRouter from "hooks/useRouter";
-// import { RoutePaths } from "pages/routePaths";
-
-// import { SwitchStepParams } from "pages/SourcesPage/pages/CreateSourcePage/CreateSourcePage";
-
-// import style from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading.module.scss";
 
 interface Iprops {
   isLoading: boolean;
   type: "destination" | "source" | "connection";
   onBack: (btnType: string) => void;
   onFinish: (btnType: string) => void;
-  //   onClickBtn: (params: SwitchStepParams) => void;
 }
 
 const Container = styled.div`

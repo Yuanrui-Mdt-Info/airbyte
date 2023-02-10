@@ -1,3 +1,3 @@
-import DataPanel from "./DataPanel";
+import DefinitionCard from "./DefinitionCard";
 
-export default DataPanel;
+export default DefinitionCard;

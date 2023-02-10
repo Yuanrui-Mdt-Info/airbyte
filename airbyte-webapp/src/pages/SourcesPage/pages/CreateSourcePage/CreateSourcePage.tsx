@@ -15,25 +15,22 @@ import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/Tes
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout/ConnectorDocumentationWrapper";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 import { SourceForm } from "./components/SourceForm";
 
-export interface SwitchStepParams {
-  currentStep: string;
-  selectDefinitionId?: string;
-  selectDefinitionName?: string;
-  fetchingConnectorError?: FormError | null;
-  isLoading?: boolean;
-  btnType?: string;
-}
-
 const CreateSourcePage: React.FC = () => {
   useTrackPage(PageTrackingCodes.SOURCE_NEW);
-  const { push } = useRouter();
+  const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [formValues, setFormValues] = useState<ServiceFormValues>({
+    name: "",
+    serviceType: "",
+    connectionConfiguration: {},
+  });
 
   const { sourceDefinitions } = useSourceDefinitionList();
   const { mutateAsync: createSource } = useCreateSource();
@@ -48,7 +45,6 @@ const CreateSourcePage: React.FC = () => {
       // Unsure if this can happen, but the types want it defined
       throw new Error("No Connector Found");
     }
-    // const result =
     await createSource({ values, sourceConnector: connector });
     setSuccessRequest(true);
     setLoadingStatus(false);
@@ -58,18 +54,32 @@ const CreateSourcePage: React.FC = () => {
     }, 2000);
   };
 
-  const clickBtnHandleStep = ({ currentStep, isLoading, fetchingConnectorError }: SwitchStepParams) => {
-    setCurrentStep(currentStep);
+  const handleBackButton = () => {
     if (currentStep === "testing") {
-      setLoadingStatus(isLoading || false);
+      setCurrentStep("creating");
+      return;
     }
-    // if (fetchingConnectorError) {
-    setFetchingConnectorError(fetchingConnectorError || null);
-    // }
+    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`, {
+      state: {
+        ...(location.state as Record<string, unknown>),
+      },
+    });
   };
 
-  const handleBackButton = () => {
-    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`);
+  const handleFinishButton = () => {
+    push(`/${RoutePaths.Source}`);
+  };
+
+  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+    console.log("error", error);
+    if (isLoading) {
+      setCurrentStep("testing");
+    } else {
+      setCurrentStep("creating");
+    }
+    setFormValues(formValues);
+    setLoadingStatus(isLoading || false);
+    setFetchingConnectorError(error);
   };
 
   return (
@@ -77,20 +87,19 @@ const CreateSourcePage: React.FC = () => {
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
       <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <ConnectorDocumentationWrapper>
-        {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="sources.newSourceTitle" />} /> */}
         <FormPageContent>
-          {/* {renderCard()} */}
           {currentStep === "testing" && (
-            <TestLoading onClickBtn={clickBtnHandleStep} isLoading={isLoading} type="source" />
+            <TestLoading onBack={handleBackButton} onFinish={handleFinishButton} isLoading={isLoading} type="source" />
           )}
           {currentStep === "creating" && (
             <SourceForm
               onSubmit={onSubmitSourceStep}
               sourceDefinitions={sourceDefinitions}
               hasSuccess={successRequest}
-              onClickBtn={clickBtnHandleStep}
+              onShowLoading={onShowLoading}
               error={fetchingConnectorError}
               onBack={handleBackButton}
+              formValues={formValues}
             />
           )}
         </FormPageContent>
