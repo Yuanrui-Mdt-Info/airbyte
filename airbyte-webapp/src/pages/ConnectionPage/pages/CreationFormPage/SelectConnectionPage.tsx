@@ -132,7 +132,6 @@ const SelectNewConnectionCard: React.FC = () => {
     if (destinationDefinitionId) {
       locationState.destinationDefinitionId = destinationDefinitionId;
     }
-    console.log("locationState", JSON.stringify(locationState));
 
     if (currentStepNumber === 1) {
       if (sourceDefinitionId) {
@@ -265,7 +264,6 @@ const SelectNewConnectionCard: React.FC = () => {
           <Button
             btnText="selectContinue"
             onClick={clickSelect}
-            disabled
             type={
               (currentStepNumber === 1 && (sourceId || sourceDefinitionId)) ||
               (currentStepNumber === 2 && (destinationId || destinationDefinitionId))

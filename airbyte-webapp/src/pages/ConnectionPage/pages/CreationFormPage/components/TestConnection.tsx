@@ -55,17 +55,34 @@ const LoadingImage = styled.img`
   animation: ${Loading} 1.8s linear infinite;
 `;
 
-const TestLoading: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
-  console.log("loading-page-------------------", isLoading, `type:${type}`);
+const TestingConnectionSuccess: React.FC<{
+  type: "destination" | "source" | "connection";
+}> = ({ type }) => {
   return (
     <>
-      <Container>
-        <Text>
-          {isLoading ? <FormattedMessage id="form.testing" /> : <FormattedMessage id={`form.${type}.validated`} />}
-        </Text>
-        {isLoading && <LoadingImage src="/icons/loading-icon.png" alt="loading-icon" />}
-        {!isLoading && <Image src="/icons/finish-icon.png" alt="finish-icon" />}
-      </Container>
+      <Text>
+        <FormattedMessage id={`form.${type}.validated`} />
+      </Text>
+      <Image src="/icons/finish-icon.png" alt="finish-icon" />
+    </>
+  );
+};
+
+const TestingConnection: React.FC = () => {
+  return (
+    <>
+      <Text>
+        <FormattedMessage id="form.testing" />
+      </Text>
+      <LoadingImage src="/icons/loading-icon.png" alt="loading-icon" />
+    </>
+  );
+};
+
+const TestConnection: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
+  return (
+    <>
+      <Container>{isLoading ? <TestingConnectionSuccess type={type} /> : <TestingConnection />}</Container>
       <ButtonRows>
         {((isLoading && type === "connection") || type !== "connection") && (
           <Button btnText="back" onClick={onBack} type="cancel" />
@@ -82,4 +99,4 @@ const TestLoading: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) =>
   );
 };
 
-export default TestLoading;
+export default TestConnection;
