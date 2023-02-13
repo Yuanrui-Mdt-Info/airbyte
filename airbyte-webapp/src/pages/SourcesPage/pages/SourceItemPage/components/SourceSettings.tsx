@@ -1,31 +1,31 @@
 import React, { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
-import DeleteBlock from "components/DeleteBlock";
-
 import { ConnectionConfiguration } from "core/domain/connection";
-import { SourceRead, WebBackendConnectionRead } from "core/request/AirbyteClient";
+import { SourceRead } from "core/request/AirbyteClient";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
-import { useFormChangeTrackerService, useUniqueFormId } from "hooks/services/FormChangeTracker";
-import { useDeleteSource, useUpdateSource } from "hooks/services/useSourceHook";
+import { useUniqueFormId } from "hooks/services/FormChangeTracker"; // useFormChangeTrackerService
+import { useUpdateSource } from "hooks/services/useSourceHook"; //
 import { useSourceDefinition } from "services/connector/SourceDefinitionService";
 import { useGetSourceDefinitionSpecification } from "services/connector/SourceDefinitionSpecificationService";
+import { FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
+import { ServiceFormValues } from "views/Connector/ServiceForm";
 
 import styles from "./SourceSettings.module.scss";
 
 interface SourceSettingsProps {
   currentSource: SourceRead;
-  connectionsWithSource: WebBackendConnectionRead[];
+  onBack?: () => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
 }
 
-const SourceSettings: React.FC<SourceSettingsProps> = ({ currentSource, connectionsWithSource }) => {
+const SourceSettings: React.FC<SourceSettingsProps> = ({ currentSource, onBack, onShowLoading }) => {
   const { mutateAsync: updateSource } = useUpdateSource();
-  const { mutateAsync: deleteSource } = useDeleteSource();
   const { setDocumentationPanelOpen } = useDocumentationPanelContext();
   const formId = useUniqueFormId();
-  const { clearFormChange } = useFormChangeTrackerService();
+  // const { clearFormChange } = useFormChangeTrackerService();
 
   useTrackPage(PageTrackingCodes.SOURCE_ITEM_SETTINGS);
   useEffect(() => {
@@ -48,11 +48,6 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({ currentSource, connecti
       sourceId: currentSource.sourceId,
     });
 
-  const onDelete = async () => {
-    clearFormChange(formId);
-    await deleteSource({ connectionsWithSource, source: currentSource });
-  };
-
   return (
     <div className={styles.content}>
       <ConnectorCard
@@ -68,8 +63,9 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({ currentSource, connecti
           serviceType: currentSource.sourceDefinitionId,
         }}
         selectedConnectorDefinitionSpecification={sourceDefinitionSpecification}
+        onBack={onBack}
+        onShowLoading={onShowLoading}
       />
-      <DeleteBlock type="source" onDelete={onDelete} />
     </div>
   );
 };

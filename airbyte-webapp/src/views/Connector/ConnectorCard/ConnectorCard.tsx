@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { Card } from "components";
+// import { Card } from "components";
 // import { JobItem } from "components/JobItem/JobItem";
 
 import { Action, Namespace } from "core/analytics";
@@ -109,7 +109,8 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   // const job = jobInfo || LogsRequestError.extractJobInfo(errorStatusRequest);
 
   return (
-    <Card fullWidth={full} title="">
+    // <Card fullWidth={full} title="">
+    <>
       <ServiceForm
         {...props}
         errorMessage={props.errorMessage || (error && generateMessageFromError(error))}
@@ -123,6 +124,7 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
         }
       />
       {/* {job && <JobItem job={job} />} */}
-    </Card>
+    </>
+    // </Card>
   );
 };
