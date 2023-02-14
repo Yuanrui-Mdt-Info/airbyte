@@ -6,15 +6,14 @@ import { useCreateDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
 import { DestinationForm } from "pages/DestinationPage/pages/CreateDestinationPage/components/DestinationForm";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
-import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 interface ConnectionCreateDestinationFormProps {
   afterSubmit: () => void;
   onBack?: () => void;
-  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
-  fetchingConnectorError?: FormError | null;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => void;
+  fetchingConnectorError?: JSX.Element | string | null;
   formValues: ServiceFormValues;
 }
 

@@ -11,11 +11,10 @@ import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
-import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
+import TestConnection from "views/Connector/TestConnection/TestConnection";
 
 import { DestinationForm } from "./components/DestinationForm";
 
@@ -29,7 +28,7 @@ export const CreateDestinationPage: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
-  const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
   const [formValues, setFormValues] = useState<ServiceFormValues>({
     name: "",
     serviceType: "",
@@ -70,7 +69,7 @@ export const CreateDestinationPage: React.FC = () => {
     push(`/${RoutePaths.Destination}`);
   };
 
-  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
     if (isLoading) {
       setCurrentStep("testing");
     } else {
@@ -89,7 +88,7 @@ export const CreateDestinationPage: React.FC = () => {
         {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="destinations.newDestinationTitle" />} /> */}
         <FormPageContent>
           {currentStep === "testing" && (
-            <TestLoading
+            <TestConnection
               onBack={handleBackButton}
               onFinish={handleFinishButton}
               isLoading={isLoading}

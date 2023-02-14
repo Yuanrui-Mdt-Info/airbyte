@@ -18,7 +18,6 @@ import TestConnection from "pages/ConnectionPage/pages/CreationFormPage/componen
 import { RoutePaths } from "pages/routePaths";
 // import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
 // import { useSourceDefinition } from "services/connector/SourceDefinitionService";
-import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
@@ -117,7 +116,7 @@ export const CreationFormPage: React.FC = () => {
   );
 
   const [isLoading, setLoadingStatus] = useState(true);
-  const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
   const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues>({
     name: "",
     serviceType: "",
@@ -200,14 +199,14 @@ export const CreationFormPage: React.FC = () => {
               //   setCurrentStep(StepsTypes.CREATE_CONNECTION);
               // }
             }}
-            onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+            onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
               setSourceFormValues(formValues);
               if (isLoading) {
                 setCurrentStep(StepsTypes.TEST_CONNECTION);
                 setLoadingStatus(true);
               } else {
                 setCurrentStep(StepsTypes.CREATE_ENTITY);
-                setFetchingConnectorError(error || null);
+                setFetchingConnectorError(error);
               }
             }}
             onBack={() => {
@@ -230,14 +229,14 @@ export const CreationFormPage: React.FC = () => {
               // setCurrentEntityStep(EntityStepsTypes.CONNECTION);
               // setCurrentStep(StepsTypes.CREATE_CONNECTION);
             }}
-            onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
+            onShowLoading={(isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
               setDestinationFormValues(formValues);
               if (isLoading) {
                 setCurrentStep(StepsTypes.TEST_CONNECTION);
                 setLoadingStatus(true);
               } else {
                 setCurrentStep(StepsTypes.CREATE_ENTITY);
-                setFetchingConnectorError(error || null);
+                setFetchingConnectorError(error);
               }
             }}
             onBack={() => {

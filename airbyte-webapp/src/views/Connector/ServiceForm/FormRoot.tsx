@@ -37,7 +37,7 @@ interface FormRootProps {
   successMessage?: React.ReactNode;
   onRetest?: () => void;
   onStopTestingConnector?: () => void;
-  formValues?: Partial<ServiceFormValues>;
+  isCopyMode?: boolean;
   onBack?: () => void;
 }
 
@@ -49,11 +49,13 @@ const FormRoot: React.FC<FormRootProps> = ({
   errorMessage,
   fetchingConnectorError,
   hasSuccess,
+  isCopyMode,
   onStopTestingConnector,
   onBack,
 }) => {
   const { dirty, isSubmitting, isValid } = useFormikContext<ServiceFormValues>();
   const { isLoadingSchema, selectedService, isEditMode, formType } = useServiceForm(); // resetServiceForm
+
   return (
     <FormContainer>
       {!isEditMode && <FormHeaderBox />}
@@ -91,7 +93,7 @@ const FormRoot: React.FC<FormRootProps> = ({
         isLoadSchema={isLoadingSchema}
         fetchingConnectorError={fetchingConnectorError}
         hasSuccess={hasSuccess}
-        disabled={isEditMode ? !isValid : !(isValid && dirty)}
+        disabled={isEditMode || isCopyMode ? !isValid : !(isValid && dirty)}
         onBack={onBack}
       />
       {/* )} */}

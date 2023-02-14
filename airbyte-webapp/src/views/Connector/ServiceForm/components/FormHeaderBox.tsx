@@ -9,7 +9,7 @@ import { useServiceForm } from "views/Connector/ServiceForm/serviceFormContext";
 const FormHeader = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
 `;
 
 const Content = styled.div`

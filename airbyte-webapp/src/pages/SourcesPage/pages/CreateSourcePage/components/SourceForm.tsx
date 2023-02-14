@@ -10,7 +10,6 @@ import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
 import { SourceDefinitionReadWithLatestTag } from "services/connector/SourceDefinitionService";
 import { useGetSourceDefinitionSpecificationAsync } from "services/connector/SourceDefinitionSpecificationService";
-import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
@@ -25,8 +24,8 @@ interface SourceFormProps {
   sourceDefinitions: SourceDefinitionReadWithLatestTag[];
   hasSuccess?: boolean;
   formValues: ServiceFormValues;
-  error?: FormError | null;
-  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
+  error?: JSX.Element | string | null;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => void;
   onBack?: () => void;
 }
 
@@ -85,7 +84,6 @@ export const SourceForm: React.FC<SourceFormProps> = ({
     });
   };
 
-  const errorMessage = error ? generateMessageFromError(error) : null;
   return (
     <ConnectorCard
       onServiceSelect={onDropDownSelect}
@@ -95,7 +93,7 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       selectedConnectorDefinitionSpecification={sourceDefinitionSpecification}
       hasSuccess={hasSuccess}
       fetchingConnectorError={sourceDefinitionError instanceof Error ? sourceDefinitionError : null}
-      errorMessage={errorMessage}
+      errorMessage={error}
       isLoading={isLoading}
       formValues={sourceDefinitionId ? { ...formValues, serviceType: sourceDefinitionId, name: "" } : undefined}
       title={<FormattedMessage id="onboarding.sourceSetUp" />}

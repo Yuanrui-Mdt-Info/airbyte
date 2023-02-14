@@ -124,6 +124,7 @@ export interface ServiceFormProps {
   onSubmit: (values: ServiceFormValues) => void;
   isLoading?: boolean;
   isEditMode?: boolean;
+  isCopyMode?: boolean;
   formValues?: Partial<ServiceFormValues>;
   hasSuccess?: boolean;
   fetchingConnectorError?: Error | null;
@@ -283,7 +284,7 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
           isLoadingSchema={props.isLoading}
           validationSchema={validationSchema}
         >
-          {!props.isEditMode && <SetDefaultName />}
+          {!props.isEditMode && !props.isCopyMode && <SetDefaultName />}
           <RevalidateOnValidationSchemaChange validationSchema={validationSchema} />
           <FormikPatch />
           <FormChangeTracker changed={dirty} formId={formId} />
@@ -296,7 +297,6 @@ const ServiceForm: React.FC<ServiceFormProps> = (props) => {
             onStopTestingConnector={onStopTesting ? () => onStopTesting() : undefined}
             onRetest={testConnector ? async () => await testConnector() : undefined}
             formFields={formFields}
-            formValues={formValues}
             onBack={onBack}
           />
 

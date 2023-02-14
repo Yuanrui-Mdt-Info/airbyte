@@ -5,7 +5,7 @@ import { LeftArrowHeadIcon } from "components/icons/LeftArrowHeadIcon";
 
 interface IProps {
   name: string;
-  linkName: string;
+  linkName: React.ReactNode;
   goBack: () => void;
 }
 

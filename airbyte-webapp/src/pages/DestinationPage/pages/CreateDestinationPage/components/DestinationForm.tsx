@@ -10,7 +10,6 @@ import { LogsRequestError } from "core/request/LogsRequestError";
 import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
 import { useGetDestinationDefinitionSpecificationAsync } from "services/connector/DestinationDefinitionSpecificationService";
-import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
@@ -24,9 +23,9 @@ interface DestinationFormProps {
   afterSelectConnector?: () => void;
   destinationDefinitions: DestinationDefinitionRead[];
   hasSuccess?: boolean;
-  error?: FormError | null;
+  error?: JSX.Element | string | null;
   formValues: ServiceFormValues;
-  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => void;
   onBack?: () => void;
 }
 
@@ -85,8 +84,6 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
     });
   };
 
-  const errorMessage = error ? generateMessageFromError(error) : null;
-
   return (
     <ConnectorCard
       onServiceSelect={onDropDownSelect}
@@ -96,7 +93,7 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
       availableServices={destinationDefinitions}
       selectedConnectorDefinitionSpecification={destinationDefinitionSpecification}
       hasSuccess={hasSuccess}
-      errorMessage={errorMessage}
+      errorMessage={error}
       isLoading={isLoading}
       // formValues={destinationServiceValues}
       formValues={destinationDefinitionId ? { ...formValues, serviceType: destinationDefinitionId } : undefined}

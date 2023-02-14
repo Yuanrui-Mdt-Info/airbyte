@@ -405,6 +405,8 @@
   "tables.overview": "Overview",
   "tables.settings": "Settings",
   "tables.dangerZone": "Danger zone",
+  "tables.allSources": "All Sources",
+  "tables.allDestinations": "All Destinations",
   "tables.sourceDelete": "Delete this source",
   "tables.destinationDelete": "Delete this destination",
   "tables.connectionDelete": "Delete this connection",

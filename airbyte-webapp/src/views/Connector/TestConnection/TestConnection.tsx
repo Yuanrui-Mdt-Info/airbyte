@@ -1,19 +1,18 @@
 import React from "react";
 import styled from "styled-components";
 
-import Button from "components/ButtonGroup/components/Button";
-
+import FooterButtons from "views/Connector/TestConnection/components/FooterButtons";
 import TestingLoading from "views/Connector/TestConnection/components/TestingLoading";
 import TestingSuccess from "views/Connector/TestConnection/components/TestingSuccess";
 
 interface Iprops {
   isLoading: boolean;
-  type: "destination" | "source" | "connection";
-  onBack: (btnType: string) => void;
-  onFinish: (btnType: string) => void;
+  type: "destination" | "source";
+  onBack: () => void;
+  onFinish: () => void;
 }
 
-const Container = styled.div`
+const LoadingContainer = styled.div`
   margin: 10% auto 200px auto;
   display: flex;
   align-items: center;
@@ -21,31 +20,11 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const ButtonRows = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin-top: 200px;
-  width: 100%;
-`;
-
-const TestConnection: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish, children }) => {
+const TestConnection: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
   return (
     <>
-      <Container>{isLoading ? <TestingSuccess type={type} /> : <TestingLoading />}</Container>
-      <ButtonRows>
-        {children}
-        {((isLoading && type === "connection") || type !== "connection") && (
-          <Button btnText="back" onClick={onBack} type="cancel" />
-        )}
-        {((!isLoading && type === "connection") || type !== "connection") && (
-          <Button
-            btnText={type === "connection" ? "returnToDashoard" : "continue"}
-            onClick={onFinish}
-            type={!isLoading ? "active" : "disabled"}
-          />
-        )}
-      </ButtonRows>
+      <LoadingContainer>{isLoading ? <TestingLoading /> : <TestingSuccess type={type} />}</LoadingContainer>
+      <FooterButtons onBack={onBack} onFinish={onFinish} isLoading={isLoading} />
     </>
   );
 };

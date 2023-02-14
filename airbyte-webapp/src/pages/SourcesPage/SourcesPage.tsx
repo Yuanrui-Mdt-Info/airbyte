@@ -7,6 +7,7 @@ import { StartOverErrorView } from "views/common/StartOverErrorView";
 
 import { RoutePaths } from "../routePaths";
 import AllSourcesPage from "./pages/AllSourcesPage";
+import CopySourcePage from "./pages/CopySourcePage/";
 import CreateSourcePage from "./pages/CreateSourcePage/CreateSourcePage";
 import SelectSourcePage from "./pages/CreateSourcePage/SelectSourcePage";
 import SourceItemPage from "./pages/SourceItemPage";
@@ -24,6 +25,7 @@ export const SourcesPage: React.FC = () => (
         </ResourceNotFoundErrorBoundary>
       }
     />
+    <Route path=":id/copy" element={<CopySourcePage />} />
     <Route index element={<AllSourcesPage />} />
     <Route element={<Navigate to="" />} />
   </Routes>

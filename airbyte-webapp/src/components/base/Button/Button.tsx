@@ -33,6 +33,8 @@ const getBackgroundColor = (props: IStyleProps) => {
     return props.theme.dangerColor;
   } else if (props.black) {
     return props.theme.black300;
+  } else if (props.white) {
+    return props.theme.whiteColor;
   }
 
   return props.theme.primaryColor;
@@ -46,6 +48,8 @@ const getTextColor = (props: IStyleProps) => {
     return props.theme.primaryColor;
   } else if (props.secondary || props.iconOnly) {
     return props.theme.darkGreyColor;
+  } else if (props.white) {
+    return props.theme.black300;
   }
 
   return props.theme.whiteColor;

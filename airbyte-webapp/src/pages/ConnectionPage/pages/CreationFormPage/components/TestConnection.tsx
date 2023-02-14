@@ -1,8 +1,10 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
+
+import TestingLoading from "views/Connector/TestConnection/components/TestingLoading";
+import TestingSuccess from "views/Connector/TestConnection/components/TestingSuccess";
 
 interface Iprops {
   isLoading: boolean;
@@ -27,62 +29,10 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const Text = styled.div`
-  font-size: 36px;
-  line-height: 58px;
-  margin-bottom: 120px;
-`;
-
-const Image = styled.img`
-  width: 120px;
-  height: 120px;
-`;
-
-const Loading = keyframes`
-0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-`;
-
-const LoadingImage = styled.img`
-  width: 120px;
-  height: 120px;
-  display: inline-block;
-  animation: ${Loading} 1.8s linear infinite;
-`;
-
-const TestingConnectionSuccess: React.FC<{
-  type: "destination" | "source" | "connection";
-}> = ({ type }) => {
-  return (
-    <>
-      <Text>
-        <FormattedMessage id={`form.${type}.validated`} />
-      </Text>
-      <Image src="/icons/finish-icon.png" alt="finish-icon" />
-    </>
-  );
-};
-
-const TestingConnection: React.FC = () => {
-  return (
-    <>
-      <Text>
-        <FormattedMessage id="form.testing" />
-      </Text>
-      <LoadingImage src="/icons/loading-icon.png" alt="loading-icon" />
-    </>
-  );
-};
-
 const TestConnection: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
   return (
     <>
-      <Container>{isLoading ? <TestingConnectionSuccess type={type} /> : <TestingConnection />}</Container>
+      <Container>{isLoading ? <TestingLoading /> : <TestingSuccess type={type} />}</Container>
       <ButtonRows>
         {((isLoading && type === "connection") || type !== "connection") && (
           <Button btnText="back" onClick={onBack} type="cancel" />

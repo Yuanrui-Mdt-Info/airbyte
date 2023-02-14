@@ -11,11 +11,10 @@ import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useCreateSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import TestLoading from "pages/SourcesPage/pages/CreateSourcePage/components/TestLoading";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
-import { FormError } from "utils/errorStatusMessage";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout/ConnectorDocumentationWrapper";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
+import TestConnection from "views/Connector/TestConnection/TestConnection";
 
 import { SourceForm } from "./components/SourceForm";
 
@@ -25,7 +24,7 @@ const CreateSourcePage: React.FC = () => {
   const [successRequest, setSuccessRequest] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
-  const [fetchingConnectorError, setFetchingConnectorError] = useState<FormError | null>(null);
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
   const [formValues, setFormValues] = useState<ServiceFormValues>({
     name: "",
     serviceType: "",
@@ -70,8 +69,7 @@ const CreateSourcePage: React.FC = () => {
     push(`/${RoutePaths.Source}`);
   };
 
-  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => {
-    console.log("error", error);
+  const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
     if (isLoading) {
       setCurrentStep("testing");
     } else {
@@ -89,7 +87,12 @@ const CreateSourcePage: React.FC = () => {
       <ConnectorDocumentationWrapper>
         <FormPageContent>
           {currentStep === "testing" && (
-            <TestLoading onBack={handleBackButton} onFinish={handleFinishButton} isLoading={isLoading} type="source" />
+            <TestConnection
+              onBack={handleBackButton}
+              onFinish={handleFinishButton}
+              isLoading={isLoading}
+              type="source"
+            />
           )}
           {currentStep === "creating" && (
             <SourceForm

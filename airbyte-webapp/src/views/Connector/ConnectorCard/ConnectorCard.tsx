@@ -9,7 +9,7 @@ import { Connector, ConnectorT } from "core/domain/connector";
 import { SynchronousJobRead } from "core/request/AirbyteClient";
 // import { LogsRequestError } from "core/request/LogsRequestError";
 import { useAnalyticsService } from "hooks/services/Analytics";
-import { generateMessageFromError, FormError } from "utils/errorStatusMessage";
+import { generateMessageFromError } from "utils/errorStatusMessage";
 import { ServiceForm, ServiceFormProps, ServiceFormValues } from "views/Connector/ServiceForm";
 
 import { useTestConnector } from "./useTestConnector";
@@ -23,8 +23,9 @@ interface ConnectorCardBaseProps extends ConnectorCardProvidedProps {
   title?: React.ReactNode;
   full?: boolean;
   jobInfo?: SynchronousJobRead | null;
-  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => void;
   onBack?: () => void;
+  isCopyMode?: boolean;
 }
 
 interface ConnectorCardCreateProps extends ConnectorCardBaseProps {
@@ -94,20 +95,22 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
     };
 
     try {
-      await testConnectorWithTracking();
+      if (!props.isCopyMode) {
+        await testConnectorWithTracking();
+      }
       await onSubmit(values);
       setSaved(true);
     } catch (e) {
       // Testing failed and return create form page
       if (onShowLoading) {
-        onShowLoading(false, values, e);
+        const errorMessage = e ? generateMessageFromError(e) : null;
+        onShowLoading(false, values, errorMessage);
       }
       // setErrorStatusRequest(e);
     }
   };
 
   // const job = jobInfo || LogsRequestError.extractJobInfo(errorStatusRequest);
-
   return (
     // <Card fullWidth={full} title="">
     <>

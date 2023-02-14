@@ -1,4 +1,4 @@
-import React, { Suspense } from "react"; // useMemo
+import React, { Suspense, useState } from "react"; // useMemo ,
 import { FormattedMessage } from "react-intl";
 import { Route, Routes, Navigate } from "react-router-dom";
 import styled from "styled-components";
@@ -21,16 +21,24 @@ import { useSourceDefinition } from "services/connector/SourceDefinitionService"
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 
 // import { useDestinationList } from "../../../../hooks/services/useDestinationHook";
+import { ServiceFormValues } from "views/Connector/ServiceForm/types";
+import TestConnection from "views/Connector/TestConnection";
+
 import { RoutePaths } from "../../../routePaths";
 import SourceConnectionTable from "./components/SourceConnectionTable";
 import SourceSettings from "./components/SourceSettings";
 
-export interface PageConfig {
+interface PageConfig {
   menuConfig: CategoryItem[];
 }
 
 interface SettingsPageProps {
   pageConfig?: PageConfig;
+}
+
+enum StepsTypes {
+  CREATE_ENTITY = "createEntity",
+  TEST_CONNECTION = "testConnection",
 }
 
 const Container = styled.div`
@@ -44,22 +52,18 @@ const TabContainer = styled.div`
   margin: 20px 0 40px 0;
 `;
 
-export const SettingsRoute = {
-  Account: "account",
-  Destination: "destination",
-  Source: "source",
-  Configuration: "configuration",
-  Notifications: "notifications",
-  Metrics: "metrics",
-  UserManagement: "user-management",
-  AccountSettings: "account-settings",
-  PlanAndBilling: "plan-and-billing",
-} as const;
-
 const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   useTrackPage(PageTrackingCodes.SOURCE_ITEM);
   const { query, push, pathname } = useRouter<{ id: string }, { id: string; "*": string }>(); // params
   // const currentStep = useMemo<string>(() => (params["*"] === "" ? StepsTypes.OVERVIEW : params["*"]), [params]);
+  const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
+  const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
+  const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
+  const [sourceFormValues, setSourceFormValues] = useState<ServiceFormValues | null>({
+    name: "",
+    serviceType: "",
+    connectionConfiguration: {},
+  });
 
   // const { destinations } = useDestinationList();
 
@@ -131,7 +135,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     {
       routes: [
         {
-          path: "status",
+          path: "overview",
           name: <FormattedMessage id="tables.overview" />,
           component: (
             <>
@@ -149,7 +153,47 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
         {
           path: "settings",
           name: <FormattedMessage id="tables.settings" />,
-          component: <SourceSettings currentSource={source} onBack={goBack} />,
+          component: (
+            <>
+              {currentStep === StepsTypes.TEST_CONNECTION && (
+                <TestConnection
+                  isLoading={loadingStatus}
+                  type="source"
+                  onBack={() => {
+                    setCurrentStep(StepsTypes.CREATE_ENTITY);
+                  }}
+                  onFinish={() => {
+                    goBack();
+                  }}
+                />
+              )}
+              {currentStep === StepsTypes.CREATE_ENTITY && (
+                <SourceSettings
+                  currentSource={source}
+                  errorMessage={fetchingConnectorError}
+                  onBack={goBack}
+                  formValues={sourceFormValues}
+                  afterSubmit={() => {
+                    setLoadingStatus(false);
+                  }}
+                  onShowLoading={(
+                    isLoading: boolean,
+                    formValues: ServiceFormValues | null,
+                    error: JSX.Element | string | null
+                  ) => {
+                    setSourceFormValues(formValues);
+                    if (isLoading) {
+                      setCurrentStep(StepsTypes.TEST_CONNECTION);
+                      setLoadingStatus(true);
+                    } else {
+                      setCurrentStep(StepsTypes.CREATE_ENTITY);
+                      setFetchingConnectorError(error);
+                    }
+                  }}
+                />
+              )}
+            </>
+          ),
           show: true,
         },
         {
@@ -174,28 +218,25 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
 
   return (
     <Container>
-      <SourceDetailsNav name={source.name} linkName="All Sources" goBack={goBack} />
+      <SourceDetailsNav name={source.name} linkName={<FormattedMessage id="tables.allSources" />} goBack={goBack} />
       <ConnectorDocumentationWrapper>
-        <SourceDetailsBox name={source.name} icon={sourceDefinition.icon} />
+        <SourceDetailsBox name={sourceDefinition.name} icon={sourceDefinition.icon} />
         <TabContainer>
           <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} />
         </TabContainer>
-
-        <Suspense fallback={<LoadingPage />}>
-          <ApiErrorBoundary>
-            <Suspense fallback={<LoadingPage />}>
-              <Routes>
-                {menuItems
-                  .flatMap((menuItem) => menuItem.routes)
-                  .map(
-                    ({ path, component: Component, show }) =>
-                      show && <Route key={path} path={path} element={Component} />
-                  )}
-                <Route path="*" element={<Navigate to={firstRoute()} replace />} />
-              </Routes>
-            </Suspense>
-
-            {/* <Routes>
+        <ApiErrorBoundary>
+          <Suspense fallback={<LoadingPage />}>
+            <Routes>
+              {menuItems
+                .flatMap((menuItem) => menuItem.routes)
+                .map(
+                  ({ path, component: Component, show }) => show && <Route key={path} path={path} element={Component} />
+                )}
+              <Route path="*" element={<Navigate to={firstRoute()} replace />} />
+            </Routes>
+          </Suspense>
+        </ApiErrorBoundary>
+        {/* <Routes>
               <Route
                 path="/settings"
                 element={<SourceSettings currentSource={source} connectionsWithSource={connectionsWithSource} />}
@@ -222,8 +263,6 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
                 }
               />
             </Routes> */}
-          </ApiErrorBoundary>
-        </Suspense>
       </ConnectorDocumentationWrapper>
     </Container>
   );

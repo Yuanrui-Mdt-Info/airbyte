@@ -5,15 +5,14 @@ import { useCreateSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
 import { SourceForm } from "pages/SourcesPage/pages/CreateSourcePage/components/SourceForm";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
-import { FormError } from "utils/errorStatusMessage";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 
 interface ConnectionCreateSourceFormProps {
   afterSubmit: () => void;
-  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: FormError | null) => void;
+  onShowLoading?: (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => void;
   onBack?: () => void;
-  fetchingConnectorError?: FormError | null;
+  fetchingConnectorError?: JSX.Element | string | null;
   formValues: ServiceFormValues;
 }
 

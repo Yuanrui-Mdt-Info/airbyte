@@ -3,16 +3,18 @@ import { FormattedMessage } from "react-intl";
 
 import { ConnectionConfiguration } from "core/domain/connection";
 import { SourceRead } from "core/request/AirbyteClient";
+import { SourceCloneRequestBody } from "core/request/AirbyteClient";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
 import { useUniqueFormId } from "hooks/services/FormChangeTracker"; // useFormChangeTrackerService
-import { useUpdateSource } from "hooks/services/useSourceHook"; //
+import { useCloneSource } from "hooks/services/useSourceHook";
+import useRouter from "hooks/useRouter";
 import { useSourceDefinition } from "services/connector/SourceDefinitionService";
 import { useGetSourceDefinitionSpecification } from "services/connector/SourceDefinitionSpecificationService";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
 import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ServiceFormValues } from "views/Connector/ServiceForm";
 
-import styles from "./SourceSettings.module.scss";
+import styles from "./SourceCopy.module.scss";
 
 interface SourceSettingsProps {
   currentSource: SourceRead;
@@ -27,7 +29,7 @@ interface SourceSettingsProps {
   ) => void;
 }
 
-const SourceSettings: React.FC<SourceSettingsProps> = ({
+const SourceCopy: React.FC<SourceSettingsProps> = ({
   currentSource,
   errorMessage,
   formValues,
@@ -35,9 +37,10 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({
   onShowLoading,
   afterSubmit,
 }) => {
-  const { mutateAsync: updateSource } = useUpdateSource();
+  const { mutateAsync: cloneSource } = useCloneSource();
   const { setDocumentationPanelOpen } = useDocumentationPanelContext();
   const formId = useUniqueFormId();
+  const { query } = useRouter<{ id: string }, { id: string; "*": string }>();
   // const { clearFormChange } = useFormChangeTrackerService();
 
   useTrackPage(PageTrackingCodes.SOURCE_ITEM_SETTINGS);
@@ -56,10 +59,14 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({
     serviceType: string;
     connectionConfiguration?: ConnectionConfiguration;
   }) => {
-    await updateSource({
-      values,
-      sourceId: currentSource.sourceId,
-    });
+    const cloneSourceData: SourceCloneRequestBody = {
+      sourceCloneId: query.id,
+      sourceConfiguration: {
+        name: values.name,
+        connectionConfiguration: values.connectionConfiguration,
+      },
+    };
+    await cloneSource({ source: cloneSourceData });
     if (afterSubmit) {
       afterSubmit();
     }
@@ -67,15 +74,15 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({
 
   const defaultFormValues = formValues?.serviceType
     ? formValues
-    : { ...currentSource, serviceType: currentSource.sourceDefinitionId };
+    : { ...currentSource, serviceType: currentSource.sourceDefinitionId, name: `${currentSource.name} (Copy)` };
 
   return (
     <div className={styles.content}>
       <ConnectorCard
         formId={formId}
         title={<FormattedMessage id="sources.sourceSettings" />}
-        isEditMode
         onSubmit={onSubmit}
+        isCopyMode
         formType="source"
         connector={currentSource}
         availableServices={[sourceDefinition]}
@@ -89,4 +96,4 @@ const SourceSettings: React.FC<SourceSettingsProps> = ({
   );
 };
 
-export default SourceSettings;
+export default SourceCopy;
