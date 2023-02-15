@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { ConnectionConfiguration } from "core/domain/connection";
@@ -9,6 +9,7 @@ import { useUpdateDestination } from "hooks/services/useDestinationHook";
 import { useDestinationDefinition } from "services/connector/DestinationDefinitionService";
 import { useGetDestinationDefinitionSpecification } from "services/connector/DestinationDefinitionSpecificationService";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
+import { useDocumentationPanelContext } from "views/Connector/ConnectorDocumentationLayout/DocumentationPanelContext";
 import { ServiceFormValues } from "views/Connector/ServiceForm";
 
 import styles from "./DestinationSettings.module.scss";
@@ -37,11 +38,18 @@ const DestinationsSettings: React.FC<DestinationsSettingsProps> = ({
   const destinationSpecification = useGetDestinationDefinitionSpecification(currentDestination.destinationDefinitionId);
   const destinationDefinition = useDestinationDefinition(currentDestination.destinationDefinitionId);
   const { mutateAsync: updateDestination } = useUpdateDestination();
+  const { setDocumentationPanelOpen } = useDocumentationPanelContext();
   // const { mutateAsync: deleteDestination } = useDeleteDestination();
   const formId = useUniqueFormId();
   // const { clearFormChange } = useFormChangeTrackerService();
 
   useTrackPage(PageTrackingCodes.DESTINATION_ITEM_SETTINGS);
+
+  useEffect(() => {
+    return () => {
+      setDocumentationPanelOpen(false);
+    };
+  }, [setDocumentationPanelOpen]);
 
   const onSubmitForm = async (values: {
     name: string;

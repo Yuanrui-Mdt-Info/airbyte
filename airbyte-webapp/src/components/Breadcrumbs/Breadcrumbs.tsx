@@ -14,12 +14,12 @@ const BreadcrumbsContainer = styled.div`
 
 const BreadcrumbsItem = styled.div<{ active: boolean }>`
   display: inline-block;
-  cursor: pointer;
+  cursor: ${({ active }) => (active ? "pointer" : "default")};
   color: ${({ theme, active }) => (active ? theme.primaryColor : "")};
   margin-left: 12px;
 
   &:hover {
-    opacity: 0.8;
+    opacity: ${({ active }) => (active ? 0.8 : 1)};
   }
 `;
 

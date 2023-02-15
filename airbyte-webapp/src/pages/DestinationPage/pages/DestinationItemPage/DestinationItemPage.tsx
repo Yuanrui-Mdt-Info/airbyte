@@ -55,6 +55,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
+  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(0);
   const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
@@ -67,11 +68,6 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
 
   const { connections } = useConnectionList();
   const { mutateAsync: deleteDestination } = useDeleteDestination();
-
-  // const onSelectStep = (id: string) => {
-  //   const path = id === StepsTypes.OVERVIEW ? "." : id.toLowerCase();
-  //   push(path);
-  // };
 
   const breadcrumbsData = [
     {
@@ -174,7 +170,10 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     },
   ];
 
-  const onSelectMenuItem = (newPath: string) => push(newPath);
+  const onSelectMenuItem = (newPath: string, activeTabIndex: number) => {
+    push(newPath);
+    setActiveTabIndex(activeTabIndex);
+  };
   const firstRoute = (): string => {
     const { routes } = menuItems[0];
     const filteredRoutes = routes.filter((route) => route.show === true);
@@ -190,7 +189,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
       <ConnectorDocumentationWrapper>
         <DefinitioDetails name={destinationDefinition.name} icon={destinationDefinition.icon} />
         <TabContainer>
-          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} />
+          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} activeTabIndex={activeTabIndex} />
         </TabContainer>
         <ApiErrorBoundary>
           <Suspense fallback={<LoadingPage />}>

@@ -20,7 +20,8 @@ export interface CategoryItem {
 interface IProps {
   data: CategoryItem[];
   activeItem?: string;
-  onSelect: (id: string) => void;
+  activeTabIndex?: number;
+  onSelect: (id: string, routeIndex: number) => void;
 }
 
 const Content = styled.div`
@@ -47,21 +48,24 @@ const TabName = styled.div`
   text-transform: uppercase;
 `;
 
-export const TabMenu: React.FC<IProps> = ({ data, activeItem, onSelect }) => {
+export const TabMenu: React.FC<IProps> = ({ data, activeItem, onSelect, activeTabIndex }) => {
+  // TODO: When bool is true, use the tabItem key(`activeTabIndex`) to determine the value of isActive
+  // Compatible with the `overview` option of the Source/Destination details page
+  const bol: boolean = typeof activeTabIndex !== "number" && activeTabIndex === undefined;
   return (
     <Content>
       {data.map((tabItem, index) => (
         <Tab key={index}>
           {tabItem.category && <TabName>{tabItem.category}</TabName>}
           {tabItem.routes.map(
-            (route) =>
+            (route, routeIndex) =>
               route.show && (
                 <TabItem
                   id={route.id}
                   key={route.path}
                   name={route.name}
-                  isActive={activeItem?.endsWith(route.path)}
-                  onClick={() => onSelect(route.path)}
+                  isActive={bol ? activeItem?.endsWith(route.path) : routeIndex === activeTabIndex}
+                  onClick={() => onSelect(route.path, routeIndex)}
                 />
               )
           )}
