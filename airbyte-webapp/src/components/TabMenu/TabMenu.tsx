@@ -42,7 +42,6 @@ const Tab = styled.div`
 const TabName = styled.div`
   padding: 5px 8px;
   font-weight: 500;
-  font-size: 10px;
   line-height: 12px;
   opacity: 0.5;
   text-transform: uppercase;

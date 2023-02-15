@@ -3,10 +3,12 @@ import { useIntl } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
-import ConnectionStep from "components/ConnectionStep";
+import { ConnectionStep } from "components/ConnectionStep";
 import DefinitionCard from "components/DataPanel";
 
+import { Action, Namespace } from "core/analytics";
 import { Connector, ConnectorDefinition } from "core/domain/connector";
+import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
@@ -41,6 +43,7 @@ const SelectNewSourceCard: React.FC = () => {
   const { push, location } = useRouter();
   const { formatMessage } = useIntl();
   const { sourceDefinitions } = useSourceDefinitionList();
+  const analyticsService = useAnalyticsService();
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string>(
     hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : ""
   );
@@ -50,6 +53,13 @@ const SelectNewSourceCard: React.FC = () => {
       state: {
         sourceDefinitionId,
       },
+    });
+
+    const connector = sourceDefinitions.find((item) => item.sourceDefinitionId === sourceDefinitionId);
+    analyticsService.track(Namespace.SOURCE, Action.SELECT, {
+      actionDescription: "Source connector type selected",
+      connector_source: connector?.name,
+      connector_source_definition_id: sourceDefinitionId,
     });
   };
 
@@ -62,7 +72,7 @@ const SelectNewSourceCard: React.FC = () => {
   };
   return (
     <>
-      <ConnectionStep lightMode type="source" currentStepNumber={1} />
+      <ConnectionStep lightMode type="source" />
       <Container>
         <DefinitionCard
           onSelect={afterSelect}

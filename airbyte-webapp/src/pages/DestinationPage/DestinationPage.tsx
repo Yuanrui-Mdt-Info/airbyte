@@ -7,6 +7,7 @@ import { StartOverErrorView } from "views/common/StartOverErrorView";
 
 import { RoutePaths } from "../routePaths";
 import AllDestinationsPage from "./pages/AllDestinationsPage";
+import CopyDestinationPage from "./pages/CopyDestinationPage";
 import { CreateDestinationPage } from "./pages/CreateDestinationPage/CreateDestinationPage";
 import SelectDestinationPage from "./pages/CreateDestinationPage/SelectDestinationPage";
 import DestinationItemPage from "./pages/DestinationItemPage";
@@ -22,6 +23,14 @@ const DestinationsPage: React.FC = () => {
         element={
           <ResourceNotFoundErrorBoundary errorComponent={<StartOverErrorView />}>
             <DestinationItemPage />
+          </ResourceNotFoundErrorBoundary>
+        }
+      />
+      <Route
+        path=":id/copy"
+        element={
+          <ResourceNotFoundErrorBoundary errorComponent={<StartOverErrorView />}>
+            <CopyDestinationPage />
           </ResourceNotFoundErrorBoundary>
         }
       />

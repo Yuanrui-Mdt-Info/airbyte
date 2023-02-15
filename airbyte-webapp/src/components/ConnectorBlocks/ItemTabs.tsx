@@ -6,6 +6,7 @@ import StepsMenu from "components/StepsMenu";
 export enum StepsTypes {
   OVERVIEW = "overview",
   SETTINGS = "settings",
+  DANGERZONE = "dangerZone",
 }
 
 interface IProps {

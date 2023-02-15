@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
-// import { FormattedMessage } from "react-intl";
-import ConnectionStep from "components/ConnectionStep";
+import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
-import HeadTitle from "components/HeadTitle";
-// import PageTitle from "components/PageTitle";
 
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
@@ -26,7 +23,7 @@ export const CreateDestinationPage: React.FC = () => {
   const { destinationDefinitions } = useDestinationDefinitionList();
   const { mutateAsync: createDestination } = useCreateDestination();
 
-  const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
+  const [currentStep, setCurrentStep] = useState<string>(CreateStepTypes.CREATE_DESTINATION);
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
   const [formValues, setFormValues] = useState<ServiceFormValues>({
@@ -54,8 +51,8 @@ export const CreateDestinationPage: React.FC = () => {
   };
 
   const handleBackButton = () => {
-    if (currentStep === "testing") {
-      setCurrentStep("creating");
+    if (currentStep === CreateStepTypes.TEST_CONNECTION) {
+      setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
       return;
     }
     push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`, {
@@ -71,9 +68,9 @@ export const CreateDestinationPage: React.FC = () => {
 
   const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
     if (isLoading) {
-      setCurrentStep("testing");
+      setCurrentStep(CreateStepTypes.TEST_CONNECTION);
     } else {
-      setCurrentStep("creating");
+      setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
     }
     setFormValues(formValues);
     setLoadingStatus(isLoading || false);
@@ -82,12 +79,10 @@ export const CreateDestinationPage: React.FC = () => {
 
   return (
     <>
-      <HeadTitle titles={[{ id: "destinations.newDestinationTitle" }]} />
-      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
+      <ConnectionStep lightMode type="destination" currentStepNumber={1} activeStep={CreateStepTypes.CREATE_SOURCE} />
       <ConnectorDocumentationWrapper>
-        {/* <PageTitle title={null} middleTitleBlock={<FormattedMessage id="destinations.newDestinationTitle" />} /> */}
         <FormPageContent>
-          {currentStep === "testing" && (
+          {currentStep === CreateStepTypes.TEST_CONNECTION && (
             <TestConnection
               onBack={handleBackButton}
               onFinish={handleFinishButton}
@@ -95,7 +90,7 @@ export const CreateDestinationPage: React.FC = () => {
               type="destination"
             />
           )}
-          {currentStep === "creating" && (
+          {currentStep === CreateStepTypes.CREATE_DESTINATION && (
             <DestinationForm
               onSubmit={onSubmitDestinationForm}
               destinationDefinitions={destinationDefinitions}

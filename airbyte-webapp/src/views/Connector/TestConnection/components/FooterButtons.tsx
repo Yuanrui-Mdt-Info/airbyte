@@ -36,7 +36,7 @@ const FooterButtons: React.FC<Iprops> = ({ isLoading, onBack, onFinish }) => {
   return (
     <Rows>
       <BtnContainer white type="button" onClick={onBack}>
-        <FormattedMessage id="form.button.cancel" />
+        <FormattedMessage id="form.button.back" />
       </BtnContainer>
       <BtnContainer onClick={onFinish} disabled={isLoading}>
         <FormattedMessage id="form.button.finish" />

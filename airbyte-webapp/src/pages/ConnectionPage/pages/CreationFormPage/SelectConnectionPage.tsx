@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useIntl } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
-import ConnectionStep from "components/ConnectionStep";
+import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
 
 import { Connector, ConnectorDefinition } from "core/domain/connector";
@@ -14,10 +14,10 @@ import { useSourceDefinitionList } from "services/connector/SourceDefinitionServ
 
 import ExistingEntityForm from "./components/ExistingEntityForm";
 
-export interface ButtonItems {
-  btnText: string;
-  type: "cancel" | "disabled" | "active";
-}
+// export interface ButtonItems {
+//   btnText: string;
+//   type: "cancel" | "disabled" | "active";
+// }
 
 interface State {
   currentStepNumber?: number;
@@ -25,6 +25,7 @@ interface State {
   destinationId?: string;
   sourceDefinitionId?: string;
   destinationDefinitionId?: string;
+  currentStep?: string;
 }
 
 const Container = styled.div`
@@ -52,11 +53,9 @@ const hasDestinationId = (state: unknown): state is { destinationId: string } =>
   );
 };
 
-const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
+const hasCurrentStep = (state: unknown): state is { currentStep: string } => {
   return (
-    typeof state === "object" &&
-    state !== null &&
-    typeof (state as { currentStepNumber?: number }).currentStepNumber === "number"
+    typeof state === "object" && state !== null && typeof (state as { currentStep?: string }).currentStep === "string"
   );
 };
 
@@ -93,33 +92,42 @@ const SelectNewConnectionCard: React.FC = () => {
   const [destinationDefinitionId, setDestinationDefinitionId] = useState<string>(
     !destinationId ? (hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : "") : ""
   );
-  const [currentStepNumber, setCurrentStepNumber] = useState<number>(
-    hasCurrentStepNumber(location.state) ? location.state.currentStepNumber : 1
-  ); // 1,2,3,4
+
+  const [currentStep, setCurrentStep] = useState<string>(
+    hasCurrentStep(location.state) ? location.state.currentStep : CreateStepTypes.CREATE_SOURCE
+  );
+
+  const [disabled, setDisabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (currentStep === CreateStepTypes.CREATE_SOURCE) {
+      setDisabled(!Boolean(sourceId || sourceDefinitionId));
+    } else {
+      setDisabled(!Boolean(destinationId || destinationDefinitionId));
+    }
+  }, [currentStep, sourceId, sourceDefinitionId, destinationId, destinationDefinitionId]);
 
   const clickCancel = () => {
-    setCurrentStepNumber(1);
+    setCurrentStep(CreateStepTypes.CREATE_SOURCE);
     if (sourceDefinitionId) {
       push("", {
         state: {
-          //  ...(location.state as Record<string, unknown>),
           sourceDefinitionId,
-          currentStepNumber: 1,
         },
       });
     } else {
       push("", {
         state: {
-          //  ...(location.state as Record<string, unknown>),
           sourceId,
-          currentStepNumber: 1,
         },
       });
     }
   };
 
   const clickSelect = () => {
-    const locationState: State = {};
+    const locationState: State = {
+      // currentStep,
+    };
     if (sourceId) {
       locationState.sourceId = sourceId;
     }
@@ -133,43 +141,30 @@ const SelectNewConnectionCard: React.FC = () => {
       locationState.destinationDefinitionId = destinationDefinitionId;
     }
 
-    if (currentStepNumber === 1) {
+    if (currentStep === CreateStepTypes.CREATE_SOURCE) {
       if (sourceDefinitionId) {
         push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
           state: {
             ...locationState,
-            currentStepNumber: 1,
+            currentStep: CreateStepTypes.CREATE_SOURCE,
           },
         });
-        setCurrentStepNumber(1);
       } else {
         push("", {
-          state: {
-            ...locationState,
-            currentStepNumber: 2,
-          },
+          state: locationState,
         });
-        setCurrentStepNumber(2);
+        setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
       }
       return;
     }
 
-    if (currentStepNumber === 2) {
-      if (destinationDefinitionId) {
-        push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
-          state: {
-            ...locationState,
-            currentStepNumber: 2,
-          },
-        });
-      } else {
-        push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
-          state: {
-            ...locationState,
-            currentStepNumber: 3,
-          },
-        });
-      }
+    if (currentStep === CreateStepTypes.CREATE_DESTINATION) {
+      push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
+        state: {
+          ...locationState,
+          currentStep: destinationDefinitionId ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_CONNECTION,
+        },
+      });
     }
   };
 
@@ -183,13 +178,13 @@ const SelectNewConnectionCard: React.FC = () => {
       return setDestinationDefinitionId("");
     }
 
-    if (currentStepNumber === 1) {
+    if (currentStep === CreateStepTypes.CREATE_SOURCE) {
       if (sourceId) {
         setSourceId("");
       }
       setSourceDefinitionId(selectId);
     }
-    if (currentStepNumber === 2) {
+    if (currentStep === CreateStepTypes.CREATE_DESTINATION) {
       if (destinationId) {
         setDestinationId("");
       }
@@ -198,13 +193,13 @@ const SelectNewConnectionCard: React.FC = () => {
   };
 
   const onSelectExistingSource = (id: string) => {
-    if (currentStepNumber === 1) {
+    if (currentStep === CreateStepTypes.CREATE_SOURCE) {
       if (sourceDefinitionId) {
         setSourceDefinitionId("");
       }
       setSourceId(id);
     }
-    if (currentStepNumber === 2) {
+    if (currentStep === CreateStepTypes.CREATE_DESTINATION) {
       if (destinationDefinitionId) {
         setDestinationDefinitionId("");
       }
@@ -213,9 +208,9 @@ const SelectNewConnectionCard: React.FC = () => {
   };
   return (
     <>
-      <ConnectionStep lightMode type="connection" currentStepNumber={currentStepNumber} />
+      <ConnectionStep lightMode type="connection" activeStep={currentStep} />
       <Container>
-        {currentStepNumber === 1 && (
+        {currentStep === CreateStepTypes.CREATE_SOURCE && (
           <>
             <ExistingEntityForm
               type="source"
@@ -237,7 +232,7 @@ const SelectNewConnectionCard: React.FC = () => {
           </>
         )}
 
-        {currentStepNumber === 2 && (
+        {currentStep === CreateStepTypes.CREATE_DESTINATION && (
           <>
             <ExistingEntityForm
               type="destination"
@@ -260,17 +255,10 @@ const SelectNewConnectionCard: React.FC = () => {
         )}
 
         <ButtonRows>
-          {currentStepNumber === 2 && <Button btnText="back" onClick={clickCancel} type="cancel" />}
-          <Button
-            btnText="selectContinue"
-            onClick={clickSelect}
-            type={
-              (currentStepNumber === 1 && (sourceId || sourceDefinitionId)) ||
-              (currentStepNumber === 2 && (destinationId || destinationDefinitionId))
-                ? "active"
-                : "disabled"
-            }
-          />
+          {currentStep === CreateStepTypes.CREATE_DESTINATION && (
+            <Button btnText="back" onClick={clickCancel} type="cancel" />
+          )}
+          <Button btnText="selectContinue" onClick={clickSelect} type={disabled ? "disabled" : "active"} />
         </ButtonRows>
       </Container>
     </>

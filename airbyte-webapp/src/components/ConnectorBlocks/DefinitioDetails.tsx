@@ -4,12 +4,16 @@ import styled from "styled-components";
 
 import { ConnectorIcon } from "components/ConnectorIcon";
 
-import { useServiceForm } from "views/Connector/ServiceForm/serviceFormContext";
+interface IProps {
+  icon?: string;
+  name?: string;
+}
 
 const FormHeader = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
+  background: #fff;
 `;
 
 const Content = styled.div`
@@ -21,16 +25,17 @@ const Content = styled.div`
 
 const Title = styled.div`
   font-weight: 700;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 30px;
 `;
 
 const Text = styled.div`
   font-weight: 400;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 22px;
   color: #6b6b6f;
   margin-top: 28px;
+  max-width: 432px;
 `;
 
 const ImageBox = styled.div`
@@ -49,17 +54,16 @@ export const Image = styled(ConnectorIcon)`
   border-radius: 18px;
 `;
 
-const FormHeaderBox: React.FC = () => {
-  const { selectedService } = useServiceForm();
+const FormHeaderBox: React.FC<IProps> = (props) => {
   return (
     <FormHeader>
       <ImageBox>
-        <Image icon={selectedService?.icon || ""} />
+        <Image icon={props?.icon || ""} />
       </ImageBox>
       <Content>
-        <Title>{selectedService?.name}</Title>
+        <Title>{props?.name}</Title>
         <Text>
-          <FormattedMessage id="form.header.subTitle" />{" "}
+          <FormattedMessage id="form.header.subTitle" />
         </Text>
       </Content>
     </FormHeader>

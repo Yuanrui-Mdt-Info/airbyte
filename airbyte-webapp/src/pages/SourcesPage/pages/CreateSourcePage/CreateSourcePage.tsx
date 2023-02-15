@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
-// import { FormattedMessage } from "react-intl";
-import ConnectionStep from "components/ConnectionStep";
+import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
-import HeadTitle from "components/HeadTitle";
-// import PageTitle from "components/PageTitle";
 
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
@@ -22,7 +19,7 @@ const CreateSourcePage: React.FC = () => {
   useTrackPage(PageTrackingCodes.SOURCE_NEW);
   const { push, location } = useRouter();
   const [successRequest, setSuccessRequest] = useState(false);
-  const [currentStep, setCurrentStep] = useState<string>("creating"); // creating|testing
+  const [currentStep, setCurrentStep] = useState<string>(CreateStepTypes.CREATE_SOURCE);
   const [isLoading, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
   const [formValues, setFormValues] = useState<ServiceFormValues>({
@@ -54,8 +51,8 @@ const CreateSourcePage: React.FC = () => {
   };
 
   const handleBackButton = () => {
-    if (currentStep === "testing") {
-      setCurrentStep("creating");
+    if (currentStep === CreateStepTypes.TEST_CONNECTION) {
+      setCurrentStep(CreateStepTypes.CREATE_SOURCE);
       return;
     }
     push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`, {
@@ -71,9 +68,9 @@ const CreateSourcePage: React.FC = () => {
 
   const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
     if (isLoading) {
-      setCurrentStep("testing");
+      setCurrentStep(CreateStepTypes.TEST_CONNECTION);
     } else {
-      setCurrentStep("creating");
+      setCurrentStep(CreateStepTypes.CREATE_SOURCE);
     }
     setFormValues(formValues);
     setLoadingStatus(isLoading || false);
@@ -82,11 +79,11 @@ const CreateSourcePage: React.FC = () => {
 
   return (
     <>
-      <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
+      {/* <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} /> */}
       <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <ConnectorDocumentationWrapper>
         <FormPageContent>
-          {currentStep === "testing" && (
+          {currentStep === CreateStepTypes.TEST_CONNECTION && (
             <TestConnection
               onBack={handleBackButton}
               onFinish={handleFinishButton}
@@ -94,7 +91,7 @@ const CreateSourcePage: React.FC = () => {
               type="source"
             />
           )}
-          {currentStep === "creating" && (
+          {currentStep === CreateStepTypes.CREATE_SOURCE && (
             <SourceForm
               onSubmit={onSubmitSourceStep}
               sourceDefinitions={sourceDefinitions}

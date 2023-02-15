@@ -3,10 +3,12 @@ import { useIntl } from "react-intl";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
-import ConnectionStep from "components/ConnectionStep";
+import { ConnectionStep } from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
 
+import { Action, Namespace } from "core/analytics";
 import { Connector, ConnectorDefinition } from "core/domain/connector";
+import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
@@ -29,19 +31,20 @@ export const ButtonRows = styled.div`
   width: 100%;
 `;
 
-const hasSourceDefinitionId = (state: unknown): state is { sourceDefinitionId: string } => {
+const hasDestinationDefinitionId = (state: unknown): state is { destinationDefinitionId: string } => {
   return (
     typeof state === "object" &&
     state !== null &&
-    typeof (state as { sourceDefinitionId?: string }).sourceDefinitionId === "string"
+    typeof (state as { destinationDefinitionId?: string }).destinationDefinitionId === "string"
   );
 };
 
 const SelectDestinationCard: React.FC = () => {
   const { push, location } = useRouter();
   const { formatMessage } = useIntl();
+  const analyticsService = useAnalyticsService();
   const [destinationDefinitionId, setDestinationDefinitionId] = useState<string>(
-    hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : ""
+    hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : ""
   );
 
   const { destinationDefinitions } = useDestinationDefinitionList();
@@ -50,6 +53,14 @@ const SelectDestinationCard: React.FC = () => {
     if (!destinationDefinitionId) {
       return;
     }
+
+    const connector = destinationDefinitions.find((item) => item.destinationDefinitionId === destinationDefinitionId);
+    analyticsService.track(Namespace.DESTINATION, Action.SELECT, {
+      actionDescription: "Destination connector type selected",
+      connector_destination: connector?.name,
+      connector_destination_definition_id: destinationDefinitionId,
+    });
+
     push(`/${RoutePaths.Destination}/${RoutePaths.DestinationNew}`, {
       state: {
         destinationDefinitionId,
@@ -67,7 +78,7 @@ const SelectDestinationCard: React.FC = () => {
 
   return (
     <>
-      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
+      <ConnectionStep lightMode type="destination" />
       <Container>
         <DataPanel
           onSelect={afterSelect}

@@ -3,12 +3,12 @@ import React from "react";
 import styled from "styled-components";
 
 import { Spinner } from "components";
+import { DefinitioDetails } from "components/ConnectorBlocks";
 
 import { FormBlock } from "core/form/types";
 
 import CreateControls from "./components/CreateControls";
 // import EditControls from "./components/EditControls";
-import FormHeaderBox from "./components/FormHeaderBox";
 import { FormSection } from "./components/Sections/FormSection";
 import ShowLoadingMessage from "./components/ShowLoadingMessage";
 import { useServiceForm } from "./serviceFormContext";
@@ -58,7 +58,7 @@ const FormRoot: React.FC<FormRootProps> = ({
 
   return (
     <FormContainer>
-      {!isEditMode && <FormHeaderBox />}
+      {!isEditMode && <DefinitioDetails name={selectedService?.name} icon={selectedService?.icon} />}
       <FormSection blocks={formFields} disabled={isSubmitting || isTestConnectionInProgress} />
       {isLoadingSchema && (
         <LoaderContainer>

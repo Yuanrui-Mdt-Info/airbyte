@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
+// import CreateStepTypes from "components/ConnectionStep";
 
 import useRouter from "hooks/useRouter";
 
 import StepBox from "./components/StepBox";
+import CreateStepTypes from "./CreateStepTypes";
 
 export interface StepMenuItem {
   id: string;
@@ -21,14 +23,14 @@ interface IProps {
   activeStep?: string;
   onSelect?: (id: string) => void;
   type?: "source" | "destination" | "connection";
-  currentStepNumber: number; // 1~4
+  currentStepNumber?: number; // 1~4
 }
 
-export enum StepsTypes {
-  CREATE_ENTITY = "createEntity",
-  CREATE_CONNECTOR = "createConnector",
-  CREATE_CONNECTION = "createConnection",
-}
+// export enum StepsTypes {
+//   CREATE_ENTITY = "createEntity",
+//   CREATE_CONNECTOR = "createConnector",
+//   CREATE_CONNECTION = "createConnection",
+// }
 
 export enum EntityStepsTypes {
   SOURCE = "source",
@@ -54,27 +56,9 @@ export const SingleText = styled.div`
   line-height: 30px;
 `;
 
-const hasSourceId = (state: unknown): state is { sourceId: string } => {
-  return typeof state === "object" && state !== null && typeof (state as { sourceId?: string }).sourceId === "string";
-};
+const currentStepArray: string[] = ["", "createSource", "createDestination", "createConnection", "allFinish"];
 
-const hasDestinationId = (state: unknown): state is { destinationId: string } => {
-  return (
-    typeof state === "object" &&
-    state !== null &&
-    typeof (state as { destinationId?: string }).destinationId === "string"
-  );
-};
-
-const hasCurrentStepNumber = (state: unknown): state is { currentStepNumber: number } => {
-  return (
-    typeof state === "object" &&
-    state !== null &&
-    typeof (state as { currentStepNumber?: number }).currentStepNumber === "number"
-  );
-};
-
-const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
+const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, activeStep }) => {
   const { location } = useRouter(); // push
   const locationType = location.pathname.split("/")[1];
 
@@ -85,64 +69,34 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
       ? EntityStepsTypes.DESTINATION
       : EntityStepsTypes.SOURCE;
 
-  const [currentStep, setCurrentStep] = useState<number>(1);
-
-  // hasSourceId(location.state) && hasDestinationId(location.state)
-  //   ? StepsTypes.CREATE_CONNECTION
-  //   : hasSourceId(location.state) && !hasDestinationId(location.state)
-  //   ? StepsTypes.CREATE_CONNECTOR
-  //   : StepsTypes.CREATE_ENTITY
+  const [currentStepNumber, setCurrentStepNumber] = useState<number>(1);
 
   useEffect(() => {
-    setCurrentStep(
-      hasCurrentStepNumber(location.state)
-        ? location.state.currentStepNumber
-        : hasSourceId(location.state)
-        ? 2
-        : hasDestinationId(location.state)
-        ? 3
-        : 1
-    );
-    // console.log("change currentStep", currentStep);
-  }, [hasSourceId, hasDestinationId, hasCurrentStepNumber, location]);
-
-  // const [currentStep] = useState(
-  //   // setCurrentStep
-
-  //   hasSourceId(location.state) && hasDestinationId(location.state)
-  //     ? StepsTypes.CREATE_CONNECTION
-  //     : hasSourceId(location.state) && !hasDestinationId(location.state)
-  //     ? StepsTypes.CREATE_CONNECTOR
-  //     : StepsTypes.CREATE_ENTITY
-  // );
-
-  // setCurrentStep(StepsTypes.CREATE_CONNECTOR)
-
-  // const [currentEntityStep] = useState(
-  //   // setCurrentEntityStep
-
-  //   hasSourceId(location.state) ? EntityStepsTypes.DESTINATION : EntityStepsTypes.SOURCE
-  // );
+    if (activeStep !== CreateStepTypes.TEST_CONNECTION) {
+      const stepNumber: number = currentStepArray.findIndex((val) => val === activeStep);
+      setCurrentStepNumber(stepNumber);
+    }
+  }, [activeStep]);
 
   const steps: StepMenuItem[] =
     type === "connection"
       ? [
           {
-            id: StepsTypes.CREATE_ENTITY,
+            id: CreateStepTypes.CREATE_SOURCE,
             name: <FormattedMessage id="onboarding.addSource" />,
           },
           {
-            id: StepsTypes.CREATE_CONNECTOR,
+            id: CreateStepTypes.CREATE_DESTINATION,
             name: <FormattedMessage id="onboarding.addDestination" />,
           },
           {
-            id: StepsTypes.CREATE_CONNECTION,
+            id: CreateStepTypes.CREATE_CONNECTION,
             name: <FormattedMessage id="onboarding.configurations" />,
           },
         ]
       : [
           {
-            id: StepsTypes.CREATE_ENTITY,
+            id: type === "destination" ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_SOURCE,
             name:
               type === "destination" ? (
                 <FormattedMessage id="onboarding.addDestination" />
@@ -165,9 +119,8 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode }) => {
               stepNumber={key}
               {...item}
               onClick={onSelect || item.onSelect}
-              currentStepNumber={currentStep}
-              // isActive={currentStep === item.id}
-              isActive={key < currentStep}
+              currentStepNumber={currentStepNumber}
+              isActive={key < currentStepNumber}
             />
           ))}
         </>

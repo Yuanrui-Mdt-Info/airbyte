@@ -4,6 +4,8 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import styled from "styled-components";
 
 import ApiErrorBoundary from "components/ApiErrorBoundary";
+import Breadcrumbs from "components/Breadcrumbs";
+import { TableItemTitle, DefinitioDetails } from "components/ConnectorBlocks";
 import DeleteBlock from "components/DeleteBlock";
 import LoadingPage from "components/LoadingPage";
 import { TabMenu, CategoryItem } from "components/TabMenu";
@@ -13,10 +15,9 @@ import { useConnectionList } from "hooks/services/useConnectionHook";
 import { useGetSource } from "hooks/services/useSourceHook";
 import { useDeleteSource } from "hooks/services/useSourceHook";
 import useRouter from "hooks/useRouter";
+
 // import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
-import SourceDetailsBox from "pages/SourcesPage/pages/SourceItemPage/components/SourceDetailsBox";
-import SourceDetailsNav from "pages/SourcesPage/pages/SourceItemPage/components/SourceDetailsNav";
-import TableItemTitle from "pages/SourcesPage/pages/SourceItemPage/components/TableItemTitle";
+
 import { useSourceDefinition } from "services/connector/SourceDefinitionService";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 
@@ -65,65 +66,27 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     connectionConfiguration: {},
   });
 
-  // const { destinations } = useDestinationList();
-
-  // const { destinationDefinitions } = useDestinationDefinitionList();
-
   const source = useGetSource(query.id);
   const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
 
   const { connections } = useConnectionList();
   const { mutateAsync: deleteSource } = useDeleteSource();
 
-  // const breadcrumbsData = [
-  //   {
-  //     name: <FormattedMessage id="sidebar.sources" />,
-  //     onClick: () => push(".."),
-  //   },
-  //   { name: source.name },
-  // ];
+  const breadcrumbsData = [
+    {
+      name: <FormattedMessage id="tables.allSources" />,
+      onClick: () => push(".."),
+    },
+    { name: source.name },
+  ];
 
   const connectionsWithSource = connections.filter((connectionItem) => connectionItem.sourceId === source.sourceId);
-
-  // const destinationsDropDownData = useMemo(
-  //   () =>
-  //     destinations.map((item) => {
-  //       const destinationDef = destinationDefinitions.find(
-  //         (dd) => dd.destinationDefinitionId === item.destinationDefinitionId
-  //       );
-  //       return {
-  //         label: item.name,
-  //         value: item.destinationId,
-  //         img: <ConnectorIcon icon={destinationDef?.icon} />,
-  //       };
-  //     }),
-  //   [destinations, destinationDefinitions]
-  // );
-
-  // const onSelectStep = (id: string) => {
-  //   const path = id === StepsTypes.OVERVIEW ? "." : id.toLowerCase();
-  //   push(path);
-  // };
-
-  // const onSelect = (data: DropDownRow.IDataItem) => {
-  //   const path = `../${RoutePaths.ConnectionNew}`;
-  //   const state =
-  //     data.value === "create-new-item"
-  //       ? { sourceId: source.sourceId }
-  //       : {
-  //           destinationId: data.value,
-  //           sourceId: source.sourceId,
-  //         };
-
-  //   push(path, { state });
-  // };
 
   const goBack = () => {
     push(`/${RoutePaths.Source}`);
   };
 
   const onDelete = async () => {
-    // clearFormChange(formId);
     await deleteSource({ connectionsWithSource, source });
   };
 
@@ -135,7 +98,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     {
       routes: [
         {
-          path: "overview",
+          path: "",
           name: <FormattedMessage id="tables.overview" />,
           component: (
             <>
@@ -162,9 +125,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
                   onBack={() => {
                     setCurrentStep(StepsTypes.CREATE_ENTITY);
                   }}
-                  onFinish={() => {
-                    goBack();
-                  }}
+                  onFinish={goBack}
                 />
               )}
               {currentStep === StepsTypes.CREATE_ENTITY && (
@@ -218,9 +179,9 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
 
   return (
     <Container>
-      <SourceDetailsNav name={source.name} linkName={<FormattedMessage id="tables.allSources" />} goBack={goBack} />
+      <Breadcrumbs data={breadcrumbsData} currentStep={0} />
       <ConnectorDocumentationWrapper>
-        <SourceDetailsBox name={sourceDefinition.name} icon={sourceDefinition.icon} />
+        <DefinitioDetails name={sourceDefinition.name} icon={sourceDefinition.icon} />
         <TabContainer>
           <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} />
         </TabContainer>
@@ -236,33 +197,6 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
             </Routes>
           </Suspense>
         </ApiErrorBoundary>
-        {/* <Routes>
-              <Route
-                path="/settings"
-                element={<SourceSettings currentSource={source} connectionsWithSource={connectionsWithSource} />}
-              />
-              <Route
-                index
-                element={
-                  <>
-                    <TableItemTitle
-                    type="destination"
-                    dropDownData={destinationsDropDownData}
-                    onSelect={onSelect}
-                    entity={source.sourceName}
-                    entityName={source.name}
-                    entityIcon={sourceDefinition ? getIcon(sourceDefinition.icon) : null}
-                    releaseStage={sourceDefinition.releaseStage}
-                  />
-                    {connectionsWithSource.length ? (
-                      <SourceConnectionTable connections={connectionsWithSource} />
-                    ) : (
-                      <Placeholder resource={ResourceTypes.Destinations} />
-                    )}
-                  </>
-                }
-              />
-            </Routes> */}
       </ConnectorDocumentationWrapper>
     </Container>
   );

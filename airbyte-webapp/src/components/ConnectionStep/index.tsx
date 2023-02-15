@@ -1,2 +1,4 @@
 import ConnectionStep from "./ConnectionStep";
-export default ConnectionStep;
+import CreateStepTypes from "./CreateStepTypes";
+
+export { CreateStepTypes, ConnectionStep };

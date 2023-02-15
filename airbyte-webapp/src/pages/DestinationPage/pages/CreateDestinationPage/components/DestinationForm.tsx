@@ -3,11 +3,10 @@ import { FormattedMessage } from "react-intl";
 
 // import { useDataCardContext } from "components/DataPanel/DataCardContext";
 
-import { Action, Namespace } from "core/analytics";
 import { ConnectionConfiguration } from "core/domain/connection";
 import { DestinationDefinitionRead } from "core/request/AirbyteClient";
 import { LogsRequestError } from "core/request/LogsRequestError";
-import { useAnalyticsService } from "hooks/services/Analytics";
+// import { useAnalyticsService } from "hooks/services/Analytics";
 import useRouter from "hooks/useRouter";
 import { useGetDestinationDefinitionSpecificationAsync } from "services/connector/DestinationDefinitionSpecificationService";
 import { ConnectorCard } from "views/Connector/ConnectorCard";
@@ -43,13 +42,11 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
   error,
   hasSuccess,
   formValues,
-  afterSelectConnector,
+  // afterSelectConnector,
   onShowLoading,
   onBack,
 }) => {
   const { location } = useRouter();
-  const analyticsService = useAnalyticsService();
-  // const { destinationServiceValues } = useDataCardContext();
 
   const [destinationDefinitionId, setDestinationDefinitionId] = useState(
     hasDestinationDefinitionId(location.state) ? location.state.destinationDefinitionId : null
@@ -63,18 +60,10 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
 
   const onDropDownSelect = (destinationDefinitionId: string) => {
     setDestinationDefinitionId(destinationDefinitionId);
-
-    const connector = destinationDefinitions.find((item) => item.destinationDefinitionId === destinationDefinitionId);
-
-    if (afterSelectConnector) {
-      afterSelectConnector();
-    }
-
-    analyticsService.track(Namespace.DESTINATION, Action.SELECT, {
-      actionDescription: "Destination connector type selected",
-      connector_destination: connector?.name,
-      connector_destination_definition_id: destinationDefinitionId,
-    });
+    // const connector = destinationDefinitions.find((item) => item.destinationDefinitionId === destinationDefinitionId);
+    // if (afterSelectConnector) {
+    //   afterSelectConnector();
+    // }
   };
 
   const onSubmitForm = async (values: { name: string; serviceType: string }) => {
@@ -95,7 +84,6 @@ export const DestinationForm: React.FC<DestinationFormProps> = ({
       hasSuccess={hasSuccess}
       errorMessage={error}
       isLoading={isLoading}
-      // formValues={destinationServiceValues}
       formValues={destinationDefinitionId ? { ...formValues, serviceType: destinationDefinitionId } : undefined}
       title={<FormattedMessage id="onboarding.destinationSetUp" />}
       jobInfo={LogsRequestError.extractJobInfo(error)}

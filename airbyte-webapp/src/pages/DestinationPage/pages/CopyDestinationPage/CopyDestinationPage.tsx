@@ -1,18 +1,16 @@
 import React, { useState } from "react"; // useMemo
 import styled from "styled-components";
 
-// import { useConnectionList } from "hooks/services/useConnectionHook";
 import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 
-import { useGetSource } from "hooks/services/useSourceHook";
+import { useGetDestination } from "hooks/services/useDestinationHook";
 import useRouter from "hooks/useRouter";
-// import { useSourceDefinition } from "services/connector/SourceDefinitionService";
 import { ConnectorDocumentationWrapper } from "views/Connector/ConnectorDocumentationLayout";
 import { ServiceFormValues } from "views/Connector/ServiceForm/types";
 import TestConnection from "views/Connector/TestConnection";
 
 import { RoutePaths } from "../../../routePaths";
-import SourceCopy from "./components/SourceCopy";
+import DestinationCopy from "./components/DestinationCopy";
 
 const Container = styled.div`
   padding: 10px 70px;
@@ -21,47 +19,46 @@ const Container = styled.div`
   box-sizing: border-box;
 `;
 
-const CopySourcePage: React.FC = () => {
+const CopyDestinationPage: React.FC = () => {
   const { query, push } = useRouter<{ id: string }, { id: string; "*": string }>();
-  const [currentStep, setCurrentStep] = useState(CreateStepTypes.CREATE_SOURCE);
+  const [currentStep, setCurrentStep] = useState(CreateStepTypes.CREATE_DESTINATION);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
-  const [sourceFormValues, setSourceFormValues] = useState<ServiceFormValues | null>({
+  const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
     connectionConfiguration: {},
   });
 
-  const source = useGetSource(query.id);
-  //   const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
+  const destination = useGetDestination(query.id);
 
   const goBack = () => {
-    push(`/${RoutePaths.Source}`);
+    push(`/${RoutePaths.Destination}`);
   };
 
   return (
     <>
-      <ConnectionStep lightMode type="source" currentStepNumber={1} activeStep={CreateStepTypes.CREATE_SOURCE} />
+      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
       <Container>
         <ConnectorDocumentationWrapper>
           {currentStep === CreateStepTypes.TEST_CONNECTION && (
             <TestConnection
               isLoading={loadingStatus}
-              type="source"
+              type="destination"
               onBack={() => {
-                setCurrentStep(CreateStepTypes.CREATE_SOURCE);
+                setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
               }}
               onFinish={() => {
                 goBack();
               }}
             />
           )}
-          {currentStep === CreateStepTypes.CREATE_SOURCE && (
-            <SourceCopy
-              currentSource={source}
+          {currentStep === CreateStepTypes.CREATE_DESTINATION && (
+            <DestinationCopy
+              currentDestination={destination}
               errorMessage={fetchingConnectorError}
               onBack={goBack}
-              formValues={sourceFormValues}
+              formValues={destinationFormValues}
               afterSubmit={() => {
                 setLoadingStatus(false);
               }}
@@ -70,12 +67,12 @@ const CopySourcePage: React.FC = () => {
                 formValues: ServiceFormValues | null,
                 error: JSX.Element | string | null
               ) => {
-                setSourceFormValues(formValues);
+                setDestinationFormValues(formValues);
                 if (isLoading) {
                   setCurrentStep(CreateStepTypes.TEST_CONNECTION);
                   setLoadingStatus(true);
                 } else {
-                  setCurrentStep(CreateStepTypes.CREATE_SOURCE);
+                  setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
                   setFetchingConnectorError(error || null);
                 }
               }}
@@ -87,4 +84,4 @@ const CopySourcePage: React.FC = () => {
   );
 };
 
-export default CopySourcePage;
+export default CopyDestinationPage;
