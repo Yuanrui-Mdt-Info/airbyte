@@ -25,6 +25,7 @@ const Text = styled.div`
   line-height: 30px;
   color: #999999;
   margin: 12px 0;
+  white-space: pre-line;
 `;
 
 const DeleteButton = styled(Button)`

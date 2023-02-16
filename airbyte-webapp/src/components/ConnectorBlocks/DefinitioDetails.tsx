@@ -13,7 +13,6 @@ const FormHeader = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 40px;
-  background: #fff;
 `;
 
 const Content = styled.div`

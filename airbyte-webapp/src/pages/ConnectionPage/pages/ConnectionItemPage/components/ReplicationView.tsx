@@ -19,6 +19,8 @@ import {
   useUpdateConnection,
   ValuesProps,
 } from "hooks/services/useConnectionHook";
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
 import { equal, naturalComparatorBy } from "utils/objects";
 import { CatalogDiffModal } from "views/Connection/CatalogDiffModal/CatalogDiffModal";
 import { ConnectionForm, ConnectionFormSubmitResult } from "views/Connection/ConnectionForm";
@@ -71,8 +73,8 @@ const ResetWarningModal: React.FC<ResetWarningModalProps> = ({ onCancel, onClose
 };
 
 const Content = styled.div`
-  max-width: 1279px;
-  margin: 0 auto;
+  // max-width: 1279px;
+  margin: 0 20px;
   padding-bottom: 10px;
 `;
 
@@ -83,6 +85,7 @@ const TryArrow = styled(FontAwesomeIcon)`
 
 export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSchema, connectionId }) => {
   const { formatMessage } = useIntl();
+  const { push } = useRouter();
   const { openModal, closeModal } = useModalService();
   const { openConfirmationModal, closeConfirmationModal } = useConfirmationModalService();
   const connectionFormDirtyRef = useRef<boolean>(false);
@@ -211,6 +214,10 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
     setActiveUpdatingSchemaMode(false);
   };
 
+  const onBack = () => {
+    push(`/${RoutePaths.Connections}`);
+  };
+
   const onDirtyChanges = useCallback((dirty: boolean) => {
     connectionFormDirtyRef.current = dirty;
   }, []);
@@ -232,6 +239,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
             </Button>
           }
           onFormDirtyChanges={onDirtyChanges}
+          onBack={onBack}
         />
       ) : (
         <LoadingSchema />

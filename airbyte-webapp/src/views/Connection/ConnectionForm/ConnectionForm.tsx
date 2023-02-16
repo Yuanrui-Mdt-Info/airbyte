@@ -229,10 +229,12 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
         <FormContainer className={className}>
           <FormChangeTracker changed={dirty} formId={formId} />
           {onFormDirtyChanges && <DirtyChangeTracker dirty={dirty} onChanges={onFormDirtyChanges} />}
+          {mode === "create" && (
+            <ConfigurationsLabel>
+              <FormattedMessage id="onboarding.configurations" />
+            </ConfigurationsLabel>
+          )}
 
-          <ConfigurationsLabel>
-            <FormattedMessage id="onboarding.configurations" />
-          </ConfigurationsLabel>
           <Section title={<FormattedMessage id="connection.basicSettings" />}>
             {!isEditMode && (
               // <Section>
@@ -367,26 +369,33 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
           </Section>
           {/* </Card> */}
           {mode === "edit" && (
-            <EditControls
-              isSubmitting={isSubmitting}
-              dirty={dirty}
-              resetForm={() => {
-                resetForm();
-                onCancel?.();
-              }}
-              successMessage={successMessage}
-              errorMessage={errorMessage || !isValid ? formatMessage({ id: "connectionForm.validation.error" }) : null}
-              enableControls={canSubmitUntouchedForm}
-            />
+            <>
+              <OperationsSection
+                wrapper={({ children }) => <StyledSection>{children}</StyledSection>}
+                destDefinition={destDefinition}
+                onStartEditTransformation={toggleEditingTransformation}
+                onEndEditTransformation={toggleEditingTransformation}
+              />
+              <EditControls
+                isSubmitting={isSubmitting}
+                dirty={dirty}
+                resetForm={() => {
+                  resetForm();
+                  onCancel?.();
+                }}
+                onBack={onBack}
+                successMessage={successMessage}
+                errorMessage={
+                  errorMessage || !isValid ? formatMessage({ id: "connectionForm.validation.error" }) : null
+                }
+                enableControls={canSubmitUntouchedForm}
+              />
+            </>
           )}
           {mode === "create" && (
             <>
               <OperationsSection
-                wrapper={({ children }) => (
-                  // <Card>
-                  <StyledSection>{children}</StyledSection>
-                  // </Card>
-                )}
+                wrapper={({ children }) => <StyledSection>{children}</StyledSection>}
                 destDefinition={destDefinition}
                 onStartEditTransformation={toggleEditingTransformation}
                 onEndEditTransformation={toggleEditingTransformation}
