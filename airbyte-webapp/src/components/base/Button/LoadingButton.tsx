@@ -25,11 +25,23 @@ const SymbolSpinner = styled(FontAwesomeIcon)<ButtonProps>`
   margin: -1px 0 -3px -9px;
 `;
 
+const SubmitButton = styled(Button)`
+  width: 160px;
+  height: 46px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+`;
+
 const ButtonView = styled(Button)<ButtonProps>`
   pointer-events: none;
   background: ${({ theme, danger }) => (danger ? theme.dangerColor25 : theme.primaryColor25)};
   border-color: transparent;
   position: relative;
+  width: 160px;
+  height: 46px;
+  border-radius: 6px;
+  font-size: 16px;
 `;
 
 const Invisible = styled.div`
@@ -56,7 +68,7 @@ const LoadingButton: React.FC<ButtonProps> = (props) => {
     );
   }
 
-  return <Button {...props} />;
+  return <SubmitButton {...props} />;
 };
 
 export default LoadingButton;

@@ -41,6 +41,7 @@ interface StatusViewProps {
   isSync?: boolean;
   afterSync?: (disabled?: boolean) => void;
   getLastSyncTime: (dateTime?: number) => void;
+  onOpenMessageBox: (id: string) => void;
 }
 
 const getJobRunningOrPending = (jobs: JobWithAttemptsRead[]) => {
@@ -50,7 +51,13 @@ const getJobRunningOrPending = (jobs: JobWithAttemptsRead[]) => {
   });
 };
 
-const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, getLastSyncTime }) => {
+const StatusView: React.FC<StatusViewProps> = ({
+  connection,
+  isSync,
+  afterSync,
+  getLastSyncTime,
+  onOpenMessageBox,
+}) => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_ITEM_STATUS);
   const [activeJob, setActiveJob] = useState<ActiveJob>();
   const [jobPageSize, setJobPageSize] = useState(JOB_PAGE_SIZE_INCREMENT);
@@ -95,7 +102,7 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
       text: `form.resetDataText`,
       title: `form.resetData`,
       submitButtonText: "form.reset",
-      cancelButtonText: "form.noNeed",
+      cancelButtonText: "form.cancel",
       onSubmit: async () => {
         await onReset();
         setActiveJob((state) => ({ ...state, action: ActionType.RESET } as ActiveJob));
@@ -112,11 +119,13 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
       submitButtonText: "connection.cancelSync.modal.buttom.confirm",
       cancelButtonText: "connection.cancelSync.modal.buttom.notNow",
       onSubmit: async () => {
+        closeConfirmationModal();
+        onOpenMessageBox("connection.messagebox.cancel");
         await onCancelJob();
         // setActiveJob((state) => ({ ...state, action: ActionType.RESET } as ActiveJob));
-        closeConfirmationModal();
       },
       submitButtonDataId: "cancel",
+      center: true,
     });
   };
 

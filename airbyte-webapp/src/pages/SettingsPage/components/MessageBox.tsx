@@ -27,7 +27,7 @@ const Container = styled.div`
 
 const Message = styled.div`
   font-weight: 400;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 20px;
   color: #1e40af;
   padding: 17px;

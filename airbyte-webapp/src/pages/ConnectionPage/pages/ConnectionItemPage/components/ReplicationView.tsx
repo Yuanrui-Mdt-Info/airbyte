@@ -90,7 +90,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
   const { openConfirmationModal, closeConfirmationModal } = useConfirmationModalService();
   const connectionFormDirtyRef = useRef<boolean>(false);
   const [activeUpdatingSchemaMode, setActiveUpdatingSchemaMode] = useState(false);
-  const [saved, setSaved] = useState(false);
+  // const [setSaved] = useState(false);
   const connectionService = useConnectionService();
   useTrackPage(PageTrackingCodes.CONNECTIONS_ITEM_REPLICATION);
 
@@ -130,7 +130,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
       skipReset,
     });
 
-    setSaved(true);
+    // setSaved(true);
     if (!equal(values.syncCatalog, initialSyncSchema)) {
       onAfterSaveSchema();
     }
@@ -177,7 +177,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
   };
 
   const refreshSourceSchema = async () => {
-    setSaved(false);
+    // setSaved(false);
     setActiveUpdatingSchemaMode(true);
     const { catalogDiff, syncCatalog } = await refreshCatalog();
     if (catalogDiff?.transforms && catalogDiff.transforms.length > 0) {
@@ -210,7 +210,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
   };
 
   const onCancelConnectionFormEdit = () => {
-    setSaved(false);
+    // setSaved(false);
     setActiveUpdatingSchemaMode(false);
   };
 
@@ -229,7 +229,7 @@ export const ReplicationView: React.FC<ReplicationViewProps> = ({ onAfterSaveSch
           mode={connection?.status !== ConnectionStatus.deprecated ? "edit" : "readonly"}
           connection={connection}
           onSubmit={onSubmitForm}
-          successMessage={saved && <FormattedMessage id="form.changesSaved" />}
+          // successMessage={saved && <FormattedMessage id="form.changesSaved" />}
           onCancel={onCancelConnectionFormEdit}
           canSubmitUntouchedForm={activeUpdatingSchemaMode}
           additionalSchemaControl={

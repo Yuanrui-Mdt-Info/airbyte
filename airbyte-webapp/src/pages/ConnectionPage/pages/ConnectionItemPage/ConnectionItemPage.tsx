@@ -13,6 +13,7 @@ import { useGetConnection } from "hooks/services/useConnectionHook";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
+import { MessageBox } from "pages/SettingsPage/components/MessageBox";
 
 import ConnectionPageTitle from "./components/ConnectionPageTitle";
 import { ReplicationView } from "./components/ReplicationView";
@@ -34,6 +35,7 @@ const ConnectionItemPage: React.FC = () => {
   const [disabled, setButtonStatus] = useState<boolean | undefined>(false);
   const [lastSyncTime, setLastSyncTime] = useState<number>();
   const analyticsService = useAnalyticsService();
+  const [messageId, setMessageId] = useState<string>("");
 
   useTrackPage(PageTrackingCodes.CONNECTIONS_ITEM);
   const { source, destination } = connection;
@@ -47,8 +49,10 @@ const ConnectionItemPage: React.FC = () => {
       connector_destination_definition_id: destination.destinationDefinitionId,
       frequency: getFrequencyType(connection.scheduleData?.basicSchedule),
     });
-  };
 
+    onOpenMessageBox("connection.messagebox.saveChange");
+  };
+  // setMessageId()
   const isConnectionDeleted = connection.status === ConnectionStatus.deprecated;
 
   const onSync = () => {
@@ -70,6 +74,10 @@ const ConnectionItemPage: React.FC = () => {
     setLastSyncTime(dateTime);
   };
 
+  const onOpenMessageBox = (id: string) => {
+    setMessageId(id);
+  };
+
   return (
     <MainPageWithScroll
       withPadding
@@ -87,15 +95,16 @@ const ConnectionItemPage: React.FC = () => {
       //     ]}
       //   />
       // }
-      // pageTitle={
-      //   <ConnectionPageTitle
-      //     source={source}
-      //     destination={destination}
-      //     connection={connection}
-      //     currentStep={currentStep}
-      //     onStatusUpdating={setStatusUpdating}
-      //   />
-      // }
+      pageTitle={
+        <MessageBox message={messageId} onClose={() => setMessageId("")} />
+        //   <ConnectionPageTitle
+        //     source={source}
+        //     destination={destination}
+        //     connection={connection}
+        //     currentStep={currentStep}
+        //     onStatusUpdating={setStatusUpdating}
+        //   />
+      }
     >
       <ConnectionPageTitle
         source={source}
@@ -113,6 +122,7 @@ const ConnectionItemPage: React.FC = () => {
             path={ConnectionSettingsRoutes.STATUS}
             element={
               <StatusView
+                onOpenMessageBox={onOpenMessageBox}
                 connection={connection}
                 isStatusUpdating={isStatusUpdating}
                 isSync={isSync}
