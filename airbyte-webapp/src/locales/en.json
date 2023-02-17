@@ -370,7 +370,7 @@
   "connection.cancelSync": "Cancel Sync",
   "connection.cancelReset": "Cancel Reset",
   "connection.cancelDataText": "Are you sure you want to cancel your current sync?",
-  "connection.cancelData":"Cancel sync?",
+  "connection.cancelData": "Cancel sync?",
   "connection.canceling": "Canceling...",
   "connection.cancelSync.modal.buttom.notNow": "Not Now",
   "connection.cancelSync.modal.buttom.confirm": "Confirm",

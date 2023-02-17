@@ -11,13 +11,14 @@ import { useAnalyticsService, useTrackPage, PageTrackingCodes } from "hooks/serv
 import { useGetConnection } from "hooks/services/useConnectionHook";
 // import TransformationView from "pages/ConnectionPage/pages/ConnectionItemPage/components/TransformationView";
 
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
+
 import ConnectionPageTitle from "./components/ConnectionPageTitle";
 import { ReplicationView } from "./components/ReplicationView";
 import SettingsView from "./components/SettingsView";
 import StatusView from "./components/StatusView";
 import { ConnectionSettingsRoutes } from "./ConnectionSettingsRoutes";
-import useRouter from "hooks/useRouter";
-import { RoutePaths } from "pages/routePaths";
 
 const ConnectionItemPage: React.FC = () => {
   const { push, pathname } = useRouter();
@@ -60,7 +61,9 @@ const ConnectionItemPage: React.FC = () => {
 
   const afterSync = (disabled?: boolean) => {
     setButtonStatus(disabled);
-    if (!disabled) setSyncStatus(false);
+    if (!disabled) {
+      setSyncStatus(false);
+    }
   };
 
   const getLastSyncTime = (dateTime?: number) => {

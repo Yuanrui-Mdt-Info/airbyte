@@ -55,7 +55,9 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
-  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>( pathname.endsWith("settings") ? 1 : pathname.endsWith("dangerzone") ? 2 : 0);
+  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(
+    pathname.endsWith("settings") ? 1 : pathname.endsWith("dangerzone") ? 2 : 0
+  );
   const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
