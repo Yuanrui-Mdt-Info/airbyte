@@ -67,7 +67,6 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
 
   useEffect(() => {
     if (isSync) {
-      console.log("点击了sync按钮");
       onSyncNowButtonClick();
     }
   }, [isSync]);
@@ -106,6 +105,21 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
     });
   };
 
+  const onCancelButtonClick = () => {
+    openConfirmationModal({
+      text: `connection.cancelDataText`,
+      title: `connection.cancelData`,
+      submitButtonText: "connection.cancelSync.modal.buttom.confirm",
+      cancelButtonText: "connection.cancelSync.modal.buttom.notNow",
+      onSubmit: async () => {
+        await onCancelJob();
+        // setActiveJob((state) => ({ ...state, action: ActionType.RESET } as ActiveJob));
+        closeConfirmationModal();
+      },
+      submitButtonDataId: "cancel",
+    });
+  };
+
   useEffect(() => {
     const jobRunningOrPending = getJobRunningOrPending(jobs);
     // console.log(JSON.stringify(jobs[0], null, 2));
@@ -124,8 +138,6 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
   }, [jobs]);
 
   useEffect(() => {
-    console.log(JSON.stringify(activeJob, null, 2));
-    console.log("disabled---------", !!activeJob?.action);
     if (afterSync) {
       afterSync(!!activeJob?.action);
     }
@@ -160,7 +172,11 @@ const StatusView: React.FC<StatusViewProps> = ({ connection, isSync, afterSync, 
   };
 
   const cancelJobBtn = (
-    <Button className={styles.cancelButton} disabled={!activeJob?.id || activeJob.isCanceling} onClick={onCancelJob}>
+    <Button
+      className={styles.cancelButton}
+      disabled={!activeJob?.id || activeJob.isCanceling}
+      onClick={onCancelButtonClick}
+    >
       <FontAwesomeIcon className={styles.iconXmark} icon={faXmark} />
       {activeJob?.action === ActionType.RESET && <FormattedMessage id="connection.cancelReset" />}
       {activeJob?.action === ActionType.SYNC && <FormattedMessage id="connection.cancelSync" />}

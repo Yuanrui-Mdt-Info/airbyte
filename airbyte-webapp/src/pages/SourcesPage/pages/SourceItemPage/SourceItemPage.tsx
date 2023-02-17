@@ -60,7 +60,9 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
-  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(0);
+  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(
+    pathname.endsWith("settings") ? 1 : pathname.endsWith("dangerzone") ? 2 : 0
+  );
   const [sourceFormValues, setSourceFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
@@ -159,7 +161,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
           show: true,
         },
         {
-          path: "delete",
+          path: "dangerzone",
           name: <FormattedMessage id="tables.dangerZone" />,
           component: <DeleteBlock type="source" onDelete={onDelete} />,
           show: true,
@@ -172,6 +174,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     push(newPath);
     setActiveTabIndex(activeTabIndex);
   };
+
   const firstRoute = (): string => {
     const { routes } = menuItems[0];
     const filteredRoutes = routes.filter((route) => route.show === true);

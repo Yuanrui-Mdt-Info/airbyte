@@ -49,6 +49,9 @@ const getTextColor = (props: IStyleProps) => {
   } else if (props.secondary || props.iconOnly) {
     return props.theme.darkGreyColor;
   } else if (props.white) {
+    if (props.disabled) {
+      return props.theme.grey300;
+    }
     return props.theme.black300;
   }
 

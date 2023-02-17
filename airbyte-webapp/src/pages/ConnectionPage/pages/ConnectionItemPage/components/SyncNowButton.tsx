@@ -17,7 +17,7 @@ const ButtonBox = styled(Button)<{ disabled?: boolean }>`
   height: 46px;
   border-radius: 6px;
   margin-top: 36px;
-  color: ${({ theme, disabled }) => (disabled ? theme.grey300 : "")};
+  color: ${({ theme, disabled }) => (disabled ? theme.grey300 : theme.black300)};
 `;
 
 const ButtonInnerContainer = styled.div`
@@ -41,7 +41,7 @@ interface IProps {
 const SyncNowButton: React.FC<IProps> = ({ onSync, disabled }) => {
   const allowSync = useFeature(FeatureItem.AllowSync);
   return (
-    <ButtonBox disabled={!allowSync || disabled} white onClick={onSync}>
+    <ButtonBox disabled={!allowSync || disabled} onClick={onSync} white>
       <ButtonInnerContainer>
         <RotateIconContainer>
           <RotateIcon color={!allowSync || disabled ? theme.grey300 : theme.primaryColor} />

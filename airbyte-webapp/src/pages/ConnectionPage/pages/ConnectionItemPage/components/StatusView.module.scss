@@ -36,8 +36,9 @@
       }
 
       .cancelButton {
-        border-color: transparent;
-        background-color: colors.$red;
+        border: 1px solid colors.$borderColor;
+        background-color: colors.$white;
+        color: #999999;
         width: 168px;
         height: 46px;
         font-size: 16px;

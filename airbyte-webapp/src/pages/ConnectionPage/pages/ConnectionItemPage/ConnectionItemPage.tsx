@@ -16,8 +16,11 @@ import { ReplicationView } from "./components/ReplicationView";
 import SettingsView from "./components/SettingsView";
 import StatusView from "./components/StatusView";
 import { ConnectionSettingsRoutes } from "./ConnectionSettingsRoutes";
+import useRouter from "hooks/useRouter";
+import { RoutePaths } from "pages/routePaths";
 
 const ConnectionItemPage: React.FC = () => {
+  const { push, pathname } = useRouter();
   const params = useParams<{
     connectionId: string;
     "*": ConnectionSettingsRoutes;
@@ -48,12 +51,16 @@ const ConnectionItemPage: React.FC = () => {
   const isConnectionDeleted = connection.status === ConnectionStatus.deprecated;
 
   const onSync = () => {
+    if (!pathname.endsWith("status")) {
+      push(`/${RoutePaths.Connections}/${connectionId}/status`);
+    }
     setSyncStatus(true);
     setButtonStatus(true);
   };
 
   const afterSync = (disabled?: boolean) => {
     setButtonStatus(disabled);
+    if (!disabled) setSyncStatus(false);
   };
 
   const getLastSyncTime = (dateTime?: number) => {
