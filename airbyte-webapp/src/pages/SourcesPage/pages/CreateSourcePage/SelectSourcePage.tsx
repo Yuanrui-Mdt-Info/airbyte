@@ -49,7 +49,7 @@ const SelectNewSourceCard: React.FC = () => {
   );
 
   const clickSelect = () => {
-    push(`/${RoutePaths.Source}/${RoutePaths.SourceNew}`, {
+    push(`/${RoutePaths.SourceNew}`, {
       state: {
         sourceDefinitionId,
       },

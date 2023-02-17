@@ -60,9 +60,6 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
-  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(
-    pathname.endsWith("settings") ? 1 : pathname.endsWith("dangerzone") ? 2 : 0
-  );
   const [sourceFormValues, setSourceFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
@@ -101,7 +98,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     {
       routes: [
         {
-          path: "",
+          path: "overview",
           name: <FormattedMessage id="tables.overview" />,
           component: (
             <>
@@ -161,7 +158,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
           show: true,
         },
         {
-          path: "dangerzone",
+          path: "danger-zone",
           name: <FormattedMessage id="tables.dangerZone" />,
           component: <DeleteBlock type="source" onDelete={onDelete} />,
           show: true,
@@ -170,9 +167,8 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     },
   ];
 
-  const onSelectMenuItem = (newPath: string, activeTabIndex: number) => {
+  const onSelectMenuItem = (newPath: string) => {
     push(newPath);
-    setActiveTabIndex(activeTabIndex);
   };
 
   const firstRoute = (): string => {
@@ -190,7 +186,7 @@ const SourceItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
       <ConnectorDocumentationWrapper>
         <DefinitioDetails name={sourceDefinition.name} icon={sourceDefinition.icon} />
         <TabContainer>
-          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} activeTabIndex={activeTabIndex} />
+          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} />
         </TabContainer>
         <ApiErrorBoundary>
           <Suspense fallback={<LoadingPage />}>

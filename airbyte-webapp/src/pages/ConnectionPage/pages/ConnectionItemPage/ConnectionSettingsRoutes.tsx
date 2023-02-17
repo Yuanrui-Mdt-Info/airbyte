@@ -4,5 +4,5 @@ export enum ConnectionSettingsRoutes {
   // REPLICATION = "replication",
   // SETTINGS = "settings",
   CONFIGURATIONS = "configurations",
-  DANGERZONE = "dangerzone",
+  DANGERZONE = "danger-zone",
 }

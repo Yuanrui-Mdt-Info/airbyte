@@ -27,4 +27,15 @@ export enum RoutePaths {
   UserSignup = "user_signup",
   Signup = "signup",
   Signin = "signin",
+
+  UserManagement = "user-management",
+
+  Status = "status",
+  Overview = "overview",
+  DangerZone = "danger-zone",
+  Configurations = "configurations",
+  AccountSettings = "account-settings",
+  PlanAndBilling = "plan-and-billing",
+  Notifications = "notifications",
+  Copy = "copy",
 }

@@ -55,9 +55,6 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
   const [currentStep, setCurrentStep] = useState(StepsTypes.CREATE_ENTITY);
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [fetchingConnectorError, setFetchingConnectorError] = useState<JSX.Element | string | null>(null);
-  const [activeTabIndex, setActiveTabIndex] = useState<number | undefined>(
-    pathname.endsWith("settings") ? 1 : pathname.endsWith("dangerzone") ? 2 : 0
-  );
   const [destinationFormValues, setDestinationFormValues] = useState<ServiceFormValues | null>({
     name: "",
     serviceType: "",
@@ -99,7 +96,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     {
       routes: [
         {
-          path: "",
+          path: RoutePaths.Overview,
           name: <FormattedMessage id="tables.overview" />,
           component: (
             <>
@@ -117,7 +114,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
           show: true,
         },
         {
-          path: "settings",
+          path: RoutePaths.Settings,
           name: <FormattedMessage id="tables.settings" />,
           component: (
             <>
@@ -163,7 +160,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
           show: true,
         },
         {
-          path: "dangerzone",
+          path: RoutePaths.DangerZone,
           name: <FormattedMessage id="tables.dangerZone" />,
           component: <DeleteBlock type="destination" onDelete={onDelete} />,
           show: true,
@@ -172,9 +169,8 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
     },
   ];
 
-  const onSelectMenuItem = (newPath: string, activeTabIndex: number) => {
+  const onSelectMenuItem = (newPath: string) => {
     push(newPath);
-    setActiveTabIndex(activeTabIndex);
   };
   const firstRoute = (): string => {
     const { routes } = menuItems[0];
@@ -191,7 +187,7 @@ const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
       <ConnectorDocumentationWrapper>
         <DefinitioDetails name={destinationDefinition.name} icon={destinationDefinition.icon} />
         <TabContainer>
-          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} activeTabIndex={activeTabIndex} />
+          <TabMenu data={menuItems} onSelect={onSelectMenuItem} activeItem={pathname} />
         </TabContainer>
         <ApiErrorBoundary>
           <Suspense fallback={<LoadingPage />}>
