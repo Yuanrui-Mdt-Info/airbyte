@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { theme } from "theme";
 
 import { LoadingPage } from "components";
+import { CreateStepTypes } from "components/ConnectionStep";
 
 import { useUser } from "core/AuthContext";
 import { getRoleAgainstRoleNumber, ROLES } from "core/Constants/roles";
@@ -17,7 +18,6 @@ import { SettingsRoute } from "pages/SettingsPage/SettingsPage";
 import { ResourceNotFoundErrorBoundary } from "views/common/ResorceNotFoundErrorBoundary";
 import { StartOverErrorView } from "views/common/StartOverErrorView";
 import SideBar from "views/layout/SideBar";
-// import { useMainViewContext } from "./mainViewContext";
 
 const MainContainer = styled.div`
   width: 100%;
@@ -29,25 +29,25 @@ const MainContainer = styled.div`
 `;
 
 const Content = styled.div<{
-  backgroundColor?: string;
+  isBlack?: boolean;
 }>`
-  background: ${({ backgroundColor }) => backgroundColor};
+  background: ${({ isBlack }) => (isBlack ? theme.backgroundColor : theme.white)};
   overflow-y: auto;
   width: 100%;
   height: 100%;
 `;
 
+const hasCurrentStep = (state: unknown): state is { currentStep: string } => {
+  return (
+    typeof state === "object" && state !== null && typeof (state as { currentStep?: string }).currentStep === "string"
+  );
+};
+
 const MainView: React.FC = (props) => {
   const { user } = useUser();
-  const { pathname, push } = useRouter();
-  const [backgroundColor, setBackgroundColor] = useState<string>("");
+  const { pathname, push, location } = useRouter();
   const [isSidebar, setIsSidebar] = useState<boolean>(true);
-  // const { backgroundColor, hasSidebar } = useMainViewContext();
-  // const params = useParams<{
-  //   connectionId?: string;
-  //   id?: string;
-  // }>();
-
+  const [isBlack, setIsBlack] = useState<boolean>(false);
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   const hasSidebarRoutes: string[] = [
@@ -63,32 +63,7 @@ const MainView: React.FC = (props) => {
     RoutePaths.PlanAndBilling,
     RoutePaths.Notifications,
     RoutePaths.Configurations,
-    RoutePaths.DangerZone,
   ];
-  const blackBackgroundRoutes: string[] = [
-    RoutePaths.Source,
-    RoutePaths.Connections,
-    RoutePaths.Destination,
-    RoutePaths.SelectConnection,
-    RoutePaths.SelectSource,
-    RoutePaths.Status,
-    RoutePaths.SelectDestination,
-    RoutePaths.UserManagement,
-    RoutePaths.Configurations,
-    RoutePaths.DangerZone,
-  ];
-
-  console.log(pathname);
-  console.log(hasSidebarRoutes);
-
-  // console.log(hasSidebarRoutes)
-
-  // console.log(endsWith(pathname))
-
-  const pathnames = pathname.split("/");
-
-  // const isSidebar = hasSidebarRoutes.includes(pathname);
-  // const isBlack = blackBackgroundRoutes.includes(pathname);
 
   // TODO: not the propersolution but works for now
   //  const isSideBar =
@@ -98,12 +73,24 @@ const MainView: React.FC = (props) => {
   // !pathname.split("/").includes(RoutePaths.ConnectionNew);
 
   useEffect(() => {
-    const backgroundColorBol: boolean = blackBackgroundRoutes.includes(pathnames[pathnames.length - 1]);
-    const isSidebarBol: boolean = hasSidebarRoutes.includes(pathnames[pathnames.length - 1]);
+    const pathnames = pathname.split("/");
+    const lastPathName = pathnames[pathnames.length - 1];
+    let isSidebarBol = false;
+    if (lastPathName === RoutePaths.DangerZone) {
+      isSidebarBol = pathnames.includes(RoutePaths.Connections);
+    } else if (lastPathName === RoutePaths.ConnectionNew) {
+      if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
+        setIsBlack(true);
+        isSidebarBol = false;
+      } else {
+        setIsBlack(false);
+      }
+    } else {
+      isSidebarBol = hasSidebarRoutes.includes(lastPathName);
+    }
+
     setIsSidebar(isSidebarBol);
-    setBackgroundColor(backgroundColorBol ? theme.backgroundColor : theme.white);
-    console.log(`isSidebar---->${isSidebar}`, `backgroundColor------${backgroundColor}`);
-  }, [pathname, blackBackgroundRoutes, hasSidebarRoutes]);
+  }, [pathname, hasSidebarRoutes]);
 
   const isUpgradePlanBar = (): boolean => {
     let showUpgradePlanBar = false;
@@ -129,7 +116,7 @@ const MainView: React.FC = (props) => {
   return (
     <MainContainer>
       {isSidebar && <SideBar />}
-      <Content backgroundColor={backgroundColor}>
+      <Content isBlack={isBlack || isSidebar}>
         <ResourceNotFoundErrorBoundary errorComponent={<StartOverErrorView />}>
           <React.Suspense fallback={<LoadingPage />}>
             {isAuthorized && <UnauthorizedModal onClose={() => setIsAuthorized(false)} />}

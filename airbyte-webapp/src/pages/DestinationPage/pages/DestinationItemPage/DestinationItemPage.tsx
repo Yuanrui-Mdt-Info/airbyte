@@ -38,14 +38,14 @@ enum StepsTypes {
 }
 
 const Container = styled.div`
-  padding: 10px 70px;
+  padding: 0px 0px 10px 70px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
 `;
 
 const TabContainer = styled.div`
-  margin: 20px 0 40px 0;
+  margin: 20px 20px 40px 0;
 `;
 
 const DestinationItemPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {

@@ -29,13 +29,13 @@ export enum RoutePaths {
   Signin = "signin",
 
   UserManagement = "user-management",
+  AccountSettings = "account-settings",
+  PlanAndBilling = "plan-and-billing",
+  Notifications = "notifications",
 
   Status = "status",
   Overview = "overview",
   DangerZone = "danger-zone",
   Configurations = "configurations",
-  AccountSettings = "account-settings",
-  PlanAndBilling = "plan-and-billing",
-  Notifications = "notifications",
   Copy = "copy",
 }

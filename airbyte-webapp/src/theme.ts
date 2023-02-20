@@ -138,7 +138,7 @@ export const theme = {
   blackColor: scss.black,
   beigeColor: scss.beige,
   darkBeigeColor: scss.beige100,
-  borderTableColor: scss.grey100,
+  borderTableColor: scss.tableThColor,
   lightTableColor: scss.grey50,
   darkGreyColor: scss.grey400,
   redColor: scss.orange,

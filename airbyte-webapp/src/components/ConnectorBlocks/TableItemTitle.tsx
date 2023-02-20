@@ -128,7 +128,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 40px;
+  margin: 0 20px 40px 0;
 `;
 
 const BtnInnerContainer = styled.div`

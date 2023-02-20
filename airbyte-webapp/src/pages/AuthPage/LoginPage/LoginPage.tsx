@@ -108,7 +108,6 @@ const LoginPage: React.FC = () => {
             </FieldItem>
             <BottomBlock>
               <LoadingButton
-                white
                 className={styles.logInBtn}
                 disabled={!(isValid && dirty)}
                 type="submit"

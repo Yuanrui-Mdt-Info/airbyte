@@ -8,7 +8,7 @@ const BreadcrumbsContainer = styled.div`
   cursor: default;
   display: flex;
   align-items: center;
-  height: 100px;
+  height: 80px;
   font-size: 16px;
 `;
 

@@ -46,6 +46,10 @@ const Tr = styled.tr<{
   &:hover {
     background-color: ${({ theme }) => `${theme.grey50}`};
   }
+
+  &:nth-child(2n) {
+    background: #f8f8fe;
+  }
 `;
 
 const Td = styled.td<{
@@ -61,7 +65,7 @@ const Td = styled.td<{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 1px solid ${({ theme }) => theme.greyColor20};
+  // border-bottom: 1px solid ${({ theme }) => theme.greyColor20};
   width: ${({ collapse, customWidth }) => (customWidth ? `${customWidth}%` : collapse ? "0.0000000001%" : "auto")};
 
   tr:last-child > & {
@@ -79,15 +83,15 @@ const Td = styled.td<{
 
 const Th = styled.th<IThProps>`
   background: ${({ theme, light }) => (light ? "none" : theme.whiteColor)};
-  padding: ${({ customPadding }) => `9px ${customPadding?.right ?? 13}px 10px ${customPadding?.left ?? 13}px`};
+  padding: ${({ customPadding }) => `20px ${customPadding?.right ?? 13}px 20px ${customPadding?.left ?? 13}px`};
   text-align: left;
-  font-size: ${({ light }) => (light ? 11 : 10)}px;
-  line-height: 12px;
-  color: ${({ theme, highlighted }) => (highlighted ? theme.lightTextColor : theme.lightTextColor)};
-  border-bottom: ${({ theme, light }) => (light ? "none" : ` 1px solid ${theme.backgroundColor}`)};
+  font-size: ${({ light }) => (light ? 11 : 16)}px;
+  line-height: 16px;
+  color: ${({ highlighted }) => (highlighted ? "#6b6b6f" : "#6b6b6f")};
+  border-bottom: ${({ theme, light }) => (light ? "none" : ` 1px solid ${theme.borderTableColor}`)};
   width: ${({ collapse, customWidth }) => (customWidth ? `${customWidth}%` : collapse ? "0.0000000001%" : "auto")};
   font-weight: ${({ light }) => (light ? 400 : 600)};
-  text-transform: ${({ light }) => (light ? "capitalize" : "uppercase")};
+  // text-transform: ${({ light }) => (light ? "capitalize" : "uppercase")};
 
   &:first-child {
     padding-left: ${({ light }) => (light ? 13 : 45)}px;

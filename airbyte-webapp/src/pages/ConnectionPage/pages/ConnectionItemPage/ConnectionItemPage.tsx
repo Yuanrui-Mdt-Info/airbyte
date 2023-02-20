@@ -4,6 +4,8 @@ import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { LoadingPage, MainPageWithScroll } from "components";
 // import HeadTitle from "components/HeadTitle";
 
+import MessageBox from "components/base/MessageBox";
+
 import { getFrequencyType } from "config/utils";
 import { Action, Namespace } from "core/analytics";
 import { ConnectionStatus } from "core/request/AirbyteClient";
@@ -13,7 +15,6 @@ import { useGetConnection } from "hooks/services/useConnectionHook";
 
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import { MessageBox } from "pages/SettingsPage/components/MessageBox";
 
 import ConnectionPageTitle from "./components/ConnectionPageTitle";
 import { ReplicationView } from "./components/ReplicationView";
