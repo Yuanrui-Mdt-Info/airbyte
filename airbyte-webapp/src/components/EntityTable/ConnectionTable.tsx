@@ -21,9 +21,9 @@ import LastSyncCell from "./components/LastSyncCell";
 // import SwitchButton from "./components/SwitchButton";
 import { ITableDataItem, SortOrderEnum } from "./types";
 
-const Content = styled.div`
-  margin: 0 32px 0 27px;
-`;
+// const Content = styled.div`
+//   margin: 0 30px 0 0px;
+// `;
 
 const SwitchContent = styled.div`
   display: flex;
@@ -243,14 +243,14 @@ const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSyn
   );
 
   return (
-    <Content>
-      <Table
-        columns={columns}
-        data={data}
-        // onClickRow={onClickRow}
-        erroredRows
-      />
-    </Content>
+    // <Content>
+    <Table
+      columns={columns}
+      data={data}
+      // onClickRow={onClickRow}
+      erroredRows
+    />
+    // </Content>
   );
 };
 

@@ -2,9 +2,8 @@ import React, { Suspense, useState } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 
 import { LoadingPage, MainPageWithScroll } from "components";
-// import HeadTitle from "components/HeadTitle";
-
 import MessageBox from "components/base/MessageBox";
+import HeadTitle from "components/HeadTitle";
 
 import { getFrequencyType } from "config/utils";
 import { Action, Namespace } from "core/analytics";
@@ -82,20 +81,20 @@ const ConnectionItemPage: React.FC = () => {
   return (
     <MainPageWithScroll
       withPadding
-      // headTitle={
-      //   <HeadTitle
-      //     titles={[
-      //       { id: "sidebar.connections" },
-      //       {
-      //         id: "connection.fromTo",
-      //         values: {
-      //           source: source.name,
-      //           destination: destination.name,
-      //         },
-      //       },
-      //     ]}
-      //   />
-      // }
+      headTitle={
+        <HeadTitle
+          titles={[
+            { id: "sidebar.connections" },
+            {
+              id: "connection.fromTo",
+              values: {
+                source: source.name,
+                destination: destination.name,
+              },
+            },
+          ]}
+        />
+      }
       pageTitle={
         <MessageBox message={messageId} onClose={() => setMessageId("")} />
         //   <ConnectionPageTitle

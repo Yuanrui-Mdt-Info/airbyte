@@ -29,9 +29,9 @@ const MainContainer = styled.div`
 `;
 
 const Content = styled.div<{
-  isBlack?: boolean;
+  backgroundColor?: string;
 }>`
-  background: ${({ isBlack }) => (isBlack ? theme.backgroundColor : theme.white)};
+  background: ${({ backgroundColor }) => backgroundColor};
   overflow-y: auto;
   width: 100%;
   height: 100%;
@@ -47,7 +47,7 @@ const MainView: React.FC = (props) => {
   const { user } = useUser();
   const { pathname, push, location } = useRouter();
   const [isSidebar, setIsSidebar] = useState<boolean>(true);
-  const [isBlack, setIsBlack] = useState<boolean>(false);
+  const [backgroundColor, setBackgroundColor] = useState<string>(theme.backgroundColor);
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   const hasSidebarRoutes: string[] = [
@@ -76,19 +76,45 @@ const MainView: React.FC = (props) => {
     const pathnames = pathname.split("/");
     const lastPathName = pathnames[pathnames.length - 1];
     let isSidebarBol = false;
+
     if (lastPathName === RoutePaths.DangerZone) {
       isSidebarBol = pathnames.includes(RoutePaths.Connections);
-    } else if (lastPathName === RoutePaths.ConnectionNew) {
-      if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
-        setIsBlack(true);
-        isSidebarBol = false;
-      } else {
-        setIsBlack(false);
-      }
     } else {
       isSidebarBol = hasSidebarRoutes.includes(lastPathName);
     }
 
+    // if (lastPathName === RoutePaths.ConnectionNew) {
+    //   if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
+    //     setBackgroundColor(theme.backgroundColor);
+    //     isSidebarBol = false;
+    //   } else {
+    //     setBackgroundColor(theme.white);
+    //   }
+    // }
+
+    if (lastPathName === RoutePaths.ConnectionNew) {
+      if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
+        setBackgroundColor("#F8F8FE");
+        isSidebarBol = false;
+      } else {
+        setBackgroundColor(theme.white);
+      }
+    } else if (isSidebarBol) {
+      if (
+        lastPathName === RoutePaths.SelectSource ||
+        lastPathName === RoutePaths.SelectDestination ||
+        lastPathName === RoutePaths.SelectConnection
+      ) {
+        setBackgroundColor("#F8F8FE");
+      } else {
+        setBackgroundColor(theme.backgroundColor);
+      }
+    }
+
+    // else
+    // else {
+    //   setBackgroundColor(theme.white);
+    // }
     setIsSidebar(isSidebarBol);
   }, [pathname, hasSidebarRoutes]);
 
@@ -116,7 +142,7 @@ const MainView: React.FC = (props) => {
   return (
     <MainContainer>
       {isSidebar && <SideBar />}
-      <Content isBlack={isBlack || isSidebar}>
+      <Content backgroundColor={backgroundColor}>
         <ResourceNotFoundErrorBoundary errorComponent={<StartOverErrorView />}>
           <React.Suspense fallback={<LoadingPage />}>
             {isAuthorized && <UnauthorizedModal onClose={() => setIsAuthorized(false)} />}

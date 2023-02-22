@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { CreationFormPage } from "pages/ConnectionPage/pages/CreationFormPage/CreationFormPage";
+import SelectConnetionPage from "pages/ConnectionPage/pages/CreationFormPage/SelectConnectionPage";
 import { ResourceNotFoundErrorBoundary } from "views/common/ResorceNotFoundErrorBoundary";
 import { StartOverErrorView } from "views/common/StartOverErrorView";
 
@@ -16,6 +17,7 @@ export const SourcesPage: React.FC = () => (
   <Routes>
     <Route path={RoutePaths.SourceNew} element={<CreateSourcePage />} />
     <Route path={RoutePaths.ConnectionNew} element={<CreationFormPage />} />
+    <Route path={RoutePaths.SelectConnection} element={<SelectConnetionPage single />} />
     <Route path={RoutePaths.SelectSource} element={<SelectSourcePage />} />
     <Route
       path=":id/*"

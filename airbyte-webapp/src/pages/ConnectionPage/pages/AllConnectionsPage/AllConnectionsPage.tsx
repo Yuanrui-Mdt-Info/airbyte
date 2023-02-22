@@ -53,7 +53,7 @@ const AllConnectionsPage: React.FC = () => {
     <Suspense fallback={<LoadingPage />}>
       {connections.length ? (
         <MainPageWithScroll
-          withPadding
+          // withPadding
           headTitle={<HeadTitle titles={[{ title: "Connections" }]} />}
           pageTitle={
             <>

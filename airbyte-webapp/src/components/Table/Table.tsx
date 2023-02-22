@@ -32,8 +32,10 @@ const TableView = styled(Card).attrs({ as: "table" })<{ light?: boolean }>`
   border-spacing: 0;
   width: 100%;
   max-width: 100%;
-  border-radius: 5px;
-  box-shadow: ${({ light, theme }) => (light ? "none" : `0 2px 4px ${theme.cardShadowColor}`)};
+  // border-radius: 5px;
+  border: 1px solid #E5E7EB;
+border-radius: 8px;
+  // box-shadow: ${({ light, theme }) => (light ? "none" : `0 2px 4px ${theme.cardShadowColor}`)};
 };
 `;
 
@@ -44,7 +46,7 @@ const Tr = styled.tr<{
   background: ${({ theme, erroredRows }) => (erroredRows ? theme.dangerTransparentColor : theme.whiteColor)};
   cursor: ${({ hasClick }) => (hasClick ? "pointer" : "auto")};
   &:hover {
-    background-color: ${({ theme }) => `${theme.grey50}`};
+    //  background-color: ${({ theme }) => `${theme.grey50}`};
   }
 
   &:nth-child(2n) {
@@ -85,7 +87,7 @@ const Th = styled.th<IThProps>`
   background: ${({ theme, light }) => (light ? "none" : theme.whiteColor)};
   padding: ${({ customPadding }) => `20px ${customPadding?.right ?? 13}px 20px ${customPadding?.left ?? 13}px`};
   text-align: left;
-  font-size: ${({ light }) => (light ? 11 : 16)}px;
+  font-size: ${({ light }) => (light ? 11 : 14)}px;
   line-height: 16px;
   color: ${({ highlighted }) => (highlighted ? "#6b6b6f" : "#6b6b6f")};
   border-bottom: ${({ theme, light }) => (light ? "none" : ` 1px solid ${theme.borderTableColor}`)};

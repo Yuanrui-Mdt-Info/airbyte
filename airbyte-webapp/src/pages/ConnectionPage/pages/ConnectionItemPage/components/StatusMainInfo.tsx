@@ -28,17 +28,18 @@ interface StatusMainInfoProps {
   onSync: () => void;
 }
 
-const lastSyncTimeFormat = (time?: number): string => {
-  if (!time && typeof time !== "number") {
+const timestampToUTCFormat = (timestamp?: number): string => {
+  if (!timestamp || typeof timestamp !== "number") {
     return "";
   }
+
+  const date: Date = new Date(timestamp * 1000);
   const months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
-  const date: Date = new Date(time * 1000);
-  const day: string = date.getDate() > 9 ? `${date.getDate()}` : `0${date.getDate()}`;
-  const month: number = date.getMonth();
-  const year: number = date.getFullYear();
-  const hour: string = date.getHours() > 9 ? `${date.getHours()}` : `0${date.getHours()}`;
-  const minute: string = date.getMinutes() > 9 ? `${date.getMinutes()}` : `0${date.getMinutes()}`;
+  const day: string = date.getUTCDate().toString().padStart(2, "0");
+  const month: number = date.getUTCMonth();
+  const year: number = date.getUTCFullYear();
+  const hour: string = date.getUTCHours().toString().padStart(2, "0");
+  const minute: string = date.getUTCMinutes().toString().padStart(2, "0");
 
   return `${hour}:${minute} UTC ${day}-${months[month]}-${year}`;
 };
@@ -61,7 +62,7 @@ export const StatusMainInfo: React.FC<StatusMainInfoProps> = ({
   const sourceConnectionPath = `../../${RoutePaths.Source}/${source.sourceId}`;
   const destinationConnectionPath = `../../${RoutePaths.Destination}/${destination.destinationId}`;
 
-  const lastSyncTimeText = `${formatMessage({ id: "sources.lastSync" })} ${lastSyncTimeFormat(lastSyncTime)} `;
+  const lastSyncTimeText = `${formatMessage({ id: "sources.lastSync" })} ${timestampToUTCFormat(lastSyncTime)} `;
 
   return (
     <div className={styles.container}>

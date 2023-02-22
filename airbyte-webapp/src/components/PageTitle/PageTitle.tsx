@@ -8,7 +8,7 @@ interface PageTitleProps {
   middleComponent?: React.ReactNode;
   middleTitleBlock?: React.ReactNode;
   endComponent?: React.ReactNode;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   subText?: React.ReactNode;
 }
 

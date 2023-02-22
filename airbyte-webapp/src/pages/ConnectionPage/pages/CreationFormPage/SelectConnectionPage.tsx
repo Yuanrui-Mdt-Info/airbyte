@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useIntl } from "react-intl";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import Button from "components/ButtonGroup/components/Button";
@@ -13,11 +14,6 @@ import { useDestinationDefinitionList } from "services/connector/DestinationDefi
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 
 import ExistingEntityForm from "./components/ExistingEntityForm";
-
-// export interface ButtonItems {
-//   btnText: string;
-//   type: "cancel" | "disabled" | "active";
-// }
 
 interface State {
   currentStepNumber?: number;
@@ -75,9 +71,12 @@ const hasDestinationDefinitionId = (state: unknown): state is { destinationDefin
   );
 };
 
-const SelectNewConnectionCard: React.FC = () => {
+const SelectNewConnectionCard: React.FC<{
+  single?: boolean;
+}> = ({ single }) => {
   const { push, location } = useRouter();
   const { formatMessage } = useIntl();
+  const navigator = useNavigate();
   const { sourceDefinitions } = useSourceDefinitionList();
   const { destinationDefinitions } = useDestinationDefinitionList();
 
@@ -108,6 +107,10 @@ const SelectNewConnectionCard: React.FC = () => {
   }, [currentStep, sourceId, sourceDefinitionId, destinationId, destinationDefinitionId]);
 
   const clickCancel = () => {
+    if (single) {
+      navigator(-1);
+      return;
+    }
     setCurrentStep(CreateStepTypes.CREATE_SOURCE);
     if (sourceDefinitionId) {
       push("", {
@@ -143,7 +146,7 @@ const SelectNewConnectionCard: React.FC = () => {
 
     if (currentStep === CreateStepTypes.CREATE_SOURCE) {
       if (sourceDefinitionId) {
-        push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
+        push(`../${RoutePaths.ConnectionNew}`, {
           state: {
             ...locationState,
             currentStep: CreateStepTypes.CREATE_SOURCE,
@@ -159,7 +162,7 @@ const SelectNewConnectionCard: React.FC = () => {
     }
 
     if (currentStep === CreateStepTypes.CREATE_DESTINATION) {
-      push(`/${RoutePaths.Connections}/${RoutePaths.ConnectionNew}`, {
+      push(`../${RoutePaths.ConnectionNew}`, {
         state: {
           ...locationState,
           currentStep: destinationDefinitionId ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_CONNECTION,
@@ -212,14 +215,16 @@ const SelectNewConnectionCard: React.FC = () => {
       <Container>
         {currentStep === CreateStepTypes.CREATE_SOURCE && (
           <>
-            <ExistingEntityForm
-              type="source"
-              onSubmit={onSelectExistingSource}
-              value={sourceId}
-              placeholder={formatMessage({
-                id: "form.select.placeholder.source",
-              })}
-            />
+            {!single && (
+              <ExistingEntityForm
+                type="source"
+                onSubmit={onSelectExistingSource}
+                value={sourceId}
+                placeholder={formatMessage({
+                  id: "form.select.placeholder.source",
+                })}
+              />
+            )}
             <DataPanel
               onSelect={afterSelect}
               data={sourceDefinitions}
@@ -234,14 +239,16 @@ const SelectNewConnectionCard: React.FC = () => {
 
         {currentStep === CreateStepTypes.CREATE_DESTINATION && (
           <>
-            <ExistingEntityForm
-              type="destination"
-              onSubmit={onSelectExistingSource}
-              value={destinationId}
-              placeholder={formatMessage({
-                id: "form.select.placeholder.destination",
-              })}
-            />
+            {!single && (
+              <ExistingEntityForm
+                type="destination"
+                onSubmit={onSelectExistingSource}
+                value={destinationId}
+                placeholder={formatMessage({
+                  id: "form.select.placeholder.destination",
+                })}
+              />
+            )}
             <DataPanel
               onSelect={afterSelect}
               data={destinationDefinitions}

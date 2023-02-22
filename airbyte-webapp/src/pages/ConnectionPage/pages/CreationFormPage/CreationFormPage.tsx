@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 // import { FormattedMessage } from "react-intl";
+import { useNavigate } from "react-router-dom";
 
 import { LoadingPage } from "components";
 // import ConnectionBlock from "components/ConnectionBlock";
@@ -59,6 +60,7 @@ function usePreloadData(): {
   destinationDefinition?: DestinationDefinitionRead;
 } {
   const { location } = useRouter();
+
   const source = useGetSource(hasSourceId(location.state) ? location.state.sourceId : null);
 
   // const sourceDefinition = useSourceDefinition(source?.sourceDefinitionId);
@@ -67,9 +69,12 @@ function usePreloadData(): {
   return { source, destination }; // sourceDefinition,destinationDefinition
 }
 
-export const CreationFormPage: React.FC = () => {
+export const CreationFormPage: React.FC<{
+  single?: boolean;
+}> = ({ single }) => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_NEW);
   const { location, push } = useRouter();
+  const navigator = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(
     hasCurrentStep(location.state) ? location.state.currentStep : CreateStepTypes.CREATE_SOURCE
@@ -144,12 +149,13 @@ export const CreationFormPage: React.FC = () => {
               }
             }}
             onBack={() => {
-              push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
-                state: {
-                  ...(location.state as Record<string, unknown>),
-                  currentStep: CreateStepTypes.CREATE_SOURCE,
-                },
-              });
+              navigator(-1);
+              // push(`../${RoutePaths.SelectConnection}`, {
+              //   state: {
+              //     ...(location.state as Record<string, unknown>),
+              //     currentStep: CreateStepTypes.CREATE_SOURCE,
+              //   },
+              // });
             }}
           />
         );
@@ -172,12 +178,13 @@ export const CreationFormPage: React.FC = () => {
               }
             }}
             onBack={() => {
-              push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
-                state: {
-                  ...(location.state as Record<string, unknown>),
-                  currentStep: CreateStepTypes.CREATE_DESTINATION,
-                },
-              });
+              navigator(-1);
+              // push(`../${RoutePaths.SelectConnection}`, {
+              //   state: {
+              //     ...(location.state as Record<string, unknown>),
+              //     currentStep: CreateStepTypes.CREATE_DESTINATION,
+              //   },
+              // });
             }}
           />
         );
@@ -198,7 +205,12 @@ export const CreationFormPage: React.FC = () => {
 
     const hanldeFinishButton = () => {
       if (currentEntityStep === EntityStepsTypes.SOURCE) {
-        push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
+        if (single) {
+          setCurrentStep(CreateStepTypes.CREATE_CONNECTION);
+          setCurrentEntityStep(EntityStepsTypes.CONNECTION);
+          return;
+        }
+        push(`../${RoutePaths.SelectConnection}`, {
           state: {
             ...(location.state as Record<string, unknown>),
             currentStep: CreateStepTypes.CREATE_DESTINATION,
@@ -241,12 +253,13 @@ export const CreationFormPage: React.FC = () => {
     return (
       <CreateConnectionContent
         onBack={() => {
-          push(`/${RoutePaths.Connections}/${RoutePaths.SelectConnection}`, {
-            state: {
-              ...(location.state as Record<string, unknown>),
-              currentStep: CreateStepTypes.CREATE_DESTINATION,
-            },
-          });
+          navigator(-1);
+          // push(`../${RoutePaths.SelectConnection}`, {
+          //   state: {
+          //     ...(location.state as Record<string, unknown>),
+          //     currentStep: CreateStepTypes.CREATE_DESTINATION,
+          //   },
+          // });
         }}
         source={source}
         destination={destination}

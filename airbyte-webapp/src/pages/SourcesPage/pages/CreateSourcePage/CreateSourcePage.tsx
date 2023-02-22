@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 import { FormPageContent } from "components/ConnectorBlocks";
+import HeadTitle from "components/HeadTitle";
 
 import { ConnectionConfiguration } from "core/domain/connection";
 import { useTrackPage, PageTrackingCodes } from "hooks/services/Analytics";
@@ -79,7 +80,7 @@ const CreateSourcePage: React.FC = () => {
 
   return (
     <>
-      {/* <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} /> */}
+      <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
       <ConnectionStep lightMode type="source" currentStepNumber={1} />
       <ConnectorDocumentationWrapper>
         <FormPageContent>

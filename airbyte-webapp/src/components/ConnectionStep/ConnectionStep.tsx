@@ -56,77 +56,147 @@ export const SingleText = styled.div`
   line-height: 30px;
 `;
 
-const currentStepArray: string[] = ["", "createSource", "createDestination", "createConnection", "allFinish"];
-
-const ConnectionStep: React.FC<IProps> = ({ onSelect, lightMode, activeStep }) => {
+const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeStep }) => {
   const { location } = useRouter(); // push
-  const locationType = location.pathname.split("/")[1];
-
-  const type: EntityStepsTypes =
-    locationType === "connections"
-      ? EntityStepsTypes.CONNECTION
-      : locationType === "destination"
-      ? EntityStepsTypes.DESTINATION
-      : EntityStepsTypes.SOURCE;
 
   const [currentStepNumber, setCurrentStepNumber] = useState<number>(1);
+
+  const connectionStepMenuItem: StepMenuItem[] = [
+    {
+      id: CreateStepTypes.CREATE_SOURCE,
+      name: <FormattedMessage id="onboarding.addSource" />,
+    },
+    {
+      id: CreateStepTypes.CREATE_DESTINATION,
+      name: <FormattedMessage id="onboarding.addDestination" />,
+    },
+    {
+      id: CreateStepTypes.CREATE_CONNECTION,
+      name: <FormattedMessage id="onboarding.configurations" />,
+    },
+  ];
+
+  const sourceStepMenuItem: StepMenuItem[] = [
+    {
+      id: CreateStepTypes.CREATE_SOURCE,
+      name: <FormattedMessage id="onboarding.addSource" />,
+    },
+    {
+      id: CreateStepTypes.CREATE_CONNECTION,
+      name: <FormattedMessage id="onboarding.configurations" />,
+    },
+  ];
+
+  const destinationStepMenuItem: StepMenuItem[] = [
+    {
+      id: CreateStepTypes.CREATE_DESTINATION,
+      name: <FormattedMessage id="onboarding.addDestination" />,
+    },
+    {
+      id: CreateStepTypes.CREATE_CONNECTION,
+      name: <FormattedMessage id="onboarding.configurations" />,
+    },
+  ];
+
+  const routes = location.pathname.split("/");
+  const locationType = routes[1];
+
+  console.log(location.pathname, location.state);
+
+  // const type: EntityStepsTypes =
+  //   locationType === "connections"
+  //     ? EntityStepsTypes.CONNECTION
+  //     : locationType === "destination"
+  //     ? EntityStepsTypes.DESTINATION
+  //     : EntityStepsTypes.SOURCE;
+
+  let steps: StepMenuItem[] = [];
+  switch (true) {
+    case locationType === "connections":
+      steps = connectionStepMenuItem;
+      break;
+    case locationType === "source":
+      steps = destinationStepMenuItem;
+      break;
+    case locationType === "destination":
+      steps = sourceStepMenuItem;
+      break;
+  }
+
+  // ["", "createSource", "createDestination", "createConnection", "allFinish"];
+  const currentStepArray: string[] = steps.map((val) => val.id);
+  currentStepArray.push("allFinish");
+  currentStepArray.unshift("");
 
   useEffect(() => {
     if (activeStep !== CreateStepTypes.TEST_CONNECTION) {
       const stepNumber: number = currentStepArray.findIndex((val) => val === activeStep);
       setCurrentStepNumber(stepNumber);
     }
-  }, [activeStep]);
+  }, [activeStep, currentStepArray]);
 
-  const steps: StepMenuItem[] =
-    type === "connection"
-      ? [
-          {
-            id: CreateStepTypes.CREATE_SOURCE,
-            name: <FormattedMessage id="onboarding.addSource" />,
-          },
-          {
-            id: CreateStepTypes.CREATE_DESTINATION,
-            name: <FormattedMessage id="onboarding.addDestination" />,
-          },
-          {
-            id: CreateStepTypes.CREATE_CONNECTION,
-            name: <FormattedMessage id="onboarding.configurations" />,
-          },
-        ]
-      : [
-          {
-            id: type === "destination" ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_SOURCE,
-            name:
-              type === "destination" ? (
-                <FormattedMessage id="onboarding.addDestination" />
-              ) : (
-                <FormattedMessage id="onboarding.addSource" />
-              ),
-          },
-        ];
+  // console.log(locationType === "source" && routes[2].indexOf("connection") > -1)
+  //   console.log(steps)
+
+  // type === "connection"
+  //   ? [
+  //       {
+  //         id: CreateStepTypes.CREATE_SOURCE,
+  //         name: <FormattedMessage id="onboarding.addSource" />,
+  //       },
+  //       {
+  //         id: CreateStepTypes.CREATE_DESTINATION,
+  //         name: <FormattedMessage id="onboarding.addDestination" />,
+  //       },
+  //       {
+  //         id: CreateStepTypes.CREATE_CONNECTION,
+  //         name: <FormattedMessage id="onboarding.configurations" />,
+  //       },
+  //     ]
+  //   : [
+  //       {
+  //         id: type === "destination" ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_SOURCE,
+  //         name:
+  //           type === "destination" ? (
+  //             <FormattedMessage id="onboarding.addDestination" />
+  //           ) : (
+  //             <FormattedMessage id="onboarding.addSource" />
+  //           ),
+  //       },
+  //       {
+  //         id: CreateStepTypes.CREATE_CONNECTION,
+  //         name: <FormattedMessage id="onboarding.configurations" />,
+  //       },
+  //     ];
 
   const StepComponents = () => {
-    if (steps.length > 1) {
+    if (type === "source" || type === "destination") {
       return (
-        <>
-          {steps.map((item, key) => (
-            <StepBox
-              status={item.status}
-              isPartialSuccess={item.isPartialSuccess}
-              lightMode={lightMode}
-              key={item.id}
-              stepNumber={key}
-              {...item}
-              onClick={onSelect || item.onSelect}
-              currentStepNumber={currentStepNumber}
-              isActive={key < currentStepNumber}
-            />
-          ))}
-        </>
+        <SingleText>
+          <FormattedMessage id={`${type === "source" ? "onboarding.addSource" : "onboarding.addDestination"}`} />
+        </SingleText>
       );
     }
-    return <SingleText>{steps[0].name}</SingleText>;
+    // if (steps.length > 1) {
+    return (
+      <>
+        {steps.map((item, key) => (
+          <StepBox
+            status={item.status}
+            isPartialSuccess={item.isPartialSuccess}
+            lightMode={lightMode}
+            key={item.id}
+            stepNumber={key}
+            {...item}
+            onClick={onSelect || item.onSelect}
+            currentStepNumber={currentStepNumber}
+            isActive={key < currentStepNumber}
+          />
+        ))}
+      </>
+    );
+    //   }
+    //   return <SingleText>{steps[0].name}</SingleText>;
   };
 
   return <StepBlock>{StepComponents()}</StepBlock>;

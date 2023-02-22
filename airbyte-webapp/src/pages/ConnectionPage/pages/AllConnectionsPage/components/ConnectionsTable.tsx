@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useQueryClient } from "react-query";
+import styled from "styled-components";
 
 import { ConnectionTable } from "components/EntityTable";
 import useSyncActions from "components/EntityTable/hooks";
@@ -13,6 +14,10 @@ import { useDestinationDefinitionList } from "services/connector/DestinationDefi
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 
 import { WebBackendConnectionRead } from "../../../../../core/request/AirbyteClient";
+
+const Content = styled.div`
+  padding: 0 24px 30px 24px;
+`;
 
 interface IProps {
   connections: WebBackendConnectionRead[];
@@ -80,15 +85,17 @@ const ConnectionsTable: React.FC<IProps> = ({ connections, onSetMessageId }) => 
   const clickRow = (source: ITableDataItem) => push(`${source.connectionId}`);
 
   return (
-    <ConnectionTable
-      data={data}
-      onClickRow={clickRow}
-      entity="connection"
-      onChangeStatus={onChangeStatus}
-      onSync={onSync}
-      rowId={rowId}
-      statusLoading={statusLoading}
-    />
+    <Content>
+      <ConnectionTable
+        data={data}
+        onClickRow={clickRow}
+        entity="connection"
+        onChangeStatus={onChangeStatus}
+        onSync={onSync}
+        rowId={rowId}
+        statusLoading={statusLoading}
+      />
+    </Content>
   );
 };
 
