@@ -15,6 +15,7 @@ interface ImageBlockProps {
 }
 
 export const ImageBlock: React.FC<ImageBlockProps> = ({ img, num, small, color, light, ariaLabel }) => {
+  console.log(color);
   const imageCircleClassnames = classnames({
     [styles.circle]: num,
     [styles.iconContainer]: !num || num === undefined,
@@ -24,6 +25,7 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({ img, num, small, color, 
     [styles.red]: color === "red",
     [styles.blue]: color === "blue",
     [styles.light]: light,
+    [styles.primary]: true,
   });
 
   const numberStyles = classnames(styles.number, { [styles.light]: light });

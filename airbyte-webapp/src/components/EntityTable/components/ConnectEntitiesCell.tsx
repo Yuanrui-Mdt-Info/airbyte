@@ -34,7 +34,7 @@ const ConnectEntitiesCell: React.FC<IProps> = ({ values, enabled, entity }) => {
   if (values.length === 1) {
     return (
       <Content enabled={enabled}>
-        <Image small />
+        <Image small color="blue" />
         <div>
           {values[0].name}
           <Connector>{values[0].connector}</Connector>

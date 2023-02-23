@@ -34,6 +34,7 @@
 .container {
   overflow: auto;
   height: 100%;
+  flex: 1;
 
   // & > *:last-child {
   //  padding-bottom: variables.$spacing-page-bottom;
@@ -44,6 +45,7 @@
   background-color: colors.$white;
   height: 100%;
   overflow: auto;
+  flex: 1;
 }
 
 .lightOverlay {

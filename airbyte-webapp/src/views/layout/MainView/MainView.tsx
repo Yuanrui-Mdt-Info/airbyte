@@ -63,6 +63,7 @@ const MainView: React.FC = (props) => {
     RoutePaths.PlanAndBilling,
     RoutePaths.Notifications,
     RoutePaths.Configurations,
+    RoutePaths.Language,
   ];
 
   // TODO: not the propersolution but works for now
@@ -77,21 +78,14 @@ const MainView: React.FC = (props) => {
     const lastPathName = pathnames[pathnames.length - 1];
     let isSidebarBol = false;
 
+    // connection has sidebar but source/destination no
     if (lastPathName === RoutePaths.DangerZone) {
       isSidebarBol = pathnames.includes(RoutePaths.Connections);
     } else {
       isSidebarBol = hasSidebarRoutes.includes(lastPathName);
     }
 
-    // if (lastPathName === RoutePaths.ConnectionNew) {
-    //   if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
-    //     setBackgroundColor(theme.backgroundColor);
-    //     isSidebarBol = false;
-    //   } else {
-    //     setBackgroundColor(theme.white);
-    //   }
-    // }
-
+    // The configuration step background color in Add Connection is #F8F8FE , and the page color of the previous steps is white.
     if (lastPathName === RoutePaths.ConnectionNew) {
       if (hasCurrentStep(location.state) && location.state.currentStep === CreateStepTypes.CREATE_CONNECTION) {
         setBackgroundColor("#F8F8FE");
@@ -100,6 +94,7 @@ const MainView: React.FC = (props) => {
         setBackgroundColor(theme.white);
       }
     } else if (isSidebarBol) {
+      // In the page with sidebar, the background color of these three pages is #F8F8FE, and the others are the theme background color.
       if (
         lastPathName === RoutePaths.SelectSource ||
         lastPathName === RoutePaths.SelectDestination ||
@@ -110,6 +105,7 @@ const MainView: React.FC = (props) => {
         setBackgroundColor(theme.backgroundColor);
       }
     } else {
+      // Other page background color is white.
       setBackgroundColor(theme.white);
     }
     setIsSidebar(isSidebarBol);

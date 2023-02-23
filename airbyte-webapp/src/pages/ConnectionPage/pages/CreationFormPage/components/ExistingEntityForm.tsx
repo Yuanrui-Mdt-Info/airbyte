@@ -118,6 +118,7 @@ const ExistingEntityForm: React.FC<IProps> = ({ type, onSubmit, value, placehold
                 > */}
       <DropDown
         // {...field}
+        $transparentBackground
         value={value}
         className={style.selectDropdown}
         options={dropDownData}

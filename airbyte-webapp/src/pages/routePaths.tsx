@@ -32,6 +32,7 @@ export enum RoutePaths {
   AccountSettings = "account-settings",
   PlanAndBilling = "plan-and-billing",
   Notifications = "notifications",
+  Language = "language",
 
   Status = "status",
   Overview = "overview",
