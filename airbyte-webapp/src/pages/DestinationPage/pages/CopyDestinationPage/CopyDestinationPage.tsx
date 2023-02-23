@@ -38,7 +38,7 @@ const CopyDestinationPage: React.FC = () => {
 
   return (
     <>
-      <ConnectionStep lightMode type="destination" currentStepNumber={1} />
+      <ConnectionStep lightMode type="destination" />
       <Container>
         <ConnectorDocumentationWrapper>
           {currentStep === CreateStepTypes.TEST_CONNECTION && (

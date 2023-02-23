@@ -1,7 +1,8 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
-import Button from "components/ButtonGroup/components/Button";
+import { BigButton, ButtonRows } from "components/base/Button/BigButton";
 
 import TestingLoading from "views/Connector/TestConnection/components/TestingLoading";
 import TestingSuccess from "views/Connector/TestConnection/components/TestingSuccess";
@@ -9,8 +10,8 @@ import TestingSuccess from "views/Connector/TestConnection/components/TestingSuc
 interface Iprops {
   isLoading: boolean;
   type: "destination" | "source" | "connection";
-  onBack: (btnType: string) => void;
-  onFinish: (btnType: string) => void;
+  onBack: () => void;
+  onFinish: () => void;
 }
 
 const Container = styled.div`
@@ -21,28 +22,20 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-export const ButtonRows = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin-top: 200px;
-  width: 100%;
-`;
-
 const TestConnection: React.FC<Iprops> = ({ isLoading, type, onBack, onFinish }) => {
   return (
     <>
       <Container>{isLoading ? <TestingLoading /> : <TestingSuccess type={type} />}</Container>
       <ButtonRows>
         {((isLoading && type === "connection") || type !== "connection") && (
-          <Button btnText="back" onClick={onBack} type="cancel" />
+          <BigButton disabled={isLoading} white onClick={onBack}>
+            <FormattedMessage id="form.button.back" />
+          </BigButton>
         )}
         {((!isLoading && type === "connection") || type !== "connection") && (
-          <Button
-            btnText={type === "connection" ? "returnToDashoard" : "continue"}
-            onClick={onFinish}
-            type={!isLoading ? "active" : "disabled"}
-          />
+          <BigButton disabled={isLoading} onClick={onFinish}>
+            <FormattedMessage id={type === "connection" ? "form.button.returnToDashoard" : "form.button.continue"} />
+          </BigButton>
         )}
       </ButtonRows>
     </>

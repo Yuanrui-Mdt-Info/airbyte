@@ -13,7 +13,6 @@ export interface StepMenuItem {
   name: string | React.ReactNode;
   status?: string;
   isPartialSuccess?: boolean;
-
   onSelect?: () => void;
 }
 
@@ -23,14 +22,7 @@ interface IProps {
   activeStep?: string;
   onSelect?: (id: string) => void;
   type?: "source" | "destination" | "connection";
-  currentStepNumber?: number; // 1~4
 }
-
-// export enum StepsTypes {
-//   CREATE_ENTITY = "createEntity",
-//   CREATE_CONNECTOR = "createConnector",
-//   CREATE_CONNECTION = "createConnection",
-// }
 
 export enum EntityStepsTypes {
   SOURCE = "source",
@@ -57,7 +49,7 @@ export const SingleText = styled.div`
 `;
 
 const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeStep }) => {
-  const { location } = useRouter(); // push
+  const { location } = useRouter();
 
   const [currentStepNumber, setCurrentStepNumber] = useState<number>(1);
 
@@ -101,15 +93,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeSte
   const routes = location.pathname.split("/");
   const locationType = routes[1];
 
-  console.log(location.pathname, location.state);
-
-  // const type: EntityStepsTypes =
-  //   locationType === "connections"
-  //     ? EntityStepsTypes.CONNECTION
-  //     : locationType === "destination"
-  //     ? EntityStepsTypes.DESTINATION
-  //     : EntityStepsTypes.SOURCE;
-
   let steps: StepMenuItem[] = [];
   switch (true) {
     case locationType === "connections":
@@ -135,40 +118,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeSte
     }
   }, [activeStep, currentStepArray]);
 
-  // console.log(locationType === "source" && routes[2].indexOf("connection") > -1)
-  //   console.log(steps)
-
-  // type === "connection"
-  //   ? [
-  //       {
-  //         id: CreateStepTypes.CREATE_SOURCE,
-  //         name: <FormattedMessage id="onboarding.addSource" />,
-  //       },
-  //       {
-  //         id: CreateStepTypes.CREATE_DESTINATION,
-  //         name: <FormattedMessage id="onboarding.addDestination" />,
-  //       },
-  //       {
-  //         id: CreateStepTypes.CREATE_CONNECTION,
-  //         name: <FormattedMessage id="onboarding.configurations" />,
-  //       },
-  //     ]
-  //   : [
-  //       {
-  //         id: type === "destination" ? CreateStepTypes.CREATE_DESTINATION : CreateStepTypes.CREATE_SOURCE,
-  //         name:
-  //           type === "destination" ? (
-  //             <FormattedMessage id="onboarding.addDestination" />
-  //           ) : (
-  //             <FormattedMessage id="onboarding.addSource" />
-  //           ),
-  //       },
-  //       {
-  //         id: CreateStepTypes.CREATE_CONNECTION,
-  //         name: <FormattedMessage id="onboarding.configurations" />,
-  //       },
-  //     ];
-
   const StepComponents = () => {
     if (type === "source" || type === "destination") {
       return (
@@ -177,7 +126,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeSte
         </SingleText>
       );
     }
-    // if (steps.length > 1) {
     return (
       <>
         {steps.map((item, key) => (
@@ -195,8 +143,6 @@ const ConnectionStep: React.FC<IProps> = ({ onSelect, type, lightMode, activeSte
         ))}
       </>
     );
-    //   }
-    //   return <SingleText>{steps[0].name}</SingleText>;
   };
 
   return <StepBlock>{StepComponents()}</StepBlock>;

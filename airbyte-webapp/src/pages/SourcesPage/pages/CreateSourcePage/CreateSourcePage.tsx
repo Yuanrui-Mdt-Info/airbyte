@@ -81,7 +81,7 @@ const CreateSourcePage: React.FC = () => {
   return (
     <>
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />
-      <ConnectionStep lightMode type="source" currentStepNumber={1} />
+      <ConnectionStep lightMode type="source" />
       <ConnectorDocumentationWrapper>
         <FormPageContent>
           {currentStep === CreateStepTypes.TEST_CONNECTION && (

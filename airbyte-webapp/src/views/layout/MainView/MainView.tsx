@@ -109,12 +109,9 @@ const MainView: React.FC = (props) => {
       } else {
         setBackgroundColor(theme.backgroundColor);
       }
+    } else {
+      setBackgroundColor(theme.white);
     }
-
-    // else
-    // else {
-    //   setBackgroundColor(theme.white);
-    // }
     setIsSidebar(isSidebarBol);
   }, [pathname, hasSidebarRoutes]);
 

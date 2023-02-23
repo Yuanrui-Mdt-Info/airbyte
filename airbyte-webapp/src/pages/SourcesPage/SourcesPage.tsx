@@ -16,8 +16,8 @@ import SourceItemPage from "./pages/SourceItemPage";
 export const SourcesPage: React.FC = () => (
   <Routes>
     <Route path={RoutePaths.SourceNew} element={<CreateSourcePage />} />
-    <Route path={RoutePaths.ConnectionNew} element={<CreationFormPage />} />
-    <Route path={RoutePaths.SelectConnection} element={<SelectConnetionPage single />} />
+    <Route path={RoutePaths.ConnectionNew} element={<CreationFormPage backtrack />} />
+    <Route path={RoutePaths.SelectConnection} element={<SelectConnetionPage backtrack />} />
     <Route path={RoutePaths.SelectSource} element={<SelectSourcePage />} />
     <Route
       path=":id/*"

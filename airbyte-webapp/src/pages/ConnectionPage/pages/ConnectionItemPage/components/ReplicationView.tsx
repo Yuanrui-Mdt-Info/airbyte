@@ -74,7 +74,7 @@ const ResetWarningModal: React.FC<ResetWarningModalProps> = ({ onCancel, onClose
 
 const Content = styled.div`
   // max-width: 1279px;
-  margin: 0 20px;
+  margin: 0 26px;
   padding-bottom: 10px;
 `;
 

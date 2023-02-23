@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useIntl } from "react-intl";
-import { useNavigate } from "react-router-dom";
+import { FormattedMessage, useIntl } from "react-intl";
+// import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import Button from "components/ButtonGroup/components/Button";
+import { BigButton, ButtonRows } from "components/base/Button/BigButton";
 import { ConnectionStep, CreateStepTypes } from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
 
@@ -16,7 +16,6 @@ import { useSourceDefinitionList } from "services/connector/SourceDefinitionServ
 import ExistingEntityForm from "./components/ExistingEntityForm";
 
 interface State {
-  currentStepNumber?: number;
   sourceId?: string;
   destinationId?: string;
   sourceDefinitionId?: string;
@@ -27,14 +26,6 @@ interface State {
 const Container = styled.div`
   max-width: 858px;
   margin: 0 auto;
-`;
-
-export const ButtonRows = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin: 40px 0 60px 0;
-  width: 100%;
 `;
 
 const hasSourceId = (state: unknown): state is { sourceId: string } => {
@@ -72,11 +63,11 @@ const hasDestinationDefinitionId = (state: unknown): state is { destinationDefin
 };
 
 const SelectNewConnectionCard: React.FC<{
-  single?: boolean;
-}> = ({ single }) => {
+  backtrack?: boolean;
+}> = ({ backtrack }) => {
   const { push, location } = useRouter();
   const { formatMessage } = useIntl();
-  const navigator = useNavigate();
+  // const navigator = useNavigate();
   const { sourceDefinitions } = useSourceDefinitionList();
   const { destinationDefinitions } = useDestinationDefinitionList();
 
@@ -107,8 +98,14 @@ const SelectNewConnectionCard: React.FC<{
   }, [currentStep, sourceId, sourceDefinitionId, destinationId, destinationDefinitionId]);
 
   const clickCancel = () => {
-    if (single) {
-      navigator(-1);
+    if (backtrack) {
+      if (sourceId) {
+        push(`/${RoutePaths.Source}/${sourceId}/overview`);
+      } else {
+        push(`/${RoutePaths.Destination}/${destinationId}/overview`);
+      }
+
+      // navigator(-1);
       return;
     }
     setCurrentStep(CreateStepTypes.CREATE_SOURCE);
@@ -215,16 +212,16 @@ const SelectNewConnectionCard: React.FC<{
       <Container>
         {currentStep === CreateStepTypes.CREATE_SOURCE && (
           <>
-            {!single && (
-              <ExistingEntityForm
-                type="source"
-                onSubmit={onSelectExistingSource}
-                value={sourceId}
-                placeholder={formatMessage({
-                  id: "form.select.placeholder.source",
-                })}
-              />
-            )}
+            {/* {!backtrack && ( */}
+            <ExistingEntityForm
+              type="source"
+              onSubmit={onSelectExistingSource}
+              value={sourceId}
+              placeholder={formatMessage({
+                id: "form.select.placeholder.source",
+              })}
+            />
+            {/* )} */}
             <DataPanel
               onSelect={afterSelect}
               data={sourceDefinitions}
@@ -239,16 +236,16 @@ const SelectNewConnectionCard: React.FC<{
 
         {currentStep === CreateStepTypes.CREATE_DESTINATION && (
           <>
-            {!single && (
-              <ExistingEntityForm
-                type="destination"
-                onSubmit={onSelectExistingSource}
-                value={destinationId}
-                placeholder={formatMessage({
-                  id: "form.select.placeholder.destination",
-                })}
-              />
-            )}
+            {/* {!backtrack && ( */}
+            <ExistingEntityForm
+              type="destination"
+              onSubmit={onSelectExistingSource}
+              value={destinationId}
+              placeholder={formatMessage({
+                id: "form.select.placeholder.destination",
+              })}
+            />
+            {/* )} */}
             <DataPanel
               onSelect={afterSelect}
               data={destinationDefinitions}
@@ -262,10 +259,14 @@ const SelectNewConnectionCard: React.FC<{
         )}
 
         <ButtonRows>
-          {currentStep === CreateStepTypes.CREATE_DESTINATION && (
-            <Button btnText="back" onClick={clickCancel} type="cancel" />
+          {(currentStep === CreateStepTypes.CREATE_DESTINATION || backtrack) && (
+            <BigButton onClick={clickCancel} white>
+              <FormattedMessage id="form.button.back" />
+            </BigButton>
           )}
-          <Button btnText="selectContinue" onClick={clickSelect} type={disabled ? "disabled" : "active"} />
+          <BigButton onClick={clickSelect} disabled={disabled}>
+            <FormattedMessage id="form.button.selectContinue" />{" "}
+          </BigButton>
         </ButtonRows>
       </Container>
     </>

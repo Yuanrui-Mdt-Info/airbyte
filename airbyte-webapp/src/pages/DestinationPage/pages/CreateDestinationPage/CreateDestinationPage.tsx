@@ -79,7 +79,7 @@ export const CreateDestinationPage: React.FC = () => {
 
   return (
     <>
-      <ConnectionStep lightMode type="destination" currentStepNumber={1} activeStep={CreateStepTypes.CREATE_SOURCE} />
+      <ConnectionStep lightMode type="destination" activeStep={CreateStepTypes.CREATE_SOURCE} />
       <ConnectorDocumentationWrapper>
         <FormPageContent>
           {currentStep === CreateStepTypes.TEST_CONNECTION && (

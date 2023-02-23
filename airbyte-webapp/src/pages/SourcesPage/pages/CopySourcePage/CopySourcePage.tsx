@@ -41,7 +41,7 @@ const CopySourcePage: React.FC = () => {
 
   return (
     <>
-      <ConnectionStep lightMode type="source" currentStepNumber={1} activeStep={CreateStepTypes.CREATE_SOURCE} />
+      <ConnectionStep lightMode type="source" activeStep={CreateStepTypes.CREATE_SOURCE} />
       <Container>
         <ConnectorDocumentationWrapper>
           {currentStep === CreateStepTypes.TEST_CONNECTION && (

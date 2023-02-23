@@ -17,8 +17,8 @@ const DestinationsPage: React.FC = () => {
   return (
     <Routes>
       <Route path={RoutePaths.DestinationNew} element={<CreateDestinationPage />} />
-      <Route path={RoutePaths.ConnectionNew} element={<CreationFormPage single />} />
-      <Route path={RoutePaths.SelectConnection} element={<SelectConnectionPage single />} />
+      <Route path={RoutePaths.ConnectionNew} element={<CreationFormPage backtrack />} />
+      <Route path={RoutePaths.SelectConnection} element={<SelectConnectionPage backtrack />} />
       <Route path={RoutePaths.SelectDestination} element={<SelectDestinationPage />} />
       <Route
         path=":id/*"

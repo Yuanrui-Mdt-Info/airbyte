@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useIntl } from "react-intl";
+import { useIntl, FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
-import Button from "components/ButtonGroup/components/Button";
+import { BigButton, ButtonRows } from "components/base/Button/BigButton";
 import { ConnectionStep } from "components/ConnectionStep";
 import DataPanel from "components/DataPanel";
 
@@ -21,14 +21,6 @@ export interface ButtonItems {
 const Container = styled.div`
   max-width: 858px;
   margin: 0 auto;
-`;
-
-export const ButtonRows = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin: 40px 0 60px 0;
-  width: 100%;
 `;
 
 const hasDestinationDefinitionId = (state: unknown): state is { destinationDefinitionId: string } => {
@@ -90,11 +82,9 @@ const SelectDestinationCard: React.FC = () => {
           })}
         />
         <ButtonRows>
-          <Button
-            btnText="selectContinue"
-            onClick={clickSelect}
-            type={destinationDefinitionId ? "active" : "disabled"}
-          />
+          <BigButton onClick={clickSelect} disabled={destinationDefinitionId ? false : true}>
+            <FormattedMessage id="form.button.selectContinue" />
+          </BigButton>
         </ButtonRows>
       </Container>
     </>
