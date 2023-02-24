@@ -187,3 +187,47 @@ export const registerNewUser = (
     options
   );
 };
+
+/**
+ * @summary Returns all non-deleted connections for a workspace.
+ */
+export const webBackendListFilteredConnectionsForWorkspace = (
+  filterConnectionRequestBody: FilterConnectionRequestBody,
+  options?: SecondParameter<typeof apiOverride>
+) => {
+  return apiOverride<WebBackendFilteredConnectionReadList>(
+    {
+      url: `/etl/web_backend/connections/page`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: filterConnectionRequestBody,
+    },
+    options
+  );
+};
+
+/**
+ * @summary Returns all filters for connections
+ */
+
+export interface FilterItem {
+  key: string;
+  value: string;
+}
+export interface ReadConnectionFilters {
+  status: FilterItem[];
+  sources: FilterItem[];
+  destinations: FilterItem[];
+}
+
+export const getConnectionFilterParams = (options?: SecondParameter<typeof apiOverride>) => {
+  return apiOverride<ReadConnectionFilters>(
+    {
+      url: `/etl/web_backend/connections/filter/param`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+    },
+    options
+  );
+};
+

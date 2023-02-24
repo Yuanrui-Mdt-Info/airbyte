@@ -437,6 +437,7 @@
   "tables.connection.modal.button.disable": "Disable",
   "tables.connection.disabled.text": "Connection has been disabled!",
   "tables.connection.enabled.text": "Connection has been enabled!",
+  "tables.emptyList": "No matching result found",
   "admin.destinations": "Destinations",
   "admin.sources": "Sources",
   "admin.configuration": "Configuration",

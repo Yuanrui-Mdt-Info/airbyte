@@ -8,6 +8,12 @@ import {
 } from "../../request/AirbyteClient";
 import { AirbyteRequestService } from "../../request/AirbyteRequestService";
 
+import {
+  FilterConnectionRequestBody,
+  webBackendListFilteredConnectionsForWorkspace,
+  getConnectionFilterParams,
+} from "../../request/DaspireClient";
+
 export class WebBackendConnectionService extends AirbyteRequestService {
   public getConnection(connectionId: string, withRefreshedCatalog?: boolean) {
     return webBackendGetConnection({ connectionId, withRefreshedCatalog }, this.requestOptions);
@@ -23,5 +29,9 @@ export class WebBackendConnectionService extends AirbyteRequestService {
 
   public create(payload: WebBackendConnectionCreate) {
     return webBackendCreateConnection(payload, this.requestOptions);
+  }
+
+  public filtersLists() {
+    return getConnectionFilterParams(this.requestOptions);
   }
 }
