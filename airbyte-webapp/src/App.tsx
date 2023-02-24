@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import React, { Suspense } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
@@ -25,7 +26,6 @@ import {
   windowConfigProvider,
 } from "./config";
 import GlobalStyle from "./global-styles";
-import en from "./locales/en.json";
 import { Routing } from "./pages/routes";
 import { WorkspaceServiceProvider } from "./services/workspaces/WorkspacesService";
 import { theme } from "./theme";
@@ -61,27 +61,27 @@ const Services: React.FC = ({ children }) => (
   </AuthContextProvider>
 );
 
-// const stripePromise = loadStripe("pk_test_6pRNASCoBOKtIshFeQd4XMUh");
-
 const App: React.FC = () => {
   return (
     <React.StrictMode>
       <StyleProvider>
-        <I18nProvider locale="en" messages={en}>
-          <StoreProvider>
-            <ServicesProvider>
-              <Suspense fallback={<LoadingPage />}>
-                <ConfigServiceProvider defaultConfig={defaultConfig} providers={configProviders}>
-                  <Router>
-                    <Services>
-                      <Routing />
-                    </Services>
-                  </Router>
-                </ConfigServiceProvider>
-              </Suspense>
-            </ServicesProvider>
-          </StoreProvider>
-        </I18nProvider>
+        <StoreProvider>
+          <ServicesProvider>
+            <Suspense fallback={<LoadingPage />}>
+              <ConfigServiceProvider defaultConfig={defaultConfig} providers={configProviders}>
+                <Router>
+                  <Services>
+                    <I18nProvider>
+                      <GoogleOAuthProvider clientId="797465575128-he9j9jrtastc66su472tnv3uvbtkllid.apps.googleusercontent.com">
+                        <Routing />
+                      </GoogleOAuthProvider>
+                    </I18nProvider>
+                  </Services>
+                </Router>
+              </ConfigServiceProvider>
+            </Suspense>
+          </ServicesProvider>
+        </StoreProvider>
       </StyleProvider>
     </React.StrictMode>
   );

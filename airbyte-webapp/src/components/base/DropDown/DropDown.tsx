@@ -21,6 +21,7 @@ export interface DropdownProps<T = unknown> extends Props<OptionType> {
   fullText?: boolean;
   error?: boolean;
   selectProps?: T;
+  $background?: string;
 }
 
 // eslint-disable-next-line react/function-component-definition

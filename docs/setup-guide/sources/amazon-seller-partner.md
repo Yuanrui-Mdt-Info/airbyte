@@ -4,6 +4,7 @@ This page contains the setup guide and reference information for the Amazon Sell
 
 ## Prerequisites
 
+<<<<<<< HEAD
 * app\_id
 * lwa\_app\_id
 * lwa\_client\_secret
@@ -14,6 +15,16 @@ This page contains the setup guide and reference information for the Amazon Sell
 * aws\_environment
 * region
 * replication\_start\_date
+=======
+* Store Name
+* App Id
+* Amazon SP account
+* AWS Access Key
+* AWS Secret Access Key
+* Role ARN
+* AWS Environment
+* AWS Region
+>>>>>>> 9fbe15486653b33a718bb9de51a98d2381cddb5a
 
 ## Setup guide
 
@@ -27,9 +38,33 @@ This page contains the setup guide and reference information for the Amazon Sell
 
 2. Using developer application from Step 1, [generate refresh token](https://developer-docs.amazon.com/sp-api/docs/self-authorization).
 
-3. Paste all data to required fields using your IAM user and developer account.
+3. Enter your Amazon **Store Name**.
 
-4. Click **Set up source**.
+4. Enter your Amazon **App ID**.
+
+5. **Authenticate your Amazon Seller Partner account**.
+
+6. Enter your **AWS Access Key**.
+
+7. Enter your **AWS Secret Access Key**.
+
+8. Enter your **Role ARN**.
+
+9. Select your **AWS Environment**.
+
+10. **Max wait time for reports (in seconds)** is the maximum number of minutes the connector waits for the generation of a report for streams.
+
+11. **Period In Days** will be used for stream slicing for initial full_refresh sync when no updated state is present for reports that support sliced incremental sync. 
+
+12. Select your **AWS Region**.
+
+13. **End Date (Optional)** - any data after this date will not be replicated.
+
+14. **Start Date** - Any data before this date will not be replicated.
+
+15. **Report Options** is additional information passed to reports. Must be a valid json string.
+
+16. Click **Set up source**.
 
 ## Supported sync modes
 

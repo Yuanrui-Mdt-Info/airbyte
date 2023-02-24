@@ -9,7 +9,7 @@ export const ButtonRows = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 200px;
+  margin: 200px auto 60px auto;
   width: 100%;
 `;
 

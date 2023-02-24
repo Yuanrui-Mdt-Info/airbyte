@@ -7,14 +7,14 @@ import { theme } from "theme";
 import { LoadingPage } from "components";
 import { CreateStepTypes } from "components/ConnectionStep";
 
-import { useUser } from "core/AuthContext";
-import { getRoleAgainstRoleNumber, ROLES } from "core/Constants/roles";
-import { getStatusAgainstStatusNumber, STATUSES } from "core/Constants/statuses";
+// import { useUser } from "core/AuthContext";
+// import { getRoleAgainstRoleNumber, ROLES } from "core/Constants/roles";
+// import { getStatusAgainstStatusNumber, STATUSES } from "core/Constants/statuses";
 import useRouter from "hooks/useRouter";
-import { UnauthorizedModal } from "pages/ConnectionPage/pages/AllConnectionsPage/components/UnauthorizedModal";
+// import { UnauthorizedModal } from "pages/ConnectionPage/pages/AllConnectionsPage/components/UnauthorizedModal";
 import { UpgradePlanBar } from "pages/ConnectionPage/pages/AllConnectionsPage/components/UpgradePlanBar";
 import { RoutePaths } from "pages/routePaths";
-import { SettingsRoute } from "pages/SettingsPage/SettingsPage";
+// import { SettingsRoute } from "pages/SettingsPage/SettingsPage";
 import { ResourceNotFoundErrorBoundary } from "views/common/ResorceNotFoundErrorBoundary";
 import { StartOverErrorView } from "views/common/StartOverErrorView";
 import SideBar from "views/layout/SideBar";
@@ -37,6 +37,12 @@ const Content = styled.div<{
   height: 100%;
 `;
 
+const PaddingTop = styled.div`
+  padding-top: 40px;
+  width: 100%;
+  height: 100%;
+`;
+
 const hasCurrentStep = (state: unknown): state is { currentStep: string } => {
   return (
     typeof state === "object" && state !== null && typeof (state as { currentStep?: string }).currentStep === "string"
@@ -44,11 +50,11 @@ const hasCurrentStep = (state: unknown): state is { currentStep: string } => {
 };
 
 const MainView: React.FC = (props) => {
-  const { user } = useUser();
-  const { pathname, push, location } = useRouter();
+  // const { user } = useUser();
+  const { pathname, location } = useRouter(); // push
   const [isSidebar, setIsSidebar] = useState<boolean>(true);
   const [backgroundColor, setBackgroundColor] = useState<string>(theme.backgroundColor);
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  // const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   const hasSidebarRoutes: string[] = [
     RoutePaths.Source,
@@ -111,26 +117,26 @@ const MainView: React.FC = (props) => {
     setIsSidebar(isSidebarBol);
   }, [pathname, hasSidebarRoutes]);
 
-  const isUpgradePlanBar = (): boolean => {
-    let showUpgradePlanBar = false;
-    if (getStatusAgainstStatusNumber(user.status) === STATUSES.Free_Trial) {
-      if (!pathname.split("/").includes(RoutePaths.Payment)) {
-        showUpgradePlanBar = true;
-      }
-    }
-    return showUpgradePlanBar;
-  };
+  // const isUpgradePlanBar = (): boolean => {
+  //   let showUpgradePlanBar = false;
+  //   if (getStatusAgainstStatusNumber(user.status) === STATUSES.Free_Trial) {
+  //     if (!pathname.split("/").includes(RoutePaths.Payment)) {
+  //       showUpgradePlanBar = true;
+  //     }
+  //   }
+  //   return showUpgradePlanBar;
+  // };
 
-  const onUpgradePlan = () => {
-    if (
-      getRoleAgainstRoleNumber(user.role) === ROLES.Administrator_Owner ||
-      getRoleAgainstRoleNumber(user.role) === ROLES.Administrator
-    ) {
-      push(`/${RoutePaths.Settings}/${SettingsRoute.PlanAndBilling}`);
-    } else {
-      setIsAuthorized(true);
-    }
-  };
+  // const onUpgradePlan = () => {
+  //   if (
+  //     getRoleAgainstRoleNumber(user.role) === ROLES.Administrator_Owner ||
+  //     getRoleAgainstRoleNumber(user.role) === ROLES.Administrator
+  //   ) {
+  //     push(`/${RoutePaths.Settings}/${SettingsRoute.PlanAndBilling}`);
+  //   } else {
+  //     setIsAuthorized(true);
+  //   }
+  // };
 
   return (
     <MainContainer>
@@ -138,9 +144,10 @@ const MainView: React.FC = (props) => {
       <Content backgroundColor={backgroundColor}>
         <ResourceNotFoundErrorBoundary errorComponent={<StartOverErrorView />}>
           <React.Suspense fallback={<LoadingPage />}>
-            {isAuthorized && <UnauthorizedModal onClose={() => setIsAuthorized(false)} />}
-            {isUpgradePlanBar() && <UpgradePlanBar onUpgradePlan={onUpgradePlan} />}
-            {props.children}
+            {/* {isAuthorized && <UnauthorizedModal onClose={() => setIsAuthorized(false)} />}
+            {isUpgradePlanBar() && <UpgradePlanBar onUpgradePlan={onUpgradePlan} />} */}
+            <UpgradePlanBar />
+            <PaddingTop>{props.children}</PaddingTop>
           </React.Suspense>
         </ResourceNotFoundErrorBoundary>
       </Content>

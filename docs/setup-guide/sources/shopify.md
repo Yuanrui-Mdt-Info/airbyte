@@ -2,6 +2,11 @@
 
 This page contains the setup guide and reference information for Shopify.
 
+## Prerequisites
+
+* Your Shopify store name
+* Your Shopify login details or API password
+
 ## Features
 
 | Feature | Supported? |

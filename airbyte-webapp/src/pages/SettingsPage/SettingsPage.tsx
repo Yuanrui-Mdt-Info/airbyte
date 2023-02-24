@@ -160,7 +160,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pageConfig }) => {
                     .flatMap((menuItem) => menuItem.routes)
                     .map(
                       ({ path, component: Component, show }) =>
-                        show && <Route key={path} path={path} element={Component} />
+                        show && <Route key={path} path={`${path}/*`} element={Component} />
                     )}
                   <Route path="*" element={<Navigate to={firstRoute()} replace />} />
                 </Routes>
