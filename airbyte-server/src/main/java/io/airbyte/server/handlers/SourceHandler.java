@@ -5,6 +5,7 @@
 package io.airbyte.server.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.lang.MoreBooleans;
@@ -19,11 +20,12 @@ import io.airbyte.protocol.models.ConnectorSpecification;
 import io.airbyte.server.converters.ConfigurationUpdate;
 import io.airbyte.validation.json.JsonSchemaValidator;
 import io.airbyte.validation.json.JsonValidationException;
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class SourceHandler {
@@ -81,6 +83,11 @@ public class SourceHandler {
         sourceCreate.getSourceDefinitionId());
     validateSource(spec, sourceCreate.getConnectionConfiguration());
 
+    // in Amazon Seller Partner source set default start date if it is empty.
+    if (!ObjectUtils.isEmpty(sourceCreate.getName()) && sourceCreate.getName().trim().equalsIgnoreCase("Amazon Seller Partner")) {
+      setDefaultValueForAmazonSellerPartner(sourceCreate);
+    }
+
     // persist
     final UUID sourceId = uuidGenerator.get();
     persistSourceConnection(
@@ -94,6 +101,17 @@ public class SourceHandler {
 
     // read configuration from db
     return buildSourceRead(sourceId, spec);
+  }
+
+  public void setDefaultValueForAmazonSellerPartner(SourceCreate sourceCreate) {
+    if (sourceCreate.getConnectionConfiguration().has("replication_start_date")
+            && sourceCreate.getConnectionConfiguration().get("replication_start_date").isEmpty()) {
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.DATE, -1);
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T00:00:00Z'");
+      String previousDayDate = dateFormat.format(new Date(cal.getTimeInMillis()));
+      ((ObjectNode) sourceCreate.getConnectionConfiguration()).put("replication_start_date", previousDayDate);
+    }
   }
 
   public SourceRead updateSource(final SourceUpdate sourceUpdate)
