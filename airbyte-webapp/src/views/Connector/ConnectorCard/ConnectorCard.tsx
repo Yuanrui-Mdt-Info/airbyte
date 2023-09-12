@@ -52,6 +52,7 @@ export const ConnectorCard: React.VFC<ConnectorCardCreateProps | ConnectorCardEd
   const [saved, setSaved] = useState(false);
 
   const { testConnector, isTestConnectionInProgress, onStopTesting, error, reset } = useTestConnector(props);
+  console.log(testConnector, "testConnector");
 
   useEffect(() => {
     // Whenever the selected connector changed, reset the check connection call and other errors

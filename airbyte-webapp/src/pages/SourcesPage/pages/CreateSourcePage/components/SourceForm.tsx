@@ -48,7 +48,7 @@ export const SourceForm: React.FC<SourceFormProps> = ({
   const [sourceDefinitionId, setSourceDefinitionId] = useState<string | null>(
     hasSourceDefinitionId(location.state) ? location.state.sourceDefinitionId : null
   );
-
+  console.log(sourceDefinitionId, "sourceDefinitionId");
   const {
     data: sourceDefinitionSpecification,
     error: sourceDefinitionError,
@@ -69,6 +69,8 @@ export const SourceForm: React.FC<SourceFormProps> = ({
       sourceDefinitionId: sourceDefinitionSpecification?.sourceDefinitionId,
     });
   };
+  console.log(sourceDefinitionSpecification, "sourceDefinitionSpecification");
+  console.log(sourceDefinitionError, "sourceDefinitionError");
 
   return (
     <ConnectorCard

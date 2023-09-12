@@ -8,10 +8,10 @@ import { Text } from "components/base/Text";
 import { ConnectorSpecification } from "core/domain/connector";
 import { ConnectorIds } from "utils/connectors";
 
-import { useServiceForm } from "../../../serviceFormContext";
 import styles from "./AuthButton.module.scss";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { useFormikOauthAdapter } from "./useOauthFlowAdapter";
+import { useServiceForm } from "../../../serviceFormContext";
 
 function isGoogleConnector(connectorDefinitionId: string): boolean {
   return (

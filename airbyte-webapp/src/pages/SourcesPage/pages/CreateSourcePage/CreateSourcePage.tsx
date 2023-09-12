@@ -39,6 +39,7 @@ const CreateSourcePage: React.FC = () => {
   }) => {
     const connector = sourceDefinitions.find((item) => item.sourceDefinitionId === values.serviceType);
     if (!connector) {
+      debugger;
       // Unsure if this can happen, but the types want it defined
       throw new Error("No Connector Found");
     }
@@ -77,7 +78,10 @@ const CreateSourcePage: React.FC = () => {
     setLoadingStatus(isLoading || false);
     setFetchingConnectorError(error);
   };
-
+  console.log(sourceDefinitions, "sourceDefinitions");
+  console.log(successRequest, "hasSuccess");
+  console.log(fetchingConnectorError, "fetchingConnectorError");
+  console.log(formValues, "formValues");
   return (
     <>
       <HeadTitle titles={[{ id: "sources.newSourceTitle" }]} />

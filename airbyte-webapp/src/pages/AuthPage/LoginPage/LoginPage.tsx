@@ -85,6 +85,9 @@ const LoginPage: React.FC = () => {
           }}
           validationSchema={LoginPageValidationSchema}
           onSubmit={async (values) => {
+            alert("Hello");
+            debugger;
+            console.log("Hello iam here");
             Signin.post(values, user?.lang)
               .then((res: IAuthUser) => {
                 setUser?.(res);

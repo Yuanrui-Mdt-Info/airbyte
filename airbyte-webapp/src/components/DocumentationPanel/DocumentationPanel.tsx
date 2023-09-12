@@ -21,9 +21,11 @@ export const DocumentationPanel: React.FC = () => {
   const { formatMessage } = useIntl();
   const config = useConfig();
   const { setDocumentationPanelOpen, documentationUrl, selectedServiceName } = useDocumentationPanelContext();
+  console.log(selectedServiceName, "selectedServiceName");
+  console.log(documentationUrl, "123");
   const { data: docs, isLoading } = useDocumentation(documentationUrl);
 
-  // @ts-expect-error rehype-slug currently has type conflicts due to duplicate vfile dependencies
+  console.log(docs, "docs");
   const urlReplacerPlugin: PluggableList = useMemo<PluggableList>(() => {
     const sanitizeLinks = (url: Url, element: Element) => {
       // Relative URLs pointing to another place within the documentation.
@@ -48,6 +50,7 @@ export const DocumentationPanel: React.FC = () => {
     setDocumentationPanelOpen(false);
   }, [setDocumentationPanelOpen, location.pathname]);
 
+  console.log(urlReplacerPlugin, "urlReplacerPlugin");
   return isLoading || documentationUrl === "" ? (
     <LoadingPage />
   ) : (

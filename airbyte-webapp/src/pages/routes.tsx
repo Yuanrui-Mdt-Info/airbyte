@@ -15,7 +15,7 @@ import { CompleteOauthRequest } from "views/CompleteOauthRequest";
 import MainView from "views/layout/MainView";
 
 import LoginNewPage from "./AuthPage/LoginNewPage/LoginNewPage";
-// import { LoginPage } from "./AuthPage/LoginPage";
+//  import { LoginPage } from "./AuthPage/LoginPage";
 // import ResetPasswordPage from "./AuthPage/ResetPasswordPage";
 // import SignupPage from "./AuthPage/SignupPage";
 // import UserSignupPage from "./AuthPage/UserSignupPage";
@@ -80,6 +80,7 @@ export const AutoSelectFirstWorkspace: React.FC = () => {
 
 const RoutingWithWorkspace: React.FC = () => {
   const workspace = useCurrentWorkspace();
+  console.log(workspace, "workspace");
   useApiHealthPoll();
   const { notification, setNotification } = useAppNotification();
 

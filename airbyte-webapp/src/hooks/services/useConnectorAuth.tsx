@@ -9,9 +9,9 @@ import { isSourceDefinitionSpecification } from "core/domain/connector/source";
 import { SourceAuthService } from "core/domain/connector/SourceAuthService";
 import { DestinationOauthConsentRequest, SourceOauthConsentRequest } from "core/request/AirbyteClient";
 
+import { useCurrentWorkspace } from "./useWorkspace";
 import { useDefaultRequestMiddlewares } from "../../services/useDefaultRequestMiddlewares";
 import useRouter from "../useRouter";
-import { useCurrentWorkspace } from "./useWorkspace";
 
 let windowObjectReference: Window | null = null; // global variable
 
@@ -48,6 +48,7 @@ export function useConnectorAuth(): {
 } {
   const { workspaceId } = useCurrentWorkspace();
   const { oauthRedirectUrl } = useConfig();
+  console.log(oauthRedirectUrl, "oauthRedirectUrl");
   const { removeUser } = useUser();
 
   // TODO: move to separate initFacade and use refs instead
