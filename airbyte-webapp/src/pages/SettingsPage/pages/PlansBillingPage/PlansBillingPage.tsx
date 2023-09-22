@@ -18,11 +18,11 @@ import { RoutePaths } from "pages/routePaths";
 import { useAuthenticationService } from "services/auth/AuthSpecificationService";
 import { useUserPlanDetail, useAsyncAction } from "services/payments/PaymentsService";
 
+import { PlanClause } from "./components/PlanClause";
+import styles from "./style.module.scss";
 import { IAuthUser } from "../../../../core/AuthContext/authenticatedUser";
 import { useHealth } from "../../../../hooks/services/Health";
 import { SettingsRoute } from "../../SettingsPage";
-import { PlanClause } from "./components/PlanClause";
-import styles from "./style.module.scss";
 
 const CancelSubscriptionBtn = styled(Button)`
   background-color: ${({ theme }) => theme.white};
@@ -113,7 +113,7 @@ const PlansBillingPage: React.FC = () => {
       });
   }, []);
 
-  const upgradePlan = () => push(`/${RoutePaths.Payment}`);
+  const upgradePlan = () => window.open(process.env.REACT_APP_UPGRADE_PLAN_URL, "_self");
 
   const onFailedPaymentPage = () => push(`/${RoutePaths.FailedPayment}`);
 
