@@ -28,6 +28,9 @@ const Link = styled(ReactLink)<ILinkProps /* & ReactLinkProps */>`
   // font-weight: ${(props) => getFontWeight(props)};
   text-decoration: ${({ $clear }) => ($clear ? "none" : "underline")};
 
+
+  export default Link;
+
   &:hover {
     opacity: 0.8;
   }

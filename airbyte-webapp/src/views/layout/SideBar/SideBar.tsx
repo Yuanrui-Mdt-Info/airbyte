@@ -1,4 +1,4 @@
-import { faHome, faGear, faInbox, faDatabase } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faGear, faInbox, faDatabase, faUpRightAndDownLeftFromCenter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classnames from "classnames";
 import React from "react";
@@ -15,8 +15,8 @@ import { useUser } from "core/AuthContext";
 import useRouter from "hooks/useRouter";
 import { LOCALES } from "locales";
 
-import { RoutePaths } from "../../../pages/routePaths";
 import styles from "./SideBar.module.scss";
+import { RoutePaths } from "../../../pages/routePaths";
 
 const Menu = styled.ul`
   padding: 0;
@@ -111,12 +111,22 @@ const SideBar: React.FC = () => {
         </Link>
         <Menu>
           <MenuItem>
-            <NavLink className={useCalculateSidebarItemStyles(RoutePaths.Connections)} to={RoutePaths.Connections}>
+            <NavLink className={useCalculateSidebarItemStyles(RoutePaths.Dashboard)} to={RoutePaths.Dashboard}>
               <div>
                 <MenuItemIcon icon={faHome} />
               </div>
               <Text>
                 <FormattedMessage id="sidebar.DaspireDashboard" />
+              </Text>
+            </NavLink>
+          </MenuItem>
+          <MenuItem>
+            <NavLink className={useCalculateSidebarItemStyles(RoutePaths.Connections)} to={RoutePaths.Connections}>
+              <div>
+                <MenuItemIcon icon={faUpRightAndDownLeftFromCenter} />
+              </div>
+              <Text>
+                <FormattedMessage id="sidebar.connections" />
               </Text>
             </NavLink>
           </MenuItem>

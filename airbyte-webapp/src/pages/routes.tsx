@@ -21,6 +21,7 @@ import LoginNewPage from "./AuthPage/LoginNewPage/LoginNewPage";
 // import UserSignupPage from "./AuthPage/UserSignupPage";
 // import VerifyEmailPage from "./AuthPage/VerifyEmailPage";
 import ConnectionPage from "./ConnectionPage";
+import DashboardPage from "./DashboardPage";
 import DestinationPage from "./DestinationPage";
 import PaymentErrorPage from "./PaymentErrorPage";
 import PaymentPage from "./PaymentPage";
@@ -36,6 +37,7 @@ const MainViewRoutes: React.FC<{ workspace: WorkspaceRead }> = () => {
     <MainView>
       <ApiErrorBoundary>
         <Routes>
+          <Route path={`${RoutePaths.Dashboard}/*`} element={<DashboardPage />} />
           <Route path={`${RoutePaths.Destination}/*`} element={<DestinationPage />} />
           <Route path={`${RoutePaths.Source}/*`} element={<SourcesPage />} />
           <Route path={`${RoutePaths.Connections}/*`} element={<ConnectionPage />} />
@@ -43,7 +45,7 @@ const MainViewRoutes: React.FC<{ workspace: WorkspaceRead }> = () => {
           <Route path={`${RoutePaths.Payment}/*`} element={<PaymentPage />} />
           <Route path={`${RoutePaths.PaymentError}/*`} element={<PaymentErrorPage />} />
           <Route path={`${RoutePaths.FailedPayment}/*`} element={<FailedPaymentPage />} />
-          <Route path="*" element={<Navigate to={RoutePaths.Connections} />} />
+          <Route path="*" element={<Navigate to={RoutePaths.Dashboard} />} />
         </Routes>
       </ApiErrorBoundary>
     </MainView>

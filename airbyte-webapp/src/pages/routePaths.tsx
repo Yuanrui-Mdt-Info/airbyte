@@ -1,7 +1,7 @@
 export enum RoutePaths {
   AuthFlow = "/auth_flow",
   Root = "/",
-
+  Dashboard = "dashboard",
   Workspaces = "workspaces",
   Preferences = "preferences",
   Onboarding = "onboarding",
