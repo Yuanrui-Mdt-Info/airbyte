@@ -1,8 +1,8 @@
 import { Box, Grid, Typography, MenuItem, FormControl, InputAdornment, OutlinedInput } from "@mui/material";
 import Select from "@mui/material/Select";
-import { LocalizationProvider } from "@mui/x-date-pickers-pro";
+import { DateRange, DateRangeCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { Pie, PieChart, Cell } from "recharts";
 import styled from "styled-components";
@@ -13,9 +13,10 @@ import { ArrowIcon } from "components/icons/ArrowIcon";
 import { CalendarTwoIcon } from "components/icons/CalendarIconTwo";
 import { DatabaseIcon } from "components/icons/DatabaseIcon";
 import { InboxIcon } from "components/icons/InboxIcon";
+import { TickIcon } from "components/icons/TickIcon";
 
 import { PageTrackingCodes, useTrackPage } from "hooks/services/Analytics";
-// ../../../../../public/downArrow.svg
+
 const CustomSelect = styled(Select)`
   width: 100%;
   height: 52px !important;
@@ -78,45 +79,58 @@ height:640px;
 border-radius:22px;
 background:#FFF;
 `;
-const selectDate = [
-  {
-    label: "Last 7 days",
-    value: "7d",
-  },
-  {
-    label: "Last 30 days",
-    value: "30d",
-  },
-  {
-    label: "Last 90 days",
-    value: "90d",
-  },
-  {
-    label: "All time",
-    value: "all",
-  },
-  {
-    label: "Custom",
-    value: "custom",
-  },
-];
+
 const AllDashboardPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_LIST);
   const [dataDate, setDataDate] = useState("30d");
-
+  console.log(dataDate, "DataDate");
   const [isDateRangePickerOpen, setDateRangePickerOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
+  const [value, setValue] = useState<DateRange<Dayjs>>([
+    dayjs().subtract(7, "days"), // Start date (e.g., 7 days ago)
+    dayjs(), // End date (current date)
+  ]);
+  const selectDate = [
+    {
+      label: "Last 7 days",
+      value: "7d",
+    },
+    {
+      label: "Last 30 days",
+      value: "30d",
+    },
+    {
+      label: "Last 90 days",
+      value: "90d",
+    },
+    {
+      label: "All time",
+      value: "all",
+    },
+    {
+      label: `Custom`,
+      value: "custom",
+    },
+  ];
   const handleDateChange = (e: any) => {
     const selectedValue = e.target.value;
-    setDataDate(selectedValue);
-    if (selectedValue === "custom") {
-      setDateRangePickerOpen(true);
-    } else {
+    if (selectedValue !== "custom") {
+      setDataDate(selectedValue);
       setDateRangePickerOpen(false);
+    } else {
+      setDateRangePickerOpen(true);
     }
   };
+  const handleCustomDateRangeChange = (newValue: DateRange<Dayjs> | null) => {
+    if (newValue) {
+      setValue(newValue);
+      // Format the start and end dates and set them as the dataDate
+      const formattedStartDate = newValue[0]?.format("YYYY-MM-DD");
+      const formattedEndDate = newValue[1]?.format("YYYY-MM-DD");
+      const formattedDateRange = `${formattedStartDate} - ${formattedEndDate}`;
+      setDataDate(`${formattedDateRange}`);
+    }
+  };
+
   return (
     <MainPageWithScroll
       withPadding
@@ -320,6 +334,7 @@ const AllDashboardPage: React.FC = () => {
                         sx: {
                           "&& .Mui-selected": {
                             backgroundColor: "#4F46E5 !important",
+                            color: "white",
                           },
                         },
                       }}
@@ -334,19 +349,27 @@ const AllDashboardPage: React.FC = () => {
                       }
                     >
                       {selectDate?.map((data) => {
-                        return <MenuItem value={data.value}>{data.label}</MenuItem>;
+                        return (
+                          <MenuItem value={data.value} key={data.value}>
+                            {data.label}{" "}
+                            {data?.value === dataDate && (
+                              <span style={{ marginLeft: "auto" }}>
+                                <TickIcon color="white" />
+                              </span>
+                            )}
+                          </MenuItem>
+                        );
                       })}
                     </CustomSelect>
                   </FormControl>
                   {isDateRangePickerOpen && (
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DateRangePicker
-                        value={[startDate, endDate]}
-                        onChange={(newValue: any) => {
-                          setStartDate(newValue[0]);
-                          setEndDate(newValue[1]);
+                      <DateRangeCalendar
+                        value={value}
+                        onChange={(newValue) => {
+                          setValue(newValue);
+                          handleCustomDateRangeChange(newValue); // Update dataDate when custom date range is selected
                         }}
-                        open={isDateRangePickerOpen}
                       />
                     </LocalizationProvider>
                   )}
