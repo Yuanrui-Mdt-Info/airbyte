@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, MenuItem, FormControl, InputAdornment, OutlinedInput } from "@mui/material";
+import { Box, Grid, Typography, MenuItem, FormControl, InputAdornment, OutlinedInput, Button } from "@mui/material";
 import Select from "@mui/material/Select";
 import { DateRange, DateRangeCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
@@ -12,6 +12,7 @@ import HeadTitle from "components/HeadTitle";
 import { ArrowIcon } from "components/icons/ArrowIcon";
 import { CalendarTwoIcon } from "components/icons/CalendarIconTwo";
 import { DatabaseIcon } from "components/icons/DatabaseIcon";
+import { FilterIcon } from "components/icons/FilterIcon";
 import { InboxIcon } from "components/icons/InboxIcon";
 import { TickIcon } from "components/icons/TickIcon";
 
@@ -83,13 +84,37 @@ background:#FFF;
 const AllDashboardPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_LIST);
   const [dataDate, setDataDate] = useState("30d");
-  console.log(dataDate, "DataDate");
+  const [sourceData, setSourceData] = useState("All sources");
+  const [destinationData, setDestinationData] = useState("All destinations");
+  const [isBothDatesSelected, setIsBothDatesSelected] = useState(false);
+  console.log(dataDate, "DataDate"); // const selectDate = [
+  //   {
+  //     label: "Last 7 days",
+  //     value: "7d",
+  //   },
+  //   {
+  //     label: "Last 30 days",
+  //     value: "30d",
+  //   },
+  //   {
+  //     label: "Last 90 days",
+  //     value: "90d",
+  //   },
+  //   {
+  //     label: "All time",
+  //     value: "all",
+  //   },
+  //   {
+  //     label: `Custom`,
+  //     value: `${dataDate}`,
+  //   },
+  // ];
   const [isDateRangePickerOpen, setDateRangePickerOpen] = useState(false);
   const [value, setValue] = useState<DateRange<Dayjs>>([
     dayjs().subtract(7, "days"), // Start date (e.g., 7 days ago)
     dayjs(), // End date (current date)
   ]);
-  const selectDate = [
+  const [selectDate, setSelectDate] = useState([
     {
       label: "Last 7 days",
       value: "7d",
@@ -103,15 +128,82 @@ const AllDashboardPage: React.FC = () => {
       value: "90d",
     },
     {
+      label: "Year to date",
+      value: "year to date",
+    },
+    {
       label: "All time",
       value: "all",
     },
     {
       label: `Custom`,
-      value: "custom",
+      value: `custom`,
+    },
+  ]);
+  // const selectDate = [
+  //   {
+  //     label: "Last 7 days",
+  //     value: "7d",
+  //   },
+  //   {
+  //     label: "Last 30 days",
+  //     value: "30d",
+  //   },
+  //   {
+  //     label: "Last 90 days",
+  //     value: "90d",
+  //   },
+  //   {
+  //     label: "All time",
+  //     value: "all",
+  //   },
+  //   {
+  //     label: `Custom`,
+  //     value: `${dataDate}`,
+  //   },
+  // ];
+  const allSources = [
+    { label: "All sources", value: "All sources" },
+    {
+      label: "Amazon Ads",
+      value: "Amazon Ads",
+    },
+    {
+      label: "Amazon Seller Partner",
+      value: "Amazon Seller Partner",
+    },
+    {
+      label: "MySQL",
+      value: "MySQL",
     },
   ];
+  const allDestinations = [
+    { label: "All destinations", value: "All destinations" },
+    {
+      label: "BigQuery",
+      value: "BigQuery",
+    },
+    {
+      label: "MySQL",
+      value: "MySQL",
+    },
+    {
+      label: "Snowflake",
+      value: "Snowflake",
+    },
+  ];
+
+  // const handleDateChange = (e: any) => {
+  //   if (e.label !== "Custom") {
+  //     setDataDate(e.value);
+  //     setDateRangePickerOpen(false);
+  //   } else {
+  //     setDataDate(e.value);
+  //     setDateRangePickerOpen(true);
+  //   }
+  // };
   const handleDateChange = (e: any) => {
+    console.log(e, "Target");
     const selectedValue = e.target.value;
     if (selectedValue !== "custom") {
       setDataDate(selectedValue);
@@ -120,14 +212,40 @@ const AllDashboardPage: React.FC = () => {
       setDateRangePickerOpen(true);
     }
   };
+  const handleSourceChange = (e: any) => {
+    setSourceData(e.target.value);
+  };
+  const handleDestinationChange = (e: any) => {
+    setDestinationData(e.target.value);
+  };
   const handleCustomDateRangeChange = (newValue: DateRange<Dayjs> | null) => {
     if (newValue) {
       setValue(newValue);
+      // Check if both start and end dates are defined
+
+      // Set isBothDatesSelected to true only if both dates are defined
+
       // Format the start and end dates and set them as the dataDate
       const formattedStartDate = newValue[0]?.format("YYYY-MM-DD");
       const formattedEndDate = newValue[1]?.format("YYYY-MM-DD");
       const formattedDateRange = `${formattedStartDate} - ${formattedEndDate}`;
       setDataDate(`${formattedDateRange}`);
+    }
+  };
+  const handleDone = () => {
+    alert(dataDate);
+    const formattedStartDate = value[0]?.format("YYYY-MM-DD");
+    const formattedEndDate = value[1]?.format("YYYY-MM-DD");
+    console.log("started", formattedStartDate);
+    console.log("Ended", formattedEndDate);
+    if (formattedStartDate === undefined || formattedEndDate === undefined) {
+      setIsBothDatesSelected(true);
+    } else {
+      const formattedDateRange = `${formattedStartDate}-${formattedEndDate}`;
+      setDataDate(`${formattedDateRange}`);
+      setSelectDate([...selectDate, { label: `${dataDate}`, value: `${dataDate}` }]);
+      setIsBothDatesSelected(false);
+      setDateRangePickerOpen(false);
     }
   };
 
@@ -328,6 +446,13 @@ const AllDashboardPage: React.FC = () => {
                 <Box>
                   {" "}
                   <FormControl size="medium" fullWidth>
+                    {/* <DropDown
+                      $withBorder
+                      $background="white"
+                      value={dataDate}
+                      options={selectDate}
+                      onChange={handleDateChange}
+                    /> */}
                     <CustomSelect
                       value={dataDate}
                       MenuProps={{
@@ -363,16 +488,118 @@ const AllDashboardPage: React.FC = () => {
                     </CustomSelect>
                   </FormControl>
                   {isDateRangePickerOpen && (
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DateRangeCalendar
-                        value={value}
-                        onChange={(newValue) => {
-                          setValue(newValue);
-                          handleCustomDateRangeChange(newValue); // Update dataDate when custom date range is selected
-                        }}
-                      />
-                    </LocalizationProvider>
+                    <>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Box>
+                          <DateRangeCalendar
+                            value={value}
+                            onChange={(newValue) => {
+                              setValue(newValue);
+                              handleCustomDateRangeChange(newValue); // Update dataDate when custom date range is selected
+                            }}
+                            sx={{
+                              "& .MuiPickersDay-root-MuiDateRangePickerDay-day.Mui-selected": {
+                                backgroundColor: "#4F46E5 !important",
+                                color: "white",
+                              },
+                            }}
+                          />
+                        </Box>
+                      </LocalizationProvider>
+                      <Box display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          sx={{ backgroundColor: "#EDF2F7", color: "#2D3748", borderColor: "#EDF2F7" }}
+                        >
+                          Clear
+                        </Button>
+                        <Box ml={2}>
+                          <Button
+                            variant="contained"
+                            sx={{ backgroundColor: "#4F46E5", color: "white", borderColor: "#4F46E5" }}
+                            onClick={handleDone}
+                            disabled={isBothDatesSelected}
+                          >
+                            Done
+                          </Button>
+                        </Box>
+                      </Box>
+                    </>
                   )}
+                </Box>
+                <Box>
+                  <FormControl size="medium" fullWidth>
+                    <CustomSelect
+                      value={sourceData}
+                      MenuProps={{
+                        sx: {
+                          "&& .Mui-selected": {
+                            backgroundColor: "#4F46E5 !important",
+                            color: "white",
+                          },
+                        },
+                      }}
+                      onChange={handleSourceChange}
+                      name="sourceData"
+                      input={<OutlinedInput notched={false} />}
+                      inputProps={{ "aria-label": "Without label" }}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <FilterIcon />
+                        </InputAdornment>
+                      }
+                    >
+                      {allSources?.map((source) => {
+                        return (
+                          <MenuItem value={source.value} key={source.value}>
+                            {source.label}{" "}
+                            {source?.value === sourceData && (
+                              <span style={{ marginLeft: "auto" }}>
+                                <TickIcon color="white" />
+                              </span>
+                            )}
+                          </MenuItem>
+                        );
+                      })}
+                    </CustomSelect>
+                  </FormControl>
+                </Box>
+                <Box>
+                  <FormControl size="medium" fullWidth>
+                    <CustomSelect
+                      value={destinationData}
+                      MenuProps={{
+                        sx: {
+                          "&& .Mui-selected": {
+                            backgroundColor: "#4F46E5 !important",
+                            color: "white",
+                          },
+                        },
+                      }}
+                      onChange={handleDestinationChange}
+                      name="destinationData"
+                      input={<OutlinedInput notched={false} />}
+                      inputProps={{ "aria-label": "Without label" }}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <FilterIcon />
+                        </InputAdornment>
+                      }
+                    >
+                      {allDestinations?.map((dest) => {
+                        return (
+                          <MenuItem value={dest.value} key={dest.value}>
+                            {dest.label}{" "}
+                            {dest?.value === destinationData && (
+                              <span style={{ marginLeft: "auto" }}>
+                                <TickIcon color="white" />
+                              </span>
+                            )}
+                          </MenuItem>
+                        );
+                      })}
+                    </CustomSelect>
+                  </FormControl>
                 </Box>
               </Box>
             </Grid>
