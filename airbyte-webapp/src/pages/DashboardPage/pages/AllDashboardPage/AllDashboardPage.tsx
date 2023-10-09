@@ -87,28 +87,8 @@ const AllDashboardPage: React.FC = () => {
   const [sourceData, setSourceData] = useState("All sources");
   const [destinationData, setDestinationData] = useState("All destinations");
   const [isBothDatesSelected, setIsBothDatesSelected] = useState(false);
-  console.log(dataDate, "DataDate"); // const selectDate = [
-  //   {
-  //     label: "Last 7 days",
-  //     value: "7d",
-  //   },
-  //   {
-  //     label: "Last 30 days",
-  //     value: "30d",
-  //   },
-  //   {
-  //     label: "Last 90 days",
-  //     value: "90d",
-  //   },
-  //   {
-  //     label: "All time",
-  //     value: "all",
-  //   },
-  //   {
-  //     label: `Custom`,
-  //     value: `${dataDate}`,
-  //   },
-  // ];
+  console.log(dataDate, "DataDate");
+
   const [isDateRangePickerOpen, setDateRangePickerOpen] = useState(false);
   const [value, setValue] = useState<DateRange<Dayjs>>([
     dayjs().subtract(7, "days"), // Start date (e.g., 7 days ago)
@@ -140,28 +120,7 @@ const AllDashboardPage: React.FC = () => {
       value: `custom`,
     },
   ]);
-  // const selectDate = [
-  //   {
-  //     label: "Last 7 days",
-  //     value: "7d",
-  //   },
-  //   {
-  //     label: "Last 30 days",
-  //     value: "30d",
-  //   },
-  //   {
-  //     label: "Last 90 days",
-  //     value: "90d",
-  //   },
-  //   {
-  //     label: "All time",
-  //     value: "all",
-  //   },
-  //   {
-  //     label: `Custom`,
-  //     value: `${dataDate}`,
-  //   },
-  // ];
+
   const allSources = [
     { label: "All sources", value: "All sources" },
     {
@@ -193,15 +152,6 @@ const AllDashboardPage: React.FC = () => {
     },
   ];
 
-  // const handleDateChange = (e: any) => {
-  //   if (e.label !== "Custom") {
-  //     setDataDate(e.value);
-  //     setDateRangePickerOpen(false);
-  //   } else {
-  //     setDataDate(e.value);
-  //     setDateRangePickerOpen(true);
-  //   }
-  // };
   const handleDateChange = (e: any) => {
     console.log(e, "Target");
     const selectedValue = e.target.value;
@@ -221,11 +171,7 @@ const AllDashboardPage: React.FC = () => {
   const handleCustomDateRangeChange = (newValue: DateRange<Dayjs> | null) => {
     if (newValue) {
       setValue(newValue);
-      // Check if both start and end dates are defined
 
-      // Set isBothDatesSelected to true only if both dates are defined
-
-      // Format the start and end dates and set them as the dataDate
       const formattedStartDate = newValue[0]?.format("YYYY-MM-DD");
       const formattedEndDate = newValue[1]?.format("YYYY-MM-DD");
       const formattedDateRange = `${formattedStartDate} - ${formattedEndDate}`;
@@ -233,22 +179,23 @@ const AllDashboardPage: React.FC = () => {
     }
   };
   const handleDone = () => {
-    alert(dataDate);
     const formattedStartDate = value[0]?.format("YYYY-MM-DD");
     const formattedEndDate = value[1]?.format("YYYY-MM-DD");
-    console.log("started", formattedStartDate);
-    console.log("Ended", formattedEndDate);
-    if (formattedStartDate === undefined || formattedEndDate === undefined) {
-      setIsBothDatesSelected(true);
-    } else {
-      const formattedDateRange = `${formattedStartDate}-${formattedEndDate}`;
-      setDataDate(`${formattedDateRange}`);
-      setSelectDate([...selectDate, { label: `${dataDate}`, value: `${dataDate}` }]);
+
+    if (formattedStartDate !== undefined && formattedEndDate !== undefined) {
       setIsBothDatesSelected(false);
-      setDateRangePickerOpen(false);
+      // const formattedDateRange = `${formattedStartDate}-${formattedEndDate}`;
+      alert(dataDate);
+      setSelectDate([...selectDate, { label: `${dataDate}`, value: `${dataDate}` }]);
+      setDataDate(`${dataDate}`);
+      setIsBothDatesSelected(false);
+      setDateRangePickerOpen(false); // Update dataDate when custom date range is selected
     }
   };
-
+  const handleClear = () => {
+    setDataDate("30d");
+    setDateRangePickerOpen(false);
+  };
   return (
     <MainPageWithScroll
       withPadding
@@ -446,13 +393,6 @@ const AllDashboardPage: React.FC = () => {
                 <Box>
                   {" "}
                   <FormControl size="medium" fullWidth>
-                    {/* <DropDown
-                      $withBorder
-                      $background="white"
-                      value={dataDate}
-                      options={selectDate}
-                      onChange={handleDateChange}
-                    /> */}
                     <CustomSelect
                       value={dataDate}
                       MenuProps={{
@@ -476,7 +416,7 @@ const AllDashboardPage: React.FC = () => {
                       {selectDate?.map((data) => {
                         return (
                           <MenuItem value={data.value} key={data.value}>
-                            {data.label}{" "}
+                            {data.label}
                             {data?.value === dataDate && (
                               <span style={{ marginLeft: "auto" }}>
                                 <TickIcon color="white" />
@@ -495,12 +435,13 @@ const AllDashboardPage: React.FC = () => {
                             value={value}
                             onChange={(newValue) => {
                               setValue(newValue);
-                              handleCustomDateRangeChange(newValue); // Update dataDate when custom date range is selected
+                              handleCustomDateRangeChange(newValue);
                             }}
                             sx={{
-                              "& .MuiPickersDay-root-MuiDateRangePickerDay-day.Mui-selected": {
-                                backgroundColor: "#4F46E5 !important",
-                                color: "white",
+                              "& .MuiPickersDay-root": {
+                                "&.Mui-selected": {
+                                  backgroundColor: "#4F46E5 !important",
+                                },
                               },
                             }}
                           />
@@ -510,6 +451,7 @@ const AllDashboardPage: React.FC = () => {
                         <Button
                           variant="outlined"
                           sx={{ backgroundColor: "#EDF2F7", color: "#2D3748", borderColor: "#EDF2F7" }}
+                          onClick={handleClear}
                         >
                           Clear
                         </Button>
@@ -518,7 +460,7 @@ const AllDashboardPage: React.FC = () => {
                             variant="contained"
                             sx={{ backgroundColor: "#4F46E5", color: "white", borderColor: "#4F46E5" }}
                             onClick={handleDone}
-                            disabled={isBothDatesSelected}
+                            disabled={isBothDatesSelected || dataDate === "30d"}
                           >
                             Done
                           </Button>
