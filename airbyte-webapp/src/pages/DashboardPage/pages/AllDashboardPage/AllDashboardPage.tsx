@@ -8,6 +8,7 @@ import { Pie, PieChart, Cell } from "recharts";
 import styled from "styled-components";
 
 import { MainPageWithScroll, PageTitle } from "components";
+import BarChart from "components/DashboardBarChart";
 import HeadTitle from "components/HeadTitle";
 import { ArrowIcon } from "components/icons/ArrowIcon";
 import { CalendarTwoIcon } from "components/icons/CalendarIconTwo";
@@ -80,14 +81,17 @@ height:640px;
 border-radius:22px;
 background:#FFF;
 `;
-
+const ChartWrapper = styled.div`
+  width: 100%;
+  height: 520px;
+  padding: 0 50px 24px 0;
+`;
 const AllDashboardPage: React.FC = () => {
   useTrackPage(PageTrackingCodes.CONNECTIONS_LIST);
   const [dataDate, setDataDate] = useState("30d");
   const [sourceData, setSourceData] = useState("All sources");
   const [destinationData, setDestinationData] = useState("All destinations");
   const [isBothDatesSelected, setIsBothDatesSelected] = useState(false);
-  console.log(dataDate, "DataDate");
 
   const [isDateRangePickerOpen, setDateRangePickerOpen] = useState(false);
   const [value, setValue] = useState<DateRange<Dayjs>>([
@@ -151,6 +155,28 @@ const AllDashboardPage: React.FC = () => {
       value: "Snowflake",
     },
   ];
+  const dataBarChart = [
+    { name: "24 May", value: 100 },
+    { name: "25 May", value: 250 },
+    { name: "26 May", value: 190 },
+    { name: "27 May", value: 220 },
+    { name: "28 May", value: 280 },
+    { name: "30 May", value: 250 },
+    { name: "28 May", value: 250 },
+    { name: "3 Jun", value: 200 },
+    { name: "4 Jun", value: 300 },
+    { name: "5 Jun", value: 310 },
+    { name: "6 Jun", value: 320 },
+    { name: "7 Jun", value: 380 },
+    { name: "8 Jun", value: 288 },
+    { name: "9 Jun", value: 194 },
+    { name: "10 Jun", value: 267 },
+    { name: "11 Jun", value: 200 },
+    { name: "12 Jun", value: 400 },
+    { name: "13 Jun", value: 600 },
+    { name: "13 Jun", value: 800 },
+  ];
+  const LegendLabels = ["value"];
 
   const handleDateChange = (e: any) => {
     console.log(e, "Target");
@@ -174,23 +200,16 @@ const AllDashboardPage: React.FC = () => {
 
       const formattedStartDate = newValue[0]?.format("YYYY-MM-DD");
       const formattedEndDate = newValue[1]?.format("YYYY-MM-DD");
-      const formattedDateRange = `${formattedStartDate} - ${formattedEndDate}`;
-      setDataDate(`${formattedDateRange}`);
+      if (formattedStartDate !== undefined && formattedEndDate !== undefined) {
+        const formattedDateRange = `${formattedStartDate} - ${formattedEndDate}`;
+        setIsBothDatesSelected(false);
+        setDataDate(`${formattedDateRange}`);
+      }
     }
   };
   const handleDone = () => {
-    const formattedStartDate = value[0]?.format("YYYY-MM-DD");
-    const formattedEndDate = value[1]?.format("YYYY-MM-DD");
-
-    if (formattedStartDate !== undefined && formattedEndDate !== undefined) {
-      setIsBothDatesSelected(false);
-      // const formattedDateRange = `${formattedStartDate}-${formattedEndDate}`;
-      alert(dataDate);
-      setSelectDate([...selectDate, { label: `${dataDate}`, value: `${dataDate}` }]);
-      setDataDate(`${dataDate}`);
-      setIsBothDatesSelected(false);
-      setDateRangePickerOpen(false); // Update dataDate when custom date range is selected
-    }
+    setSelectDate([...selectDate, { label: `${dataDate}`, value: `${dataDate}` }]);
+    setDateRangePickerOpen(false);
   };
   const handleClear = () => {
     setDataDate("30d");
@@ -544,6 +563,11 @@ const AllDashboardPage: React.FC = () => {
                   </FormControl>
                 </Box>
               </Box>
+            </Grid>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
+              <ChartWrapper>
+                <BarChart data={dataBarChart} legendLabels={LegendLabels} />
+              </ChartWrapper>
             </Grid>
           </Grid>
         </BarCard>

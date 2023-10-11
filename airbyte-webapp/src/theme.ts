@@ -153,6 +153,6 @@ export const theme = {
   italicFont: scss.italicFont,
 };
 
-export const barChartColors = [scss.grey500, scss.grey300];
+export const barChartColors = [scss.blue400, scss.black300];
 
 export type Theme = typeof theme;
