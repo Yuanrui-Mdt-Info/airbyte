@@ -1,5 +1,6 @@
-import { Box, Grid, Typography, MenuItem, FormControl, InputAdornment, OutlinedInput, Button } from "@mui/material";
+import { Box, Grid, Typography, MenuItem, InputAdornment, OutlinedInput, Button } from "@mui/material";
 import Select from "@mui/material/Select";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { DateRange, DateRangeCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -7,7 +8,7 @@ import { useState } from "react";
 import { Pie, PieChart, Cell } from "recharts";
 import styled from "styled-components";
 
-import { MainPageWithScroll, PageTitle } from "components";
+import { MainPageWithScroll, Modal, PageTitle } from "components";
 import BarChart from "components/DashboardBarChart";
 import HeadTitle from "components/HeadTitle";
 import { ArrowIcon } from "components/icons/ArrowIcon";
@@ -94,6 +95,7 @@ const AllDashboardPage: React.FC = () => {
   const [isBothDatesSelected, setIsBothDatesSelected] = useState(false);
 
   const [isDateRangePickerOpen, setDateRangePickerOpen] = useState(false);
+
   const [value, setValue] = useState<DateRange<Dayjs>>([
     dayjs().subtract(7, "days"), // Start date (e.g., 7 days ago)
     dayjs(), // End date (current date)
@@ -179,7 +181,6 @@ const AllDashboardPage: React.FC = () => {
   const LegendLabels = ["value"];
 
   const handleDateChange = (e: any) => {
-    console.log(e, "Target");
     const selectedValue = e.target.value;
     if (selectedValue !== "custom") {
       setDataDate(selectedValue);
@@ -409,47 +410,45 @@ const AllDashboardPage: React.FC = () => {
             </Grid>
             <Grid item lg={8} md={8} sm={12} xs={12}>
               <Box display="flex" justifyContent="space-evenly">
-                <Box>
+                <Box width="25%">
                   {" "}
-                  <FormControl size="medium" fullWidth>
-                    <CustomSelect
-                      value={dataDate}
-                      MenuProps={{
-                        sx: {
-                          "&& .Mui-selected": {
-                            backgroundColor: "#4F46E5 !important",
-                            color: "white",
-                          },
+                  <CustomSelect
+                    value={dataDate}
+                    MenuProps={{
+                      sx: {
+                        "&& .Mui-selected": {
+                          backgroundColor: "#4F46E5 !important",
+                          color: "white",
                         },
-                      }}
-                      onChange={handleDateChange}
-                      name="dataDate"
-                      input={<OutlinedInput notched={false} />}
-                      inputProps={{ "aria-label": "Without label" }}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <CalendarTwoIcon />
-                        </InputAdornment>
-                      }
-                    >
-                      {selectDate?.map((data) => {
-                        return (
-                          <MenuItem value={data.value} key={data.value}>
-                            {data.label}
-                            {data?.value === dataDate && (
-                              <span style={{ marginLeft: "auto" }}>
-                                <TickIcon color="white" />
-                              </span>
-                            )}
-                          </MenuItem>
-                        );
-                      })}
-                    </CustomSelect>
-                  </FormControl>
+                      },
+                    }}
+                    onChange={handleDateChange}
+                    name="dataDate"
+                    input={<OutlinedInput notched={false} />}
+                    inputProps={{ "aria-label": "Without label" }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <CalendarTwoIcon />
+                      </InputAdornment>
+                    }
+                  >
+                    {selectDate?.map((data) => {
+                      return (
+                        <MenuItem value={data.value} key={data.value}>
+                          {data.label}
+                          {data?.value === dataDate && (
+                            <span style={{ marginLeft: "auto" }}>
+                              <TickIcon color="white" />
+                            </span>
+                          )}
+                        </MenuItem>
+                      );
+                    })}
+                  </CustomSelect>
                   {isDateRangePickerOpen && (
-                    <>
+                    <Modal onClose={handleClear} size="lmd">
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box>
+                        <DemoContainer components={["DateRangeCalendar"]}>
                           <DateRangeCalendar
                             value={value}
                             onChange={(newValue) => {
@@ -464,8 +463,8 @@ const AllDashboardPage: React.FC = () => {
                               },
                             }}
                           />
-                        </Box>
-                      </LocalizationProvider>
+                        </DemoContainer>
+                      </LocalizationProvider>{" "}
                       <Box display="flex" justifyContent="flex-end">
                         <Button
                           variant="outlined"
@@ -485,86 +484,83 @@ const AllDashboardPage: React.FC = () => {
                           </Button>
                         </Box>
                       </Box>
-                    </>
+                    </Modal>
                   )}
                 </Box>
-                <Box>
-                  <FormControl size="medium" fullWidth>
-                    <CustomSelect
-                      value={sourceData}
-                      MenuProps={{
-                        sx: {
-                          "&& .Mui-selected": {
-                            backgroundColor: "#4F46E5 !important",
-                            color: "white",
-                          },
+                <Box width="25%">
+                  <CustomSelect
+                    value={sourceData}
+                    MenuProps={{
+                      sx: {
+                        "&& .Mui-selected": {
+                          backgroundColor: "#4F46E5 !important",
+                          color: "white",
                         },
-                      }}
-                      onChange={handleSourceChange}
-                      name="sourceData"
-                      input={<OutlinedInput notched={false} />}
-                      inputProps={{ "aria-label": "Without label" }}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <FilterIcon />
-                        </InputAdornment>
-                      }
-                    >
-                      {allSources?.map((source) => {
-                        return (
-                          <MenuItem value={source.value} key={source.value}>
-                            {source.label}{" "}
-                            {source?.value === sourceData && (
-                              <span style={{ marginLeft: "auto" }}>
-                                <TickIcon color="white" />
-                              </span>
-                            )}
-                          </MenuItem>
-                        );
-                      })}
-                    </CustomSelect>
-                  </FormControl>
+                      },
+                    }}
+                    onChange={handleSourceChange}
+                    name="sourceData"
+                    input={<OutlinedInput notched={false} />}
+                    inputProps={{ "aria-label": "Without label" }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <FilterIcon />
+                      </InputAdornment>
+                    }
+                  >
+                    {allSources?.map((source) => {
+                      return (
+                        <MenuItem value={source.value} key={source.value}>
+                          {source.label}{" "}
+                          {source?.value === sourceData && (
+                            <span style={{ marginLeft: "auto" }}>
+                              <TickIcon color="white" />
+                            </span>
+                          )}
+                        </MenuItem>
+                      );
+                    })}
+                  </CustomSelect>
                 </Box>
-                <Box>
-                  <FormControl size="medium" fullWidth>
-                    <CustomSelect
-                      value={destinationData}
-                      MenuProps={{
-                        sx: {
-                          "&& .Mui-selected": {
-                            backgroundColor: "#4F46E5 !important",
-                            color: "white",
-                          },
+                <Box width="25%">
+                  <CustomSelect
+                    value={destinationData}
+                    MenuProps={{
+                      sx: {
+                        "&& .Mui-selected": {
+                          backgroundColor: "#4F46E5 !important",
+                          color: "white",
                         },
-                      }}
-                      onChange={handleDestinationChange}
-                      name="destinationData"
-                      input={<OutlinedInput notched={false} />}
-                      inputProps={{ "aria-label": "Without label" }}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <FilterIcon />
-                        </InputAdornment>
-                      }
-                    >
-                      {allDestinations?.map((dest) => {
-                        return (
-                          <MenuItem value={dest.value} key={dest.value}>
-                            {dest.label}{" "}
-                            {dest?.value === destinationData && (
-                              <span style={{ marginLeft: "auto" }}>
-                                <TickIcon color="white" />
-                              </span>
-                            )}
-                          </MenuItem>
-                        );
-                      })}
-                    </CustomSelect>
-                  </FormControl>
+                      },
+                    }}
+                    onChange={handleDestinationChange}
+                    name="destinationData"
+                    input={<OutlinedInput notched={false} />}
+                    inputProps={{ "aria-label": "Without label" }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <FilterIcon />
+                      </InputAdornment>
+                    }
+                  >
+                    {allDestinations?.map((dest) => {
+                      return (
+                        <MenuItem value={dest.value} key={dest.value}>
+                          {dest.label}{" "}
+                          {dest?.value === destinationData && (
+                            <span style={{ marginLeft: "auto" }}>
+                              <TickIcon color="white" />
+                            </span>
+                          )}
+                        </MenuItem>
+                      );
+                    })}
+                  </CustomSelect>
                 </Box>
               </Box>
             </Grid>
-            <Grid item lg={12} md={12} sm={12} xs={12}>
+            <Grid item lg={12} md={12} sm={12} xs={12} />
+            <Grid item lg={12} md={12} sm={12} xs={12} mt={5}>
               <ChartWrapper>
                 <BarChart data={dataBarChart} legendLabels={LegendLabels} />
               </ChartWrapper>

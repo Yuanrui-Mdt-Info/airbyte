@@ -8,12 +8,13 @@ export interface ModalProps {
   title?: string | React.ReactNode;
   onClose?: () => void;
   cardless?: boolean;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "lmd" | "md" | "lg" | "xl";
   testId?: string;
 }
 
 const cardStyleBySize = {
   sm: styles.sm,
+  lmd: styles.lmd,
   md: styles.md,
   lg: styles.lg,
   xl: styles.xl,
