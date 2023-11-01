@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { DropDown, DropDownRow } from "components";
 
 interface IProps {
-  totalPage: number;
+  totalPage?: number;
   onChange: (size: number) => void;
   currentPageSize: number;
 }
@@ -25,6 +25,7 @@ const DropDownContainer = styled.div`
 `;
 
 export const PageSize: React.FC<IProps> = ({ totalPage, onChange, currentPageSize }) => {
+  console.log(totalPage);
   const pageSizeOptons: DropDownRow.IDataItem[] = [
     {
       value: 10,
@@ -44,9 +45,9 @@ export const PageSize: React.FC<IProps> = ({ totalPage, onChange, currentPageSiz
     },
   ];
 
-  if (totalPage <= 1) {
-    return null;
-  }
+  // if (totalPage <= 1) {
+  //   return null;
+  // }
 
   return (
     <Container>
@@ -57,6 +58,7 @@ export const PageSize: React.FC<IProps> = ({ totalPage, onChange, currentPageSiz
           $background="white"
           value={currentPageSize}
           options={pageSizeOptons}
+          menuPlacement="top"
           onChange={(option: DropDownRow.IDataItem) => onChange(option.value)}
         />
       </DropDownContainer>

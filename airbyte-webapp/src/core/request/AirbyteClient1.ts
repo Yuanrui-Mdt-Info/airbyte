@@ -139,10 +139,11 @@ export const SyncMode = {
   incremental: "incremental",
 } as const;
 
-export interface WebBackendConnectionFilterParam {
-  status?: WebBackendConnectionFilterParamItem[];
-  sources?: WebBackendConnectionFilterParamItem[];
-  destinations?: WebBackendConnectionFilterParamItem[];
+export interface SourcePageReadList {
+  sources: SourceRead[];
+  total?: number;
+  pageSize?: number;
+  pageCurrent?: number;
 }
 
 export interface WebBackendConnectionRead {
@@ -187,6 +188,12 @@ export interface WebBackendConnectionReadList {
 export interface WebBackendConnectionFilterParamItem {
   key?: string;
   value?: string;
+}
+
+export interface WebBackendConnectionFilterParam {
+  status?: WebBackendConnectionFilterParamItem[];
+  sources?: WebBackendConnectionFilterParamItem[];
+  destinations?: WebBackendConnectionFilterParamItem[];
 }
 
 export type SetInstancewideDestinationOauthParamsRequestBodyParams = { [key: string]: any };
@@ -688,6 +695,11 @@ export const JobStatus = {
   cancelled: "cancelled",
 } as const;
 
+export interface JobWithAttemptsRead {
+  job?: JobRead;
+  attempts?: AttemptRead[];
+}
+
 export interface StreamDescriptor {
   name: string;
   namespace?: string;
@@ -749,11 +761,6 @@ export interface JobRead {
   updatedAt: number;
   status: JobStatus;
   resetConfig?: ResetConfig;
-}
-
-export interface JobWithAttemptsRead {
-  job?: JobRead;
-  attempts?: AttemptRead[];
 }
 
 export interface JobIdRequestBody {
@@ -895,10 +902,6 @@ export interface OperatorConfiguration {
   dbt?: OperatorDbt;
 }
 
-export interface OperationReadList {
-  operations: OperationRead[];
-}
-
 export interface OperationCreate {
   workspaceId: WorkspaceId;
   name: string;
@@ -912,6 +915,10 @@ export interface OperationRead {
   operationId: OperationId;
   name: string;
   operatorConfiguration: OperatorConfiguration;
+}
+
+export interface OperationReadList {
+  operations: OperationRead[];
 }
 
 export interface WebBackendOperationCreateOrUpdate {
@@ -948,6 +955,14 @@ export type ConnectionScheduleDataCron = {
   cronTimeZone: string;
 };
 
+/**
+ * schedule for when the the connection should run, per the schedule type
+ */
+export interface ConnectionScheduleData {
+  basicSchedule?: ConnectionScheduleDataBasicSchedule;
+  cron?: ConnectionScheduleDataCron;
+}
+
 export type ConnectionScheduleDataBasicScheduleTimeUnit =
   (typeof ConnectionScheduleDataBasicScheduleTimeUnit)[keyof typeof ConnectionScheduleDataBasicScheduleTimeUnit];
 
@@ -964,14 +979,6 @@ export type ConnectionScheduleDataBasicSchedule = {
   timeUnit: ConnectionScheduleDataBasicScheduleTimeUnit;
   units: number;
 };
-
-/**
- * schedule for when the the connection should run, per the schedule type
- */
-export interface ConnectionScheduleData {
-  basicSchedule?: ConnectionScheduleDataBasicSchedule;
-  cron?: ConnectionScheduleDataCron;
-}
 
 /**
  * determine how the schedule data should be interpreted
@@ -1022,6 +1029,30 @@ export interface ConnectionsCount {
 
 export interface ConnectionDisplayFlag {
   flag: boolean;
+}
+
+export interface ConnectionReadList {
+  connections: ConnectionRead[];
+}
+
+export interface ConnectionCreate {
+  /** Optional name of the connection */
+  name?: string;
+  namespaceDefinition?: NamespaceDefinitionType;
+  /** Used when namespaceDefinition is 'customformat'. If blank then behaves like namespaceDefinition = 'destination'. If "${SOURCE_NAMESPACE}" then behaves like namespaceDefinition = 'source'. */
+  namespaceFormat?: string;
+  /** Prefix that will be prepended to the name of each stream when it is written to the destination. */
+  prefix?: string;
+  sourceId: SourceId;
+  destinationId: DestinationId;
+  operationIds?: OperationId[];
+  syncCatalog?: AirbyteCatalog;
+  schedule?: ConnectionSchedule;
+  scheduleType?: ConnectionScheduleType;
+  scheduleData?: ConnectionScheduleData;
+  status: ConnectionStatus;
+  resourceRequirements?: ResourceRequirements;
+  sourceCatalogId?: string;
 }
 
 export interface DbMigrationRequestBody {
@@ -1084,10 +1115,6 @@ export interface ConnectionRead {
   status: ConnectionStatus;
   resourceRequirements?: ResourceRequirements;
   sourceCatalogId?: string;
-}
-
-export interface ConnectionReadList {
-  connections: ConnectionRead[];
 }
 
 export interface WebBackendConnectionUpdate {
@@ -1154,12 +1181,23 @@ export const ReleaseStage = {
   custom: "custom",
 } as const;
 
-/**
- * The values required to configure the destination. The schema for this should have an id of the existing destination along with the configuration you want to change in case.
- */
-export interface DestinationCloneRequestBody {
-  destinationCloneId: DestinationId;
-  destinationConfiguration?: DestinationCloneConfiguration;
+export interface DestinationPageReadList {
+  destinations: DestinationRead[];
+  total?: number;
+  pageSize?: number;
+  pageCurrent?: number;
+}
+
+export interface DestinationReadList {
+  destinations: DestinationRead[];
+}
+
+export interface DestinationReadWithConnectionPage {
+  DestinationRead: DestinationRead;
+  WebBackendConnectionReadList?: WebBackendConnectionReadList;
+  total?: number;
+  pageSize?: number;
+  pageCurrent?: number;
 }
 
 /**
@@ -1176,22 +1214,15 @@ export interface DestinationSearch {
   destinationName?: string;
 }
 
-export interface DestinationRead {
-  destinationDefinitionId: DestinationDefinitionId;
-  destinationId: DestinationId;
-  workspaceId: WorkspaceId;
-  connectionConfiguration: DestinationConfiguration;
-  name: string;
-  destinationName: string;
-}
-
-export interface DestinationReadList {
-  destinations: DestinationRead[];
-}
-
 export interface DestinationCloneConfiguration {
   connectionConfiguration?: DestinationConfiguration;
   name?: string;
+}
+
+export interface DestinationUpdate {
+  destinationId: DestinationId;
+  connectionConfiguration: DestinationConfiguration;
+  name: string;
 }
 
 export interface DestinationCreate {
@@ -1229,30 +1260,27 @@ export interface WebBackendConnectionCreate {
   sourceCatalogId?: string;
 }
 
-export interface ConnectionCreate {
-  /** Optional name of the connection */
-  name?: string;
-  namespaceDefinition?: NamespaceDefinitionType;
-  /** Used when namespaceDefinition is 'customformat'. If blank then behaves like namespaceDefinition = 'destination'. If "${SOURCE_NAMESPACE}" then behaves like namespaceDefinition = 'source'. */
-  namespaceFormat?: string;
-  /** Prefix that will be prepended to the name of each stream when it is written to the destination. */
-  prefix?: string;
-  sourceId: SourceId;
+export interface DestinationRead {
+  destinationDefinitionId: DestinationDefinitionId;
   destinationId: DestinationId;
-  operationIds?: OperationId[];
-  syncCatalog?: AirbyteCatalog;
-  schedule?: ConnectionSchedule;
-  scheduleType?: ConnectionScheduleType;
-  scheduleData?: ConnectionScheduleData;
-  status: ConnectionStatus;
-  resourceRequirements?: ResourceRequirements;
-  sourceCatalogId?: string;
-}
-
-export interface DestinationUpdate {
-  destinationId: DestinationId;
+  workspaceId: WorkspaceId;
   connectionConfiguration: DestinationConfiguration;
   name: string;
+  destinationName: string;
+}
+
+/**
+ * The values required to configure the destination. The schema for this should have an id of the existing destination along with the configuration you want to change in case.
+ */
+export interface DestinationCloneRequestBody {
+  destinationCloneId: DestinationId;
+  destinationConfiguration?: DestinationCloneConfiguration;
+}
+
+export interface DestinationIdPageRequestBody {
+  destinationId: DestinationId;
+  pageSize?: number;
+  pageCurrent?: number;
 }
 
 export interface DestinationIdRequestBody {
@@ -1274,10 +1302,6 @@ export interface DestinationDefinitionSpecificationRead {
   supportedDestinationSyncModes?: DestinationSyncMode[];
   supportsDbt?: boolean;
   supportsNormalization?: boolean;
-}
-
-export interface PrivateDestinationDefinitionReadList {
-  destinationDefinitions: PrivateDestinationDefinitionRead[];
 }
 
 export interface DestinationDefinitionIdWithWorkspaceId {
@@ -1315,6 +1339,10 @@ export interface PrivateDestinationDefinitionRead {
   granted: boolean;
 }
 
+export interface PrivateDestinationDefinitionReadList {
+  destinationDefinitions: PrivateDestinationDefinitionRead[];
+}
+
 export interface DestinationDefinitionReadList {
   destinationDefinitions: DestinationDefinitionRead[];
 }
@@ -1342,6 +1370,15 @@ export interface DestinationDefinitionIdRequestBody {
   destinationDefinitionId: DestinationDefinitionId;
 }
 
+export interface SourceSearch {
+  sourceDefinitionId?: SourceDefinitionId;
+  sourceId?: SourceId;
+  workspaceId?: WorkspaceId;
+  connectionConfiguration?: SourceConfiguration;
+  name?: string;
+  sourceName?: string;
+}
+
 /**
  * Returns the results of a discover catalog job. If the job was not successful, the catalog field will not be present. jobInfo will aways be present and its status be used to determine if the job was successful or not.
  */
@@ -1355,6 +1392,14 @@ export interface SourceReadList {
   sources: SourceRead[];
 }
 
+export interface SourceReadWithConnectionPage {
+  SourceRead: SourceRead;
+  ConnectionReadList?: WebBackendConnectionReadList;
+  total?: number;
+  pageSize?: number;
+  pageCurrent?: number;
+}
+
 export interface SourceDiscoverSchemaRequestBody {
   sourceId: SourceId;
   disable_cache?: boolean;
@@ -1365,19 +1410,9 @@ export interface SourceDiscoverSchemaRequestBody {
  */
 export type SourceConfiguration = unknown;
 
-export interface SourceSearch {
-  sourceDefinitionId?: SourceDefinitionId;
-  sourceId?: SourceId;
-  workspaceId?: WorkspaceId;
-  connectionConfiguration?: SourceConfiguration;
-  name?: string;
-  sourceName?: string;
-}
-
-export interface SourceCreate {
-  sourceDefinitionId: SourceDefinitionId;
+export interface SourceUpdate {
+  sourceId: SourceId;
   connectionConfiguration: SourceConfiguration;
-  workspaceId: WorkspaceId;
   name: string;
 }
 
@@ -1393,18 +1428,18 @@ export interface SourceCloneConfiguration {
 
 export type SourceId = string;
 
-export interface SourceUpdate {
-  sourceId: SourceId;
-  connectionConfiguration: SourceConfiguration;
-  name: string;
-}
-
 /**
  * The values required to configure the source. The schema for this should have an id of the existing source along with the configuration you want to change in case.
  */
 export interface SourceCloneRequestBody {
   sourceCloneId: SourceId;
   sourceConfiguration?: SourceCloneConfiguration;
+}
+
+export interface SourceIdPageRequestBody {
+  sourceId: SourceId;
+  pageSize?: number;
+  pageCurrent?: number;
 }
 
 export interface SourceIdRequestBody {
@@ -1455,11 +1490,6 @@ export interface SourceDefinitionSpecificationRead {
   jobInfo: SynchronousJobRead;
 }
 
-export interface PrivateSourceDefinitionRead {
-  sourceDefinition: SourceDefinitionRead;
-  granted: boolean;
-}
-
 export interface PrivateSourceDefinitionReadList {
   sourceDefinitions: PrivateSourceDefinitionRead[];
 }
@@ -1467,6 +1497,11 @@ export interface PrivateSourceDefinitionReadList {
 export interface SourceDefinitionIdWithWorkspaceId {
   sourceDefinitionId: SourceDefinitionId;
   workspaceId: WorkspaceId;
+}
+
+export interface CustomSourceDefinitionUpdate {
+  workspaceId: WorkspaceId;
+  sourceDefinition: SourceDefinitionUpdate;
 }
 
 export type SourceDefinitionReadSourceType =
@@ -1494,6 +1529,11 @@ export interface SourceDefinitionRead {
   releaseDate?: string;
   sourceType?: SourceDefinitionReadSourceType;
   resourceRequirements?: ActorDefinitionResourceRequirements;
+}
+
+export interface PrivateSourceDefinitionRead {
+  sourceDefinition: SourceDefinitionRead;
+  granted: boolean;
 }
 
 export interface SourceDefinitionReadList {
@@ -1525,6 +1565,13 @@ export interface SourceRead {
   sourceName: string;
 }
 
+export interface SourceCreate {
+  sourceDefinitionId: SourceDefinitionId;
+  connectionConfiguration: SourceConfiguration;
+  workspaceId: WorkspaceId;
+  name: string;
+}
+
 /**
  * Update the SourceDefinition. Currently, the only allowed attribute to update is the default docker image version.
  */
@@ -1532,11 +1579,6 @@ export interface SourceDefinitionUpdate {
   sourceDefinitionId: SourceDefinitionId;
   dockerImageTag: string;
   resourceRequirements?: ActorDefinitionResourceRequirements;
-}
-
-export interface CustomSourceDefinitionUpdate {
-  workspaceId: WorkspaceId;
-  sourceDefinition: SourceDefinitionUpdate;
 }
 
 export interface SourceDefinitionIdRequestBody {
@@ -1599,6 +1641,12 @@ export interface WorkspaceReadList {
 
 export interface WorkspaceIdRequestBody {
   workspaceId: WorkspaceId;
+}
+
+export interface PageRequestBody {
+  workspaceId: WorkspaceId;
+  pageSize?: number;
+  pageCurrent?: number;
 }
 
 export interface WorkspaceIdPageRequestBody {
@@ -2093,6 +2141,19 @@ export const listSourcesForWorkspace = (
 };
 
 /**
+ * @summary Returns all non-deleted sources for a workspace.
+ */
+export const pageSourcesForWorkspace = (
+  pageRequestBody: PageRequestBody,
+  options?: SecondParameter<typeof apiOverride>
+) => {
+  return apiOverride<SourcePageReadList>(
+    { url: `/v1/sources/page`, method: "post", headers: { "Content-Type": "application/json" }, data: pageRequestBody },
+    options
+  );
+};
+
+/**
  * @summary Get source
  */
 export const getSource = (sourceIdRequestBody: SourceIdRequestBody, options?: SecondParameter<typeof apiOverride>) => {
@@ -2102,6 +2163,24 @@ export const getSource = (sourceIdRequestBody: SourceIdRequestBody, options?: Se
       method: "post",
       headers: { "Content-Type": "application/json" },
       data: sourceIdRequestBody,
+    },
+    options
+  );
+};
+
+/**
+ * @summary Get source with connection
+ */
+export const getSourceWithConnection = (
+  sourceIdPageRequestBody: SourceIdPageRequestBody,
+  options?: SecondParameter<typeof apiOverride>
+) => {
+  return apiOverride<SourceReadWithConnectionPage>(
+    {
+      url: `/v1/sources/connection/get`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: sourceIdPageRequestBody,
     },
     options
   );
@@ -2517,6 +2596,24 @@ export const listDestinationsForWorkspace = (
 };
 
 /**
+ * @summary Returns all non-deleted destination for a workspace.
+ */
+export const pageDestinationsForWorkspace = (
+  pageRequestBody: PageRequestBody,
+  options?: SecondParameter<typeof apiOverride>
+) => {
+  return apiOverride<DestinationPageReadList>(
+    {
+      url: `/v1/destinations/page`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: pageRequestBody,
+    },
+    options
+  );
+};
+
+/**
  * @summary Get configured destination
  */
 export const getDestination = (
@@ -2529,6 +2626,24 @@ export const getDestination = (
       method: "post",
       headers: { "Content-Type": "application/json" },
       data: destinationIdRequestBody,
+    },
+    options
+  );
+};
+
+/**
+ * @summary Get destination with connection
+ */
+export const getDestinationWithConnection = (
+  destinationIdPageRequestBody: DestinationIdPageRequestBody,
+  options?: SecondParameter<typeof apiOverride>
+) => {
+  return apiOverride<DestinationReadWithConnectionPage>(
+    {
+      url: `/v1/destinations/connection/get`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: destinationIdPageRequestBody,
     },
     options
   );
@@ -3476,7 +3591,9 @@ export type GetSourceDefinitionSpecificationResult = NonNullable<
 export type CreateSourceResult = NonNullable<Awaited<ReturnType<typeof createSource>>>;
 export type UpdateSourceResult = NonNullable<Awaited<ReturnType<typeof updateSource>>>;
 export type ListSourcesForWorkspaceResult = NonNullable<Awaited<ReturnType<typeof listSourcesForWorkspace>>>;
+export type PageSourcesForWorkspaceResult = NonNullable<Awaited<ReturnType<typeof pageSourcesForWorkspace>>>;
 export type GetSourceResult = NonNullable<Awaited<ReturnType<typeof getSource>>>;
+export type GetSourceWithConnectionResult = NonNullable<Awaited<ReturnType<typeof getSourceWithConnection>>>;
 export type SearchSourcesResult = NonNullable<Awaited<ReturnType<typeof searchSources>>>;
 export type CloneSourceResult = NonNullable<Awaited<ReturnType<typeof cloneSource>>>;
 export type DeleteSourceResult = NonNullable<Awaited<ReturnType<typeof deleteSource>>>;
@@ -3523,7 +3640,9 @@ export type GetDestinationDefinitionSpecificationResult = NonNullable<
 export type CreateDestinationResult = NonNullable<Awaited<ReturnType<typeof createDestination>>>;
 export type UpdateDestinationResult = NonNullable<Awaited<ReturnType<typeof updateDestination>>>;
 export type ListDestinationsForWorkspaceResult = NonNullable<Awaited<ReturnType<typeof listDestinationsForWorkspace>>>;
+export type PageDestinationsForWorkspaceResult = NonNullable<Awaited<ReturnType<typeof pageDestinationsForWorkspace>>>;
 export type GetDestinationResult = NonNullable<Awaited<ReturnType<typeof getDestination>>>;
+export type GetDestinationWithConnectionResult = NonNullable<Awaited<ReturnType<typeof getDestinationWithConnection>>>;
 export type SearchDestinationsResult = NonNullable<Awaited<ReturnType<typeof searchDestinations>>>;
 export type CheckConnectionToDestinationResult = NonNullable<Awaited<ReturnType<typeof checkConnectionToDestination>>>;
 export type CheckConnectionToDestinationForUpdateResult = NonNullable<
