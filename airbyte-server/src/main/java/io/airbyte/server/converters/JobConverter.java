@@ -90,7 +90,10 @@ public class JobConverter {
         .attempts(job.getAttempts().stream().map(JobConverter::getAttemptRead).toList());
   }
 
-  private static JobRead getJobRead(final Job job) {
+  public static JobRead getJobRead(final Job job) {
+    if (job == null) {
+      return null;
+    }
     final String configId = job.getScope();
     final JobConfigType configType = Enums.convertTo(job.getConfigType(), JobConfigType.class);
 

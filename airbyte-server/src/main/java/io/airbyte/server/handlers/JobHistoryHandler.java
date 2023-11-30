@@ -16,6 +16,7 @@ import io.airbyte.api.model.generated.JobIdRequestBody;
 import io.airbyte.api.model.generated.JobInfoLightRead;
 import io.airbyte.api.model.generated.JobInfoRead;
 import io.airbyte.api.model.generated.JobListRequestBody;
+import io.airbyte.api.model.generated.JobRead;
 import io.airbyte.api.model.generated.JobReadList;
 import io.airbyte.api.model.generated.JobWithAttemptsRead;
 import io.airbyte.api.model.generated.SourceDefinitionIdRequestBody;
@@ -34,6 +35,7 @@ import io.airbyte.scheduler.persistence.JobPersistence;
 import io.airbyte.server.converters.JobConverter;
 import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -100,6 +102,15 @@ public class JobHistoryHandler {
         .collect(Collectors.toList());
 
     return new JobReadList().jobs(jobReads).totalJobCount(totalJobCount);
+  }
+
+  public List<JobRead> latestJobListFor(List<String> ids) throws IOException {
+    List<Job> jobList = jobPersistence.latestJobList(JobConfig.ConfigType.SYNC, ids);
+    List<JobRead> jobReadList = new ArrayList<>();
+    for (Job job : jobList) {
+      jobReadList.add(JobConverter.getJobRead(job));
+    }
+    return jobReadList;
   }
 
   public JobInfoRead getJobInfo(final JobIdRequestBody jobIdRequestBody) throws IOException {

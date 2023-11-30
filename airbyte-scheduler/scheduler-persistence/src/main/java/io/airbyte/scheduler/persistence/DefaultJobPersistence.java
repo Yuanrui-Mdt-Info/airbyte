@@ -419,6 +419,37 @@ public class DefaultJobPersistence implements JobPersistence {
   }
 
   @Override
+  public List<Job> latestJobList(final ConfigType configTypes, List<String> configIds) throws IOException {
+    final Result<Record> result = jobDatabase.query(ctx -> {
+      return ctx.fetch(String.format("SELECT * FROM (SELECT ROW_NUMBER() OVER(PARTITION BY scope ORDER BY created_at DESC) AS row_num," +
+          "id,config_type,scope,config,status,started_at,created_at,updated_at FROM jobs " +
+          "WHERE config_type = '%s' AND scope IN (%s)) ranked " +
+          "WHERE row_num = 1", configTypes.value(),
+          configIds.stream()
+              .map(id -> String.format("'%s'", id))
+              .collect(Collectors.joining(", "))));
+    });
+    return getJobFromCustomQuery(result);
+  }
+
+  private static List<Job> getJobFromCustomQuery(final Result<Record> recordList) {
+    List<Job> jobs = new ArrayList<>();
+    for (Record record : recordList) {
+      Job job = new Job(record.get("id", Long.class),
+          Enums.toEnum(record.get("config_type", String.class), ConfigType.class).orElseThrow(),
+          record.get("scope", String.class),
+          Jsons.deserialize(record.get("config", String.class), JobConfig.class),
+          new ArrayList<Attempt>(),
+          JobStatus.valueOf(record.get("status", String.class).toUpperCase()),
+          Optional.ofNullable(record.get("started_at")).map(value -> getEpoch(record, "started_at")).orElse(null),
+          getEpoch(record, "created_at"),
+          getEpoch(record, "updated_at"));
+      jobs.add(job);
+    }
+    return jobs;
+  }
+
+  @Override
   public List<Job> listJobsIncludingId(final Set<ConfigType> configTypes, final String connectionId, final long includingJobId, final int pagesize)
       throws IOException {
     final Optional<OffsetDateTime> includingJobCreatedAt = jobDatabase.query(ctx -> ctx.select(JOBS.CREATED_AT).from(JOBS)
@@ -681,9 +712,9 @@ public class DefaultJobPersistence implements JobPersistence {
   @Override
   public String getConnectionName(UUID connectionId) throws IOException {
     return jobDatabase.query(ctx -> ctx.select()
-            .from(CONNECTION_TABLE)
-            .where(DSL.field("id").eq(connectionId))
-            .fetchOne("name", String.class));
+        .from(CONNECTION_TABLE)
+        .where(DSL.field("id").eq(connectionId))
+        .fetchOne("name", String.class));
   }
 
   @Override

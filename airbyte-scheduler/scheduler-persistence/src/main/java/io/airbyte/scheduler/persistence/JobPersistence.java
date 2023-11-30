@@ -157,6 +157,14 @@ public interface JobPersistence {
   List<Job> listJobs(Set<JobConfig.ConfigType> configTypes, String configId, int limit, int offset) throws IOException;
 
   /**
+   * @param configTypes - type of config, e.g. sync
+   * @param configIds - ids of that config
+   * @return List of Job - return latest job based on config id order by created_at
+   * @throws IOException - what you do when you IO
+   */
+  List<Job> latestJobList(JobConfig.ConfigType configTypes, List<String> configIds) throws IOException;
+
+  /**
    * @param configType The type of job
    * @param attemptEndedAtTimestamp The timestamp after which you want the jobs
    * @return List of jobs that have attempts after the provided timestamp
@@ -289,5 +297,6 @@ public interface JobPersistence {
    */
   void setSchedulerMigrationDone() throws IOException;
 
-    String getConnectionName(UUID connectionId) throws IOException;
+  String getConnectionName(UUID connectionId) throws IOException;
+
 }

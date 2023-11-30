@@ -2070,6 +2070,29 @@ paths:
           $ref: "#/components/responses/NotFoundResponse"
         "422":
           $ref: "#/components/responses/InvalidInputResponse"
+  /v1/web_backend/connections/status:
+    post:
+      tags:
+        - web_backend
+      summary: Returns all non-deleted connections status for a workspace.
+      operationId: webBackendConnectionStatusForWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionIdListRequestBody"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebBackendConnectionStatusReadList"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
   /v1/web_backend/connections/list:
     post:
       tags:
@@ -3412,6 +3435,15 @@ components:
       properties:
         connectionId:
           $ref: "#/components/schemas/ConnectionId"
+    ConnectionIdListRequestBody:
+      type: object
+      required:
+        - connectionIds
+      properties:
+        connectionIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectionId"
     DbMigrationRequestBody:
       type: object
       required:
@@ -4962,7 +4994,6 @@ components:
         - entityName
         - connectorName
         - status
-        - isSyncing
       properties:
         connectionId:
           $ref: "#/components/schemas/ConnectionId"
@@ -4972,10 +5003,15 @@ components:
           type: string
         connectorName:
           type: string
-        isSyncing:
-          type: boolean
         status:
           $ref: "#/components/schemas/ConnectionStatus"
+    WebBackendConnectionStatusRead:
+      type: object
+      required:
+        - connectionId
+      properties:
+        connectionId:
+          $ref: "#/components/schemas/ConnectionId"
         latestSyncJobCreatedAt:
           description: epoch time of the latest sync job. null if no sync job has taken place.
           type: integer
@@ -5023,6 +5059,15 @@ components:
           type: integer
         pageCurrent:
           type: integer
+    WebBackendConnectionStatusReadList:
+      type: object
+      required:
+        - connectionStatusList
+      properties:
+        connectionStatusList:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebBackendConnectionStatusRead"
     SourcePageReadList:
       type: object
       required:

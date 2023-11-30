@@ -33,13 +33,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllArgsConstructor
 @Slf4j
 public class WebBackendConnectionsHandler {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionsHandler.class);
 
   private static final Set<JobStatus> TERMINAL_STATUSES = Sets.newHashSet(JobStatus.FAILED, JobStatus.SUCCEEDED, JobStatus.CANCELLED);
 
@@ -106,12 +111,30 @@ public class WebBackendConnectionsHandler {
     if (workspaceIdPageRequestBody.getPageCurrent() == null || workspaceIdPageRequestBody.getPageCurrent() == 0) {
       workspaceIdPageRequestBody.setPageCurrent(1);
     }
+    long startTime = System.nanoTime();
     for (final ConnectionRead connection : connectionsHandler.connectionPageReadList(workspaceIdPageRequestBody).getConnections()) {
       reads.add(buildWebBackendConnectionPageRead(connection));
     }
+    long elapsedTimeInNano = System.nanoTime() - startTime;
+    double elapsedTimeInMilli = (double) elapsedTimeInNano / 1_000_000;
+    LOGGER.info("webBackendConnectionsPageForWorkspace spends {} milliseconds", elapsedTimeInMilli);
+
     return new WebBackendConnectionsPageReadList().connections(reads)
         .total(connectionsHandler.pageConnectionsForWorkspaceCount(workspaceIdPageRequestBody))
         .pageCurrent(workspaceIdPageRequestBody.getPageCurrent()).pageSize(workspaceIdPageRequestBody.getPageSize());
+  }
+
+  public WebBackendConnectionStatusReadList webBackendConnectionStatusForWorkspace(ConnectionIdListRequestBody connectionIdListRequestBody)
+      throws IOException {
+    List<String> connectionIds = connectionIdListRequestBody.getConnectionIds().stream()
+        .map(UUID::toString).collect(Collectors.toList());
+    List<JobRead> jobReads = jobHistoryHandler.latestJobListFor(connectionIds);
+    List<WebBackendConnectionStatusRead> connectionStatusList = new ArrayList<>();
+    for (JobRead data : jobReads) {
+      connectionStatusList.add(new WebBackendConnectionStatusRead().connectionId(UUID.fromString(data.getConfigId()))
+          .latestSyncJobStatus(data.getStatus()).latestSyncJobCreatedAt(data.getCreatedAt()));
+    }
+    return new WebBackendConnectionStatusReadList().connectionStatusList(connectionStatusList);
   }
 
   public WebBackendConnectionFilterParam webBackendConnectionsFilterParam()
@@ -151,24 +174,24 @@ public class WebBackendConnectionsHandler {
 
   private WebBackendConnectionPageRead buildWebBackendConnectionPageRead(final ConnectionRead connectionRead)
       throws IOException {
+    long startTime = System.nanoTime();
     StandardDestinationDefinition destinationDefinition =
         configRepository.getStandardDestinationDefinationByDestinationId(connectionRead.getDestinationId());
     StandardDestinationDefinition sourceDefinition = configRepository.getStandardSourceDefinationBySourceId(connectionRead.getSourceId());
-    final JobReadList syncJobReadList = getSyncJobs(connectionRead);
 
+    long elapsedTimeInNano = System.nanoTime() - startTime;
+    double elapsedTimeInMilli = (double) elapsedTimeInNano / 1_000_000;
+    LOGGER.info("buildWebBackendConnectionPageRead part 0 spends {} milliseconds", elapsedTimeInMilli);
+
+    startTime = System.nanoTime();
     WebBackendConnectionPageRead webBackendConnectionPageRead = new WebBackendConnectionPageRead().connectionId(connectionRead.getConnectionId())
         .name(connectionRead.getName()).status(connectionRead.getStatus()).entityName(destinationDefinition.getName())
-        .connectorName(sourceDefinition.getName())
-        .isSyncing(syncJobReadList.getJobs()
-            .stream()
-            .map(JobWithAttemptsRead::getJob)
-            .anyMatch(WebBackendConnectionsHandler::isRunningJob));
+        .connectorName(sourceDefinition.getName());
 
-    syncJobReadList.getJobs().stream().map(JobWithAttemptsRead::getJob).findFirst()
-        .ifPresent(job -> {
-          webBackendConnectionPageRead.setLatestSyncJobCreatedAt(job.getCreatedAt());
-          webBackendConnectionPageRead.setLatestSyncJobStatus(job.getStatus());
-        });
+    elapsedTimeInNano = System.nanoTime() - startTime;
+    elapsedTimeInMilli = (double) elapsedTimeInNano / 1_000_000;
+    LOGGER.info("buildWebBackendConnectionPageRead part 2 spends {} milliseconds", elapsedTimeInMilli);
+
     return webBackendConnectionPageRead;
   }
 
