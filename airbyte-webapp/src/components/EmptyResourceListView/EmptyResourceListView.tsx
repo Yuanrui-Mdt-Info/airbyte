@@ -42,6 +42,21 @@ const ButtonContainer = styled.div`
   border-radius: 60px;
   margin: 70px 0 50px 0;
 `;
+const Badge = styled.div`
+  padding: 20px 23px;
+  border-radius: 10px;
+  background: var(--Surface, #fff);
+  color: var(--text-normal, #27272a);
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  position: absolute;
+  top: 50%;
+  right: -50px;
+  transform: translate(0, -50%) rotate(-90deg);
+`;
 
 export const EmptyResourceListView: React.FC<EmptyResourceListViewProps> = React.memo(
   ({ resourceType, onCreateClick }) => {
@@ -75,6 +90,18 @@ export const EmptyResourceListView: React.FC<EmptyResourceListViewProps> = React
 
     return (
       <Container>
+        {" "}
+        <Badge
+          style={{
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "flex-end",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
+          On boarding
+        </Badge>
         <HeadTitle titles={[{ id: getPageTitle(resourceType) }]} />
         <TitlesBlock testId="onboarding.welcome" title={<FormattedMessage id="onboarding.welcome" />}>
           <FormattedMessage
