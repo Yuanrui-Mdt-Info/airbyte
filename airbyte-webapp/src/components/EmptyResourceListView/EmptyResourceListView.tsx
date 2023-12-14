@@ -44,7 +44,7 @@ const ButtonContainer = styled.div`
 `;
 const Badge = styled.div`
   padding: 20px 23px;
-  border-radius: 10px;
+  border-radius: 10px 10px 0px 1px;
   background: var(--Surface, #fff);
   color: var(--text-normal, #27272a);
   font-family: Inter;
@@ -54,7 +54,7 @@ const Badge = styled.div`
   line-height: 18px;
   position: absolute;
   top: 50%;
-  right: -50px;
+  right: -61px;
   transform: translate(0, -50%) rotate(-90deg);
 `;
 
@@ -100,7 +100,7 @@ export const EmptyResourceListView: React.FC<EmptyResourceListViewProps> = React
             gap: "8px",
           }}
         >
-          On boarding
+          Onboarding
         </Badge>
         <HeadTitle titles={[{ id: getPageTitle(resourceType) }]} />
         <TitlesBlock testId="onboarding.welcome" title={<FormattedMessage id="onboarding.welcome" />}>
