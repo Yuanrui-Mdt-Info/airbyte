@@ -21,38 +21,31 @@ class AmazonAdsConfig(BaseModel):
 
     auth_type: str = Field(default="oauth2.0", const=True, order=0)
 
-    source_name: str = Field(
-        None,
-        title="Source Name",
-        description="Table Source Identification",
-        order=0,
-    )
-
     client_id: str = Field(
         title="Client ID",
         description='The client ID of your Amazon Ads developer application. See the <a href="https://advertising.amazon.com/API/docs/en-us/get-started/generate-api-tokens#retrieve-your-client-id-and-client-secret">docs</a> for more information.',
-        order=1,
+        order=0,
     )
 
     client_secret: str = Field(
         title="Client Secret",
         description='The client secret of your Amazon Ads developer application. See the <a href="https://advertising.amazon.com/API/docs/en-us/get-started/generate-api-tokens#retrieve-your-client-id-and-client-secret">docs</a> for more information.',
         airbyte_secret=True,
-        order=2,
+        order=1,
     )
 
     refresh_token: str = Field(
         title="Refresh Token",
         description='Amazon Ads refresh token. See the <a href="https://advertising.amazon.com/API/docs/en-us/get-started/generate-api-tokens">docs</a> for more information on how to obtain this token.',
         airbyte_secret=True,
-        order=3,
+        order=2,
     )
 
     region: AmazonAdsRegion = Field(
         title="Region *",
         description='Region to pull data from (EU/NA/FE/SANDBOX). See <a href="https://advertising.amazon.com/API/docs/en-us/info/api-overview#api-endpoints">docs</a> for more details.',
         default=AmazonAdsRegion.NA,
-        order=4,
+        order=3,
     )
 
     report_wait_timeout: int = Field(
@@ -60,7 +53,7 @@ class AmazonAdsConfig(BaseModel):
         description="Timeout duration in minutes for Reports. Default is 30 minutes.",
         default=30,
         examples=[30, 120],
-        order=5,
+        order=4,
     )
 
     report_generation_max_retries: int = Field(
@@ -68,7 +61,7 @@ class AmazonAdsConfig(BaseModel):
         description="Maximum retries Daspire will attempt for fetching report data. Default is 5.",
         default=5,
         examples=[5, 10, 15],
-        order=6,
+        order=5,
     )
 
     start_date: str = Field(
@@ -76,14 +69,14 @@ class AmazonAdsConfig(BaseModel):
         title="Start Date (Optional)",
         description="The Start date for collecting reports, should not be more than 60 days in the past. In YYYY-MM-DD format",
         examples=["2022-10-10", "2022-10-22"],
-        order=7,
+        order=6,
     )
 
     profiles: List[int] = Field(
         None,
         title="Profile IDs (Optional)",
         description='Profile IDs you want to fetch data for. See <a href="https://advertising.amazon.com/API/docs/en-us/concepts/authorization/profiles">docs</a> for more details.',
-        order=8,
+        order=7,
     )
 
     @classmethod
