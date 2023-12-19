@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
-import { Button, DropDown, DropDownRow, MainPageWithScroll } from "components";
+import { Button, DropDown, DropDownRow, NewMainPageWithScroll } from "components";
 import HeadTitle from "components/HeadTitle";
 import { PageSize } from "components/PageSize";
 import PageTitle from "components/PageTitle";
@@ -63,13 +63,13 @@ const AllSourcesPage: React.FC = () => {
   const { push, query } = useRouter();
   // const { push } = useRouter();
   const [pageConfig, updatePageSize] = usePageConfig();
-  const { sourceOptions } = useConnectionFilterOptions();
   // const [currentPageSize, setCurrentPageSize] = useState<number>(pageConfig.connection.pageSize);
   const [pageCurrent, setCurrentPageSize] = useState<number>(pageConfig?.source?.pageSize);
   // const { sources } = useSourceList();
 
   useTrackPage(PageTrackingCodes.SOURCE_LIST);
   const workspace = useCurrentWorkspace();
+  const { sourceOptions } = useConnectionFilterOptions(workspace.workspaceId);
   const initialFiltersState = {
     workspaceId: workspace.workspaceId,
     pageSize: pageCurrent,
@@ -117,12 +117,11 @@ const AllSourcesPage: React.FC = () => {
   );
   const onCreateSource = () => push(`${RoutePaths.SelectSource}`);
 
-  // if (sources.length === 0) {
-  //   onCreateSource();
-  //   return null;
-  // }
+  if (sources?.length === 0) {
+    onCreateSource();
+  }
   return (
-    <MainPageWithScroll
+    <NewMainPageWithScroll
       headTitle={<HeadTitle titles={[{ id: "admin.sources" }]} />}
       pageTitle={
         <PageTitle
@@ -164,7 +163,7 @@ const AllSourcesPage: React.FC = () => {
         </Box>
       </Footer>
       <Separator height="24px" />
-    </MainPageWithScroll>
+    </NewMainPageWithScroll>
   );
 };
 

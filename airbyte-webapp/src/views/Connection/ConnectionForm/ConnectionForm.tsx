@@ -187,7 +187,6 @@ export const ConnectionForm: React.FC<ConnectionFormProps> = ({
         typeof values?.scheduleData?.basicSchedule === "string" && values?.scheduleData?.basicSchedule === "manual"
           ? ConnectionScheduleType.manual
           : ConnectionScheduleType.basic;
-
       const formValues: ConnectionFormValues = connectionValidationSchema.cast(values, {
         context: { isRequest: true },
       }) as unknown as ConnectionFormValues;

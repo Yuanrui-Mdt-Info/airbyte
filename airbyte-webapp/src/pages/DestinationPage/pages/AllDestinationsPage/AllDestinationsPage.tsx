@@ -5,7 +5,7 @@ import { useState, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
-import { Button, DropDown, DropDownRow, MainPageWithScroll } from "components";
+import { Button, DropDown, DropDownRow, NewMainPageWithScroll } from "components";
 import HeadTitle from "components/HeadTitle";
 import { PageSize } from "components/PageSize";
 import PageTitle from "components/PageTitle";
@@ -63,7 +63,7 @@ const AllDestinationsPage: React.FC = () => {
   const { push, query } = useRouter();
   // const { push } = useRouter();
   // const { destinations } = useDestinationList();
-  const { destinationOptions } = useConnectionFilterOptions();
+
   const [pageConfig, updatePageSize] = usePageConfig();
   // const [pageConfig] = usePageConfig();
 
@@ -71,6 +71,7 @@ const AllDestinationsPage: React.FC = () => {
   const [pageCurrent, setCurrentPageSize] = useState<number>(pageConfig?.destination?.pageSize);
   useTrackPage(PageTrackingCodes.DESTINATION_LIST);
   const workspace = useCurrentWorkspace();
+  const { destinationOptions } = useConnectionFilterOptions(workspace.workspaceId);
   const initialFiltersState = {
     workspaceId: workspace.workspaceId,
     pageSize: pageCurrent,
@@ -116,13 +117,12 @@ const AllDestinationsPage: React.FC = () => {
   );
   const onCreateDestination = () => push(`${RoutePaths.SelectDestination}`);
 
-  // if (destinations.length === 0) {
-  //   onCreateDestination();
-  //   return null;
-  // }
+  if (destinations.length === 0) {
+    onCreateDestination();
+  }
 
   return (
-    <MainPageWithScroll
+    <NewMainPageWithScroll
       headTitle={<HeadTitle titles={[{ id: "admin.destinations" }]} />}
       pageTitle={
         <PageTitle
@@ -164,7 +164,7 @@ const AllDestinationsPage: React.FC = () => {
         </Box>
       </Footer>
       <Separator height="24px" />
-    </MainPageWithScroll>
+    </NewMainPageWithScroll>
   );
 };
 
