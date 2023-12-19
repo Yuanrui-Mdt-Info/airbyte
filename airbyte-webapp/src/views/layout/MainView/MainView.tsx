@@ -87,6 +87,7 @@ const MainView: React.FC = (props) => {
       RoutePaths.Password,
       RoutePaths.Account,
       RoutePaths.Support,
+      RoutePaths.OnBoarding,
     ],
     []
   );

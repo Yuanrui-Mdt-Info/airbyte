@@ -7,6 +7,7 @@ export enum RoutePaths {
   Onboarding = "onboarding",
   Connections = "connections",
   Destination = "destination",
+  OnBoarding = "onBoarding",
   Source = "source",
   Settings = "settings",
   Documentation = "documentation",

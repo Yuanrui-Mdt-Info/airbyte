@@ -1,11 +1,13 @@
 import React, { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { BigButton } from "components/CenteredPageComponents";
 import HeadTitle from "components/HeadTitle";
 
 import TitlesBlock from "pages/OnboardingPage/components/TitlesBlock";
+import { RoutePaths } from "pages/routePaths";
 
 interface EmptyResourceListViewProps {
   resourceType: "connections" | "destinations" | "sources";
@@ -71,7 +73,7 @@ export const EmptyResourceListView: React.FC<EmptyResourceListViewProps> = React
 
       return { headingMessageId, buttonMessageId, singularResourceType };
     }, [resourceType]);
-
+    const navigate = useNavigate();
     const getPageTitle = (resourceType: "connections" | "destinations" | "sources"): string => {
       switch (resourceType) {
         case "connections":
@@ -98,7 +100,9 @@ export const EmptyResourceListView: React.FC<EmptyResourceListViewProps> = React
             alignItems: "flex-end",
             flexDirection: "column",
             gap: "8px",
+            cursor: "pointer",
           }}
+          onClick={() => navigate(`/${RoutePaths.OnBoarding}`, { replace: true })}
         >
           Onboarding
         </Badge>

@@ -22,6 +22,7 @@ import LoginNewPage from "./AuthPage/LoginNewPage/LoginNewPage";
 // import VerifyEmailPage from "./AuthPage/VerifyEmailPage";
 import ConnectionPage from "./ConnectionPage";
 import DestinationPage from "./DestinationPage";
+import NewOnBoardingPage from "./NewOnBoardingPage";
 import PaymentErrorPage from "./PaymentErrorPage";
 import PaymentPage from "./PaymentPage";
 import FailedPaymentPage from "./PaymentPage/FailedPaymentPage";
@@ -43,6 +44,7 @@ const MainViewRoutes: React.FC<{ workspace: WorkspaceRead }> = () => {
           <Route path={`${RoutePaths.Payment}/*`} element={<PaymentPage />} />
           <Route path={`${RoutePaths.PaymentError}/*`} element={<PaymentErrorPage />} />
           <Route path={`${RoutePaths.FailedPayment}/*`} element={<FailedPaymentPage />} />
+          <Route path={`${RoutePaths.OnBoarding}/*`} element={<NewOnBoardingPage />} />
           <Route path="*" element={<Navigate to={RoutePaths.Connections} />} />
         </Routes>
       </ApiErrorBoundary>
