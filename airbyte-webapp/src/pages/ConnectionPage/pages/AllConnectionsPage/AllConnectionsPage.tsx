@@ -1,11 +1,12 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box } from "@mui/material";
 import _ from "lodash";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
-import { Button, LoadingPage, MainPageWithScroll, PageTitle, DropDown, DropDownRow } from "components";
+import { Button, LoadingPage, NewMainPageWithScroll, PageTitle, DropDown, DropDownRow } from "components";
 import MessageBox from "components/base/MessageBox";
 import { EmptyResourceListView } from "components/EmptyResourceListView";
 import HeadTitle from "components/HeadTitle";
@@ -75,7 +76,7 @@ const AllConnectionsPage: React.FC = () => {
 
   useTrackPage(PageTrackingCodes.CONNECTIONS_LIST);
   const workspace = useCurrentWorkspace();
-  const { statusOptions, sourceOptions, destinationOptions } = useConnectionFilterOptions();
+  const { statusOptions, sourceOptions, destinationOptions } = useConnectionFilterOptions(workspace.workspaceId);
 
   const initialFiltersState = {
     workspaceId: workspace.workspaceId,
@@ -153,7 +154,7 @@ const AllConnectionsPage: React.FC = () => {
       {hasConnections() ? (
         <>
           <MessageBox message={messageId} onClose={() => setMessageId("")} type="info" position="center" />
-          <MainPageWithScroll
+          <NewMainPageWithScroll
             headTitle={<HeadTitle titles={[{ id: "connection.pageTitle" }]} />}
             pageTitle={
               <PageTitle
@@ -212,14 +213,16 @@ const AllConnectionsPage: React.FC = () => {
             <Separator height="24px" />
             <Footer>
               <PageSize currentPageSize={currentPageSize} totalPage={total / pageSize} onChange={onChangePageSize} />
-              <Pagination
-                pages={total / pageSize}
-                value={filters.pageCurrent}
-                onChange={(value: number) => onSelectFilter("pageCurrent", value)}
-              />
+              <Box paddingLeft="20px">
+                <Pagination
+                  pages={total / pageSize}
+                  value={filters.pageCurrent}
+                  onChange={(value: number) => onSelectFilter("pageCurrent", value)}
+                />
+              </Box>
             </Footer>
             <Separator height="24px" />
-          </MainPageWithScroll>
+          </NewMainPageWithScroll>
         </>
       ) : (
         <EmptyResourceListView

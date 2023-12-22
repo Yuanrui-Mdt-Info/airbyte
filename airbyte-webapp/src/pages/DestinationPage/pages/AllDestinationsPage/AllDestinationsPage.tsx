@@ -1,10 +1,12 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box } from "@mui/material";
 import { useState, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { Button, DropDown, DropDownRow, MainPageWithScroll } from "components";
+import { Button, DropDown, DropDownRow, NewMainPageWithScroll } from "components";
 import HeadTitle from "components/HeadTitle";
 import { PageSize } from "components/PageSize";
 import PageTitle from "components/PageTitle";
@@ -60,9 +62,12 @@ const DDContainer = styled.div<{
 
 const AllDestinationsPage: React.FC = () => {
   const { push, query } = useRouter();
+
+  const navigate = useNavigate();
+
   // const { push } = useRouter();
   // const { destinations } = useDestinationList();
-  const { destinationOptions } = useConnectionFilterOptions();
+
   const [pageConfig, updatePageSize] = usePageConfig();
   // const [pageConfig] = usePageConfig();
 
@@ -70,6 +75,7 @@ const AllDestinationsPage: React.FC = () => {
   const [pageCurrent, setCurrentPageSize] = useState<number>(pageConfig?.destination?.pageSize);
   useTrackPage(PageTrackingCodes.DESTINATION_LIST);
   const workspace = useCurrentWorkspace();
+  const { destinationOptions } = useConnectionFilterOptions(workspace?.workspaceId);
   const initialFiltersState = {
     workspaceId: workspace.workspaceId,
     pageSize: pageCurrent,
@@ -79,6 +85,7 @@ const AllDestinationsPage: React.FC = () => {
 
   const [filters, setFilters] = useState<FilterDestinationRequestBody>(initialFiltersState);
   const { destinations, total, pageSize } = usePaginatedDestination(filters);
+
   // const workspace = useCurrentWorkspace();
   // const { statusOptions, sourceOptions, destinationOptions } = useConnectionFilterOptions();
 
@@ -115,53 +122,56 @@ const AllDestinationsPage: React.FC = () => {
   );
   const onCreateDestination = () => push(`${RoutePaths.SelectDestination}`);
 
-  // if (destinations.length === 0) {
-  //   onCreateDestination();
-  //   return null;
-  // }
-
   return (
-    <MainPageWithScroll
-      headTitle={<HeadTitle titles={[{ id: "admin.destinations" }]} />}
-      pageTitle={
-        <PageTitle
-          withPadding
-          title=""
-          endComponent={
-            <Button onClick={onCreateDestination} data-id="new-destination">
-              <BtnInnerContainer>
-                <BtnIcon icon={faPlus} />
-                <BtnText>
-                  <FormattedMessage id="destinations.newDestination" />
-                </BtnText>
-              </BtnInnerContainer>
-            </Button>
+    <>
+      {destinations && destinations?.length > 0 ? (
+        <NewMainPageWithScroll
+          headTitle={<HeadTitle titles={[{ id: "admin.destinations" }]} />}
+          pageTitle={
+            <PageTitle
+              withPadding
+              title=""
+              endComponent={
+                <Button onClick={onCreateDestination} data-id="new-destination">
+                  <BtnInnerContainer>
+                    <BtnIcon icon={faPlus} />
+                    <BtnText>
+                      <FormattedMessage id="destinations.newDestination" />
+                    </BtnText>
+                  </BtnInnerContainer>
+                </Button>
+              }
+            />
           }
-        />
-      }
-    >
-      <DDContainer>
-        <DropDown
-          $withBorder
-          $background="white"
-          value={filters.DestinationDefinitionId}
-          options={destinationOptions}
-          onChange={(option: DropDownRow.IDataItem) => onSelectFilter("DestinationDefinitionId", option.value)}
-        />
-      </DDContainer>
-      <Separator height="10px" />
-      <DestinationsTable destinations={destinations} />
-      <Separator height="24px" />
-      <Footer>
-        <PageSize currentPageSize={pageCurrent} totalPage={total / pageSize} onChange={onChangePageSize} />
-        <Pagination
-          pages={total / pageSize}
-          value={filters.pageCurrent}
-          onChange={(value: number) => onSelectFilter("pageCurrent", value)}
-        />
-      </Footer>
-      <Separator height="24px" />
-    </MainPageWithScroll>
+        >
+          <DDContainer>
+            <DropDown
+              $withBorder
+              $background="white"
+              value={filters.DestinationDefinitionId}
+              options={destinationOptions}
+              onChange={(option: DropDownRow.IDataItem) => onSelectFilter("DestinationDefinitionId", option.value)}
+            />
+          </DDContainer>
+          <Separator height="10px" />
+          <DestinationsTable destinations={destinations} />
+          <Separator height="24px" />
+          <Footer>
+            <PageSize currentPageSize={pageCurrent} totalPage={total / pageSize} onChange={onChangePageSize} />
+            <Box paddingLeft="20px">
+              <Pagination
+                pages={total / pageSize}
+                value={filters.pageCurrent}
+                onChange={(value: number) => onSelectFilter("pageCurrent", value)}
+              />
+            </Box>
+          </Footer>
+          <Separator height="24px" />
+        </NewMainPageWithScroll>
+      ) : (
+        navigate(`${RoutePaths.SelectDestination}`)
+      )}
+    </>
   );
 };
 

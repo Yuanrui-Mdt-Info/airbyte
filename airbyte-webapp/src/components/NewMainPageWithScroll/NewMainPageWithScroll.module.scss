@@ -1,0 +1,24 @@
+@use "../../scss/variables";
+
+.page {
+  overflow-y: hidden;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentContainer {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.content {
+  overflow-y: auto;
+  height: 100%;
+  min-width: variables.$main-page-content-min-width;
+}
+
+.withPadding {
+  padding: variables.$spacing-lg variables.$spacing-xl variables.$spacing-lg variables.$spacing-xl;
+}
