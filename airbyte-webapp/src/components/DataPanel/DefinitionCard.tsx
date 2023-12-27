@@ -45,9 +45,9 @@ const DefinitionCard: React.FC<SourcePanelProps> = ({ data, onSelect, value, tit
   return (
     <Container>
       <Title>{title}</Title>
-      <Grid container spacing={{ lg: 5, md: 4, sm: 5, xs: 4 }}>
+      <Grid container spacing={{ lg: 8, md: 4, sm: 4, xs: 4 }}>
         {data.map((item) => (
-          <Grid item lg={3} md={4} sm={4} xs={3}>
+          <Grid item lg={3} md={4} sm={6} xs={12}>
             <DataCard
               type={type}
               data={item}

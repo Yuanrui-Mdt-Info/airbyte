@@ -114,7 +114,7 @@ const Button = styled.button<ButtonProps>`
   display: ${(props) => (props.full ? "block" : "inline-block")};
   border: 1px solid ${(props) => getBorderColor(props)};
   outline: none;
-  border-radius: 4px;
+  border-radius: ${(props) => (props.borderRadius != null ? `${props.borderRadius}px` : "4px")};
   padding: ${(props) => getPadding(props)};
   font-weight: ${(props) => (props.size === "xl" ? 600 : 500)};
   font-size: ${(props) => getFontSize(props)}px;

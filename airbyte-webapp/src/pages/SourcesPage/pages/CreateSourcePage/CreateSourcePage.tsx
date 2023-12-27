@@ -59,15 +59,31 @@ const CreateSourcePage: React.FC = () => {
       setCurrentStep(CreateStepTypes.CREATE_SOURCE);
       return;
     }
-    push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`, {
-      state: {
-        ...(location.state as Record<string, unknown>),
-      },
-    });
+    if ((location?.state as { onBoarding?: string })?.onBoarding?.includes("onBoarding")) {
+      navigate(`/${RoutePaths.OnBoarding}`, {
+        state: {
+          onBoarding: "addSource",
+        },
+      });
+    } else {
+      push(`/${RoutePaths.Source}/${RoutePaths.SelectSource}`, {
+        state: {
+          ...(location.state as Record<string, unknown>),
+        },
+      });
+    }
   };
 
   const handleFinishButton = () => {
-    return navigate(`/${RoutePaths.Source}`);
+    if ((location?.state as { onBoarding?: string })?.onBoarding?.includes("onBoarding")) {
+      navigate(`/${RoutePaths.OnBoarding}`, {
+        state: {
+          onBoarding: "finishSource",
+        },
+      });
+    } else {
+      navigate(`/${RoutePaths.Source}`);
+    }
   };
 
   const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {

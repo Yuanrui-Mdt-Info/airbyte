@@ -60,15 +60,31 @@ export const CreateDestinationPage: React.FC = () => {
       setCurrentStep(CreateStepTypes.CREATE_DESTINATION);
       return;
     }
-    push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`, {
-      state: {
-        ...(location.state as Record<string, unknown>),
-      },
-    });
+    if ((location?.state as { onBoarding?: string })?.onBoarding?.includes("onBoarding")) {
+      navigate(`/${RoutePaths.OnBoarding}`, {
+        state: {
+          onBoarding: "addDestination",
+        },
+      });
+    } else {
+      push(`/${RoutePaths.Destination}/${RoutePaths.SelectDestination}`, {
+        state: {
+          ...(location.state as Record<string, unknown>),
+        },
+      });
+    }
   };
 
   const handleFinishButton = () => {
-    navigate(`/${RoutePaths.Destination}`);
+    if ((location?.state as { onBoarding?: string })?.onBoarding?.includes("onBoarding")) {
+      navigate(`/${RoutePaths.OnBoarding}`, {
+        state: {
+          onBoarding: "finishDestination",
+        },
+      });
+    } else {
+      navigate(`/${RoutePaths.Destination}`);
+    }
   };
 
   const onShowLoading = (isLoading: boolean, formValues: ServiceFormValues, error: JSX.Element | string | null) => {
