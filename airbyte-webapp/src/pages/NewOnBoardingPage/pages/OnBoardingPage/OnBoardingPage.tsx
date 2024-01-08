@@ -10,10 +10,11 @@ import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
 import { Button as NewButton } from "components";
-import { ColorRocketIcon } from "components/icons/ColorRocketIcon";
-import "./OnBoardingPage.scss";
-import { BoardIcon } from "components/icons/BoardIcon";
+import { ButtonRows, CustomButton } from "components/base/Button/CustomButton";
 import DataPanel from "components/DataPanel";
+import DefinitionCard from "components/DataPanel";
+import { BoardIcon } from "components/icons/BoardIcon";
+import { ColorRocketIcon } from "components/icons/ColorRocketIcon";
 import { RocketIcon } from "components/icons/RocketIcon";
 
 import { Action, Namespace } from "core/analytics";
@@ -24,8 +25,7 @@ import { RoutePaths } from "pages/routePaths";
 import { useDestinationDefinitionList } from "services/connector/DestinationDefinitionService";
 import { useSourceDefinitionList } from "services/connector/SourceDefinitionService";
 
-import DefinitionCard from "components/DataPanel";
-import { ButtonRows, CustomButton } from "components/base/Button/CustomButton";
+import "./OnBoardingPage.scss";
 
 const steps = [
   "Setup your first connection",
