@@ -60,7 +60,11 @@ const MenuItemIcon = styled(FontAwesomeIcon)`
   line-height: 16px;
   font-weight: normal;
 `;
-
+const MenuItemIconDoc = styled.div`
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: normal;
+`;
 const UserDetail = styled.div`
   font-weight: 500;
   font-size: 12px;
@@ -163,7 +167,11 @@ const SideBar: React.FC = () => {
           rel="noreferrer"
           className={useCalculateSidebarItemStyles(RoutePaths.Documentation)}
         >
-          <DocumentationIcon width={16} height={16} />
+          <MenuItemIconDoc>
+            {" "}
+            <DocumentationIcon width={18} height={18} />
+          </MenuItemIconDoc>
+
           <Text>
             <FormattedMessage id="sidebar.documentation" />
           </Text>

@@ -575,6 +575,7 @@ export interface HealthCheckRead {
   usage?: number;
   isPaymentFailed?: boolean;
   isUpdatePaymentMethod?: boolean;
+  connectionUpdate?:string;
 }
 
 export interface Pagination {
@@ -982,7 +983,9 @@ export interface ConnectionScheduleData {
   basicSchedule?: ConnectionScheduleDataBasicSchedule;
   cron?: ConnectionScheduleDataCron;
 }
-
+export interface EmptyConnectionScheduleData{
+  
+}
 /**
  * determine how the schedule data should be interpreted
  */
@@ -3285,11 +3288,12 @@ export const webBackendCreateConnection = (
  */
 export const webBackendUpdateConnection = (
   webBackendConnectionUpdate: WebBackendConnectionUpdate,
+  connectionId:string,
   options?: SecondParameter<typeof apiOverride>
 ) => {
   return apiOverride<WebBackendConnectionRead>(
     {
-      url: `/etl/web_backend/connections/update`,
+      url: `/etl/web_backend/connections/update?connectionId=${connectionId}`,
       method: "post",
       headers: { "Content-Type": "application/json" },
       data: webBackendConnectionUpdate,

@@ -1,6 +1,6 @@
 import { Box, IconButton, Tooltip } from "@mui/material";
 import queryString from "query-string";
-import React, { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { CellProps } from "react-table";
 import styled from "styled-components";
@@ -10,6 +10,9 @@ import { FailedIcon } from "components/icons/FailedIcon";
 import { GreenIcon } from "components/icons/GreenIcon";
 import { GreenLoaderIcon } from "components/icons/GreenLoaderIcon";
 import { NotStartedIcon } from "components/icons/NotStartedIcon";
+import { SortDescIcon } from "components/icons/SortDescIcon";
+import { SortDownIcon } from "components/icons/SortDownIcon";
+import { SortUpIcon } from "components/icons/SortUpIcon";
 import { WaitingIcon } from "components/icons/WaitingIcon";
 import { LabeledSwitch } from "components/LabeledSwitch";
 import Table from "components/Table";
@@ -23,6 +26,7 @@ import NameCell from "./components/NameCell";
 import NewTabIconButton from "./components/NewTabIconButton";
 import { ITableDataItem, SortOrderEnum } from "./types";
 import { RoutePaths } from "../../pages/routePaths";
+
 const SwitchContent = styled.div`
   display: flex;
   align-items: center;
@@ -48,35 +52,85 @@ interface IProps {
   rowId?: string;
   statusLoading?: boolean;
   switchSize?: string;
+  setSortFieldName?: any;
+  setSortDirection?: any;
+  onSelectFilter?: any;
+  localSortOrder?: any;
+  setLocalSortOrder?: any;
+  connectorSortOrder?: any;
+  setConnectorSortOrder?: any;
+  entitySortOrder?: any;
+  setEntitySortOrder?: any;
+  statusSortOrder?: any;
+  setStatusSortOrder?: any;
+  pageCurrent?: any;
+  pageSize?: any;
 }
 //
-const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSync, rowId, statusLoading }) => {
+const ConnectionTable: React.FC<IProps> = ({
+  data,
+  entity,
+  onChangeStatus,
+  onSync,
+  rowId,
+  statusLoading,
+  setSortDirection,
+  setSortFieldName,
+  onSelectFilter,
+  localSortOrder,
+  setLocalSortOrder,
+  connectorSortOrder,
+  setConnectorSortOrder,
+  entitySortOrder,
+  setEntitySortOrder,
+  statusSortOrder,
+  setStatusSortOrder,
+  pageCurrent,
+  pageSize,
+}) => {
   const { query, push } = useRouter();
+  const sortBy = query.sortBy;
+  const sortOrder = query.order;
   const allowSync = useFeature(FeatureItem.AllowSync);
-
-  const sortBy = query.sortBy || "entityName";
-  const sortOrder = query.order || SortOrderEnum.ASC;
-
   const onSortClick = useCallback(
     (field: string) => {
-      const order =
-        sortBy !== field ? SortOrderEnum.ASC : sortOrder === SortOrderEnum.ASC ? SortOrderEnum.DESC : SortOrderEnum.ASC;
+      let newSortOrder: SortOrderEnum | "" = "";
+
+      if (sortBy !== field) {
+        // Clicking on a new column
+        newSortOrder = SortOrderEnum.ASC;
+      } else {
+        // Clicking on the same column
+        newSortOrder =
+          sortOrder === SortOrderEnum.ASC
+            ? SortOrderEnum.DESC
+            : sortOrder === SortOrderEnum.DESC
+            ? ""
+            : SortOrderEnum.ASC;
+      }
+
+      const newSearchParams: { sortBy?: string; order?: string; pageCurrent?: any; pageSize?: any } = {};
+      if (newSortOrder !== "") {
+        newSearchParams.sortBy = field;
+        newSearchParams.order = newSortOrder;
+        newSearchParams.pageCurrent = pageCurrent;
+        newSearchParams.pageSize = pageSize;
+      } else {
+        newSearchParams.sortBy = "";
+        newSearchParams.order = "";
+        newSearchParams.pageCurrent = pageCurrent;
+        newSearchParams.pageSize = pageSize;
+      }
+
       push({
-        search: queryString.stringify(
-          {
-            sortBy: field,
-            order,
-          },
-          { skipNull: true }
-        ),
+        search: queryString.stringify(newSearchParams, { skipNull: true }),
       });
     },
-    [push, sortBy, sortOrder]
+    [push, sortBy, sortOrder, query]
   );
-
   const onClickRows = (connectionId: string) => push(`/${RoutePaths.Connections}/${connectionId}`);
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       onChangeStatus
         ? {
@@ -158,10 +212,39 @@ const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSyn
             },
           },
       {
-        Header: <FormattedMessage id="tables.name" />,
+        Header: (
+          <>
+            <FormattedMessage id="tables.name" />
+            <IconButton
+              onClick={() => {
+                setSortFieldName("name");
+                onSortClick("name");
+                setLocalSortOrder((prev: any) => {
+                  const newSortOrder =
+                    prev === "" ? SortOrderEnum.ASC : prev === SortOrderEnum.ASC ? SortOrderEnum.DESC : "";
+                  setSortDirection(newSortOrder);
+                  setConnectorSortOrder("");
+                  setEntitySortOrder("");
+                  setStatusSortOrder("");
+                  onSelectFilter("sortFieldName", "name", query);
+                  onSelectFilter("sortDirection", newSortOrder, query);
+                  return newSortOrder;
+                });
+              }}
+            >
+              {localSortOrder === "" ? (
+                <SortUpIcon />
+              ) : localSortOrder === SortOrderEnum.ASC ? (
+                <SortDownIcon />
+              ) : (
+                <SortDescIcon />
+              )}
+            </IconButton>
+          </>
+        ),
         headerHighlighted: true,
         accessor: "name",
-        customWidth: 30,
+
         Cell: ({ cell }: CellProps<ITableDataItem>) => {
           return (
             <NameColums>
@@ -175,9 +258,105 @@ const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSyn
       //   Header: <FormattedMessage id="tables.status" />,
       //   accessor: "statusLang",
       // },
+
       {
-        Header: <FormattedMessage id="tables.status" />,
+        Header: (
+          <>
+            <FormattedMessage id="tables.source" />
+            <IconButton
+              onClick={() => {
+                setSortFieldName("connectorName");
+                onSortClick("connectorName");
+                setConnectorSortOrder((prev: any) => {
+                  const newSortOrder =
+                    prev === "" ? SortOrderEnum.ASC : prev === SortOrderEnum.ASC ? SortOrderEnum.DESC : "";
+                  setLocalSortOrder("");
+                  setEntitySortOrder("");
+                  setStatusSortOrder("");
+                  onSelectFilter("sortFieldName", "connectorName", query);
+                  onSelectFilter("sortDirection", newSortOrder, query);
+                  return newSortOrder;
+                });
+              }}
+            >
+              {connectorSortOrder === "" ? (
+                <SortUpIcon />
+              ) : connectorSortOrder === SortOrderEnum.ASC ? (
+                <SortDownIcon />
+              ) : (
+                <SortDescIcon />
+              )}
+            </IconButton>
+          </>
+        ),
+        accessor: "connectorName",
+      },
+      {
+        Header: (
+          <>
+            <FormattedMessage id="tables.destination" />
+            <IconButton
+              onClick={() => {
+                setSortFieldName("entityName");
+                onSortClick("entityName");
+                setEntitySortOrder((prev: any) => {
+                  const newSortOrder =
+                    prev === "" ? SortOrderEnum.ASC : prev === SortOrderEnum.ASC ? SortOrderEnum.DESC : "";
+                  onSelectFilter("sortFieldName", "entityName", query);
+                  onSelectFilter("sortDirection", newSortOrder, query);
+                  setLocalSortOrder("");
+                  setConnectorSortOrder("");
+                  setStatusSortOrder("");
+                  return newSortOrder;
+                });
+              }}
+            >
+              {entitySortOrder === "" ? (
+                <SortUpIcon />
+              ) : entitySortOrder === SortOrderEnum.ASC ? (
+                <SortDownIcon />
+              ) : (
+                <SortDescIcon />
+              )}
+            </IconButton>
+          </>
+        ),
+        headerHighlighted: true,
+        accessor: "entityName",
+      },
+
+      {
+        Header: (
+          <>
+            <FormattedMessage id="tables.status" />
+            <IconButton
+              onClick={() => {
+                setSortFieldName("status");
+                onSortClick("status");
+                setStatusSortOrder((prev: any) => {
+                  const newSortOrder =
+                    prev === "" ? SortOrderEnum.ASC : prev === SortOrderEnum.ASC ? SortOrderEnum.DESC : "";
+                  setLocalSortOrder("");
+                  setEntitySortOrder("");
+                  setConnectorSortOrder("");
+                  onSelectFilter("sortFieldName", "status", query);
+                  onSelectFilter("sortDirection", newSortOrder, query);
+                  return newSortOrder;
+                });
+              }}
+            >
+              {statusSortOrder === "" ? (
+                <SortUpIcon />
+              ) : statusSortOrder === SortOrderEnum.ASC ? (
+                <SortDownIcon />
+              ) : (
+                <SortDescIcon />
+              )}
+            </IconButton>
+          </>
+        ),
         accessor: "status",
+
         Cell: ({ cell }: CellProps<ITableDataItem>) => {
           return cell.row.original.status === "active" ? (
             <FormattedMessage id="connection.active" />
@@ -198,15 +377,6 @@ const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSyn
         ),
       },
       {
-        Header: <FormattedMessage id="tables.source" />,
-        accessor: "connectorName",
-      },
-      {
-        Header: <FormattedMessage id="tables.destination" />,
-        headerHighlighted: true,
-        accessor: "entityName",
-      },
-      {
         Header: "",
         accessor: "connectionId",
         customWidth: 1,
@@ -222,7 +392,7 @@ const ConnectionTable: React.FC<IProps> = ({ data, entity, onChangeStatus, onSyn
         },
       },
     ],
-    [allowSync, entity, onChangeStatus, onSync, onSortClick, sortBy, sortOrder]
+    [allowSync, entity, onChangeStatus, onSync, localSortOrder, connectorSortOrder, statusSortOrder, entitySortOrder]
   );
 
   return <Table columns={columns} data={data} erroredRows />;
