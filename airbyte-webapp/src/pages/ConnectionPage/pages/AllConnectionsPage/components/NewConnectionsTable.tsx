@@ -20,9 +20,37 @@ interface IProps {
   connections?: WebBackendNewConnectionList[];
   connectionStatus?: WebBackendNewConnectionStatusList[];
   onSetMessageId: (id: string) => void;
+  setSortFieldName?: any;
+  setSortDirection?: any;
+  onSelectFilter?: any;
+  localSortOrder?: any;
+  setLocalSortOrder?: any;
+  connectorSortOrder?: any;
+  setConnectorSortOrder?: any;
+  entitySortOrder?: any;
+  setEntitySortOrder?: any;
+  statusSortOrder?: any;
+  setStatusSortOrder?: any;
+  pageCurrent?: any;
+  pageSize?: any;
 }
 
-const NewConnectionsTable: React.FC<IProps> = ({ connections }) => {
+const NewConnectionsTable: React.FC<IProps> = ({
+  connections,
+  setSortDirection,
+  setSortFieldName,
+  onSelectFilter,
+  localSortOrder,
+  setLocalSortOrder,
+  connectorSortOrder,
+  setConnectorSortOrder,
+  entitySortOrder,
+  setEntitySortOrder,
+  statusSortOrder,
+  setStatusSortOrder,
+  pageCurrent,
+  pageSize,
+}) => {
   const [statusList, setStatusList] = useState([]);
   const user = getUser();
   const connectionIds = connections?.map((con: any) => con?.connectionId);
@@ -47,7 +75,7 @@ const NewConnectionsTable: React.FC<IProps> = ({ connections }) => {
           });
 
           const responseData = await response.json();
-          setStatusList(responseData.connectionStatusList);
+          setStatusList(responseData?.connectionStatusList);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -69,7 +97,25 @@ const NewConnectionsTable: React.FC<IProps> = ({ connections }) => {
 
   return (
     <Content>
-      <ConnectionTable data={updatedConnections as any} onClickRow={clickRow} entity="connection" rowId={rowId} />
+      <ConnectionTable
+        data={updatedConnections as any}
+        onClickRow={clickRow}
+        entity="connection"
+        rowId={rowId}
+        setSortFieldName={setSortFieldName}
+        setSortDirection={setSortDirection}
+        onSelectFilter={onSelectFilter}
+        localSortOrder={localSortOrder}
+        setLocalSortOrder={setLocalSortOrder}
+        connectorSortOrder={connectorSortOrder}
+        setConnectorSortOrder={setConnectorSortOrder}
+        entitySortOrder={entitySortOrder}
+        setEntitySortOrder={setEntitySortOrder}
+        statusSortOrder={statusSortOrder}
+        setStatusSortOrder={setStatusSortOrder}
+        pageCurrent={pageCurrent}
+        pageSize={pageSize}
+      />
     </Content>
   );
 };

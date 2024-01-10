@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import _ from "lodash";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import { Button, LoadingPage, NewMainPageWithScroll, PageTitle, DropDown, DropDownRow } from "components";
@@ -70,25 +71,36 @@ const Footer = styled.div`
 const AllConnectionsPage: React.FC = () => {
   // const CONNECTION_PAGE_SIZE = 10;
   const { push, pathname, query } = useRouter();
+  const location = useLocation();
+  // const { push, pathname, query } = useRouter();
   const [messageId, setMessageId] = useState<string | undefined>("");
   const [pageConfig, updatePageSize] = usePageConfig();
   const [currentPageSize, setCurrentPageSize] = useState<number>(pageConfig.connection.pageSize);
-
+  const [sortFieldName, setSortFieldName] = useState("");
+  const [sortDirection, setSortDirection] = useState("");
+  const [localSortOrder, setLocalSortOrder] = useState("");
+  const [connectorSortOrder, setConnectorSortOrder] = useState("");
+  const [entitySortOrder, setEntitySortOrder] = useState("");
+  const [statusSortOrder, setStatusSortOrder] = useState("");
   useTrackPage(PageTrackingCodes.CONNECTIONS_LIST);
   const workspace = useCurrentWorkspace();
   const { statusOptions, sourceOptions, destinationOptions } = useConnectionFilterOptions(workspace.workspaceId);
 
   const initialFiltersState = {
     workspaceId: workspace.workspaceId,
-    pageSize: currentPageSize,
+    pageSize: query.pageSize ? JSON.parse(query.pageSize) : pageConfig.connection.pageSize,
     pageCurrent: query.pageCurrent ? JSON.parse(query.pageCurrent) : 1,
     status: statusOptions[0].value,
     sourceDefinitionId: sourceOptions[0].value,
     destinationDefinitionId: destinationOptions[0].value,
+    sortDetails: {
+      sortFieldName: query.sortBy ?? sortFieldName,
+      sortDirection: query.order ?? sortDirection,
+    },
   };
 
   const [filters, setFilters] = useState<FilterConnectionRequestBody>(initialFiltersState);
-
+  console.log(query, "query");
   const { connections, total, pageSize } = useFilteredConnectionList(filters);
   // const connectionIds = connections?.map((con: any) => con?.connectionId);
   // const apiData = {
@@ -97,23 +109,98 @@ const AllConnectionsPage: React.FC = () => {
 
   // const { connectionStatusList } = useConnectionStatusList(apiData) || [];
 
+  // const onSelectFilter = useCallback(
+  //   (
+  //     filterType: "pageCurrent" | "status" | "sourceDefinitionId" | "destinationDefinitionId" | "pageSize",
+  //     filterValue: number | string
+  //   ) => {
+  //     if (
+  //       filterType === "status" ||
+  //       filterType === "sourceDefinitionId" ||
+  //       filterType === "destinationDefinitionId" ||
+  //       filterType === "pageSize"
+  //     ) {
+  //       setFilters({ ...filters, [filterType]: filterValue, pageCurrent: 1 });
+  //     } else if (filterType === "pageCurrent") {
+  //       setFilters({ ...filters, [filterType]: filterValue as number });
+  //     }
+  //   },
+  //   [filters]
+  // );
+
   const onSelectFilter = useCallback(
     (
-      filterType: "pageCurrent" | "status" | "sourceDefinitionId" | "destinationDefinitionId" | "pageSize",
-      filterValue: number | string
+      filterType:
+        | "pageCurrent"
+        | "status"
+        | "sourceDefinitionId"
+        | "destinationDefinitionId"
+        | "pageSize"
+        | "sortDirection"
+        | "sortFieldName",
+      filterValue: number | string,
+      query?: any
     ) => {
-      if (
-        filterType === "status" ||
-        filterType === "sourceDefinitionId" ||
-        filterType === "destinationDefinitionId" ||
-        filterType === "pageSize"
-      ) {
-        setFilters({ ...filters, [filterType]: filterValue, pageCurrent: 1 });
-      } else if (filterType === "pageCurrent") {
-        setFilters({ ...filters, [filterType]: filterValue as number });
-      }
+      setFilters((prevFilters: any) => {
+        if (
+          filterType === "destinationDefinitionId" ||
+          filterType === "pageSize" ||
+          filterType === "status" ||
+          filterType === "sourceDefinitionId"
+        ) {
+          return { ...prevFilters, [filterType]: filterValue };
+        } else if (filterType === "sortDirection" || filterType === "sortFieldName") {
+          return {
+            ...prevFilters,
+            sortDetails: {
+              ...prevFilters.sortDetails,
+              [filterType]: filterValue,
+            },
+            pageCurrent: prevFilters.pageCurrent,
+          };
+        } else if (filterType === "pageCurrent") {
+          const querySortBy = query?.sortBy ?? "";
+          if (querySortBy === "name") {
+            setLocalSortOrder(query?.order ?? "");
+            setConnectorSortOrder("");
+            setStatusSortOrder("");
+            setEntitySortOrder("");
+          } else if (querySortBy === "connectorName") {
+            setConnectorSortOrder(query?.order ?? "");
+            setLocalSortOrder("");
+            setStatusSortOrder("");
+            setEntitySortOrder("");
+          } else if (querySortBy === "entityName") {
+            setEntitySortOrder(query?.order ?? "");
+            setLocalSortOrder("");
+            setStatusSortOrder("");
+            setConnectorSortOrder("");
+          } else if (querySortBy === "status") {
+            setStatusSortOrder(query?.order ?? "");
+            setLocalSortOrder("");
+            setConnectorSortOrder("");
+            setEntitySortOrder("");
+          } else {
+            setEntitySortOrder("");
+            setStatusSortOrder("");
+            setConnectorSortOrder("");
+            setLocalSortOrder("");
+          }
+
+          const sortOrder = querySortBy
+            ? { sortFieldName: querySortBy, sortDirection: query?.order }
+            : { sortFieldName: "", sortDirection: "" };
+
+          return {
+            ...prevFilters,
+            [filterType]: filterValue,
+            sortDetails: sortOrder,
+          };
+        }
+        return prevFilters;
+      });
     },
-    [filters]
+    []
   );
 
   const hasConnections = useCallback((): boolean => {
@@ -127,20 +214,52 @@ const AllConnectionsPage: React.FC = () => {
     (size: number) => {
       setCurrentPageSize(size);
       updatePageSize("connection", size);
-      onSelectFilter("pageSize", size);
+      onSelectFilter("pageSize", size, query);
     },
     [onSelectFilter]
   );
-
   useEffect(() => {
     if (hasConnections()) {
-      push({ pathname, search: `?pageCurrent=${filters.pageCurrent}` });
+      const queryParams = new URLSearchParams(location.search);
+
+      // Add or update the sortBy, order, and pageCurrent parameters
+      queryParams.set("sortBy", query.sortBy ?? "");
+      queryParams.set("order", query.order ?? "");
+      queryParams.set("pageCurrent", `${filters.pageCurrent}`);
+      queryParams.set("pageSize", `${filters.pageSize}`);
+
+      // Preserve existing query parameters
+      const existingParams = new URLSearchParams(location.search);
+      existingParams.forEach((value, key) => {
+        if (key !== "sortBy" && key !== "order" && key !== "pageCurrent" && key !== "pageSize") {
+          queryParams.set(key, value);
+        }
+      });
+      // Update the URL with the new parameters
+      push({
+        pathname,
+        search: queryParams.toString(),
+      });
     }
-  }, [filters.pageCurrent]);
+  }, [filters.pageCurrent, filters.pageSize]);
+
+  // useEffect(() => {
+  //   if (hasConnections()) {
+  //     push({ pathname, search: `?pageCurrent=${filters.pageCurrent}` });
+  //   }
+  // }, [filters.pageCurrent]);
 
   useEffect(() => {
-    if (Object.keys(query).length > 2 && query?.pageCurrent !== undefined) {
-      setFilters({ ...filters, pageCurrent: JSON.parse(query.pageCurrent) });
+    if (Object.keys(query).length > 2 && query?.pageCurrent !== undefined && query?.pageSize !== undefined) {
+      setFilters({
+        ...filters,
+        pageCurrent: JSON.parse(query.pageCurrent),
+        pageSize: JSON.parse(query.pageSize),
+        sortDetails: {
+          sortDirection: query.order,
+          sortFieldName: query.sortBy,
+        },
+      });
     }
   }, [query]);
 
@@ -180,7 +299,7 @@ const AllConnectionsPage: React.FC = () => {
                   $background="white"
                   value={filters.status}
                   options={statusOptions}
-                  onChange={(option: DropDownRow.IDataItem) => onSelectFilter("status", option.value)}
+                  onChange={(option: DropDownRow.IDataItem) => onSelectFilter("status", option.value, query)}
                 />
               </DDContainer>
               <DDContainer margin="0 24px 0 0">
@@ -189,7 +308,9 @@ const AllConnectionsPage: React.FC = () => {
                   $background="white"
                   value={filters.sourceDefinitionId}
                   options={sourceOptions}
-                  onChange={(option: DropDownRow.IDataItem) => onSelectFilter("sourceDefinitionId", option.value)}
+                  onChange={(option: DropDownRow.IDataItem) =>
+                    onSelectFilter("sourceDefinitionId", option.value, query)
+                  }
                 />
               </DDContainer>
               <DDContainer>
@@ -198,7 +319,9 @@ const AllConnectionsPage: React.FC = () => {
                   $background="white"
                   value={filters.destinationDefinitionId}
                   options={destinationOptions}
-                  onChange={(option: DropDownRow.IDataItem) => onSelectFilter("destinationDefinitionId", option.value)}
+                  onChange={(option: DropDownRow.IDataItem) =>
+                    onSelectFilter("destinationDefinitionId", option.value, query)
+                  }
                 />
               </DDContainer>
             </DDsContainer>
@@ -208,6 +331,19 @@ const AllConnectionsPage: React.FC = () => {
             <NewConnectionsTable
               connections={connections as any}
               onSetMessageId={onSetMessageId}
+              setSortDirection={setSortDirection}
+              setSortFieldName={setSortFieldName}
+              onSelectFilter={onSelectFilter}
+              localSortOrder={localSortOrder}
+              setLocalSortOrder={setLocalSortOrder}
+              connectorSortOrder={connectorSortOrder}
+              setConnectorSortOrder={setConnectorSortOrder}
+              entitySortOrder={entitySortOrder}
+              setEntitySortOrder={setEntitySortOrder}
+              statusSortOrder={statusSortOrder}
+              setStatusSortOrder={setStatusSortOrder}
+              pageCurrent={filters.pageCurrent}
+              pageSize={filters.pageSize}
               // connectionStatus={connectionStatusList as any}
             />
             <Separator height="24px" />
@@ -217,7 +353,7 @@ const AllConnectionsPage: React.FC = () => {
                 <Pagination
                   pages={total / pageSize}
                   value={filters.pageCurrent}
-                  onChange={(value: number) => onSelectFilter("pageCurrent", value)}
+                  onChange={(value: number) => onSelectFilter("pageCurrent", value, query)}
                 />
               </Box>
             </Footer>

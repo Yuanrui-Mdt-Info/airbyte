@@ -1,3 +1,4 @@
+// import dayjs from "dayjs";
 import { JSONSchema7 } from "json-schema";
 import * as yup from "yup";
 
@@ -59,6 +60,17 @@ export const buildYupFormForJsonSchema = (
       if (jsonSchema?.pattern !== undefined) {
         schema = schema.matches(new RegExp(jsonSchema.pattern), "form.pattern.error");
       }
+      // if (jsonSchema?.type === "string" && jsonSchema?.format === "date-time") {
+      //   schema = yup
+      //     .string()
+      //     .trim()
+      //     .test("is-valid-date-time", "Invalid date-time format", (value) => {
+      //       const isValidDateTime = dayjs(value).isValid();
+      //       const valueAsString = String(value);
+      //       const isValidSimpleDate = /^\d{4}-\d{2}-\d{2}$/.test(valueAsString);
+      //       return isValidDateTime || isValidSimpleDate;
+      //     });
+      // }
 
       break;
     case "boolean":
@@ -89,18 +101,19 @@ export const buildYupFormForJsonSchema = (
       }
       break;
     case "array":
-      if (typeof jsonSchema.items === "object" && !Array.isArray(jsonSchema.items)) {
-        schema = yup
-          .array()
-          .of(
-            buildYupFormForJsonSchema(
-              jsonSchema.items,
-              uiConfig,
-              jsonSchema,
-              propertyKey,
-              propertyPath ? `${propertyPath}.${propertyKey}` : propertyKey
-            )
-          );
+      if (typeof jsonSchema.items === "object" && typeof jsonSchema.items === "string") {
+        schema = yup.array().of(yup.string().trim()).ensure();
+
+        // Check if the array is required and apply the required validation conditionally
+        const isRequired =
+          !jsonSchema.default &&
+          parentSchema &&
+          Array.isArray(parentSchema.required) &&
+          parentSchema.required.find((item) => item === propertyKey);
+
+        if (isRequired) {
+          schema = schema.required("form.empty.error");
+        }
       }
       break;
     case "object":
