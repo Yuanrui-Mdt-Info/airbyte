@@ -11,6 +11,9 @@ import { useInitService } from "../useInitService";
 export const paymentKeys = {
   all: [SCOPE_USER, "payments"] as const,
   userPlanDetail: () => [...paymentKeys.all, "userPlanDetail"] as const,
+  regions: () => ["regions"] as const,
+  instance: () => ["instances"] as const,
+  packages: () => ["packages"] as const,
   createSubscriptionUrl: (productItemId: string) =>
     [...paymentKeys.all, "createSubscriptionUrl", productItemId] as const,
 };
@@ -30,10 +33,19 @@ export const useUserPlanDetail = () => {
 
   return useSuspenseQuery(paymentKeys.userPlanDetail(), () => service.userPlanDetail()).data;
 };
+export const useCloudPackages = (): any => {
+  const service = usePaymentService();
 
+  return useSuspenseQuery(paymentKeys.packages(), () => service.cloudPackage()).data;
+};
+export const useCloudRegions = (): any => {
+  const service = usePaymentService();
+
+  return useSuspenseQuery(paymentKeys.regions(), () => service.cloudRegion()).data;
+};
 export const useCreateSubscription = () => {
   const service = usePaymentService();
-  return useMutation((productItemId: string) => service.createSubscriptionUrl(productItemId));
+  return useMutation((params: GetUpgradeSubscriptionParams) => service.createSubscriptionUrl(params));
 };
 
 export const useGetUpgradeSubscription = () => {
@@ -60,14 +72,18 @@ export const useUpdatePaymentMethodURL = () => {
   const service = usePaymentService();
   return useMutation((paymentOrderId: string) => service.updatePaymentMethod(paymentOrderId));
 };
-
+export const useInstanceSelect = () => {
+  const service = usePaymentService();
+  return useMutation((cloudItemId: string) => service.instanceSelect(cloudItemId));
+};
 export const useAsyncAction = (): {
-  onCreateSubscriptionURL: (productItemId: string) => Promise<any>;
+  onCreateSubscriptionURL: (params: GetUpgradeSubscriptionParams) => Promise<any>;
   onGetUpgradeSubscription: (params: GetUpgradeSubscriptionParams) => Promise<any>;
   onUpgradeSubscription: () => Promise<any>;
   onPauseSubscription: () => Promise<any>;
   onFailedPaymentDetails: () => Promise<any>;
   onUpdatePaymentMethodURL: (paymentOrderId: string) => Promise<any>;
+  onInstanceSelect: (cloudItemId: any) => Promise<any>;
 } => {
   const { mutateAsync: createSubscription } = useCreateSubscription();
   const { mutateAsync: getUpgradeSubscription } = useGetUpgradeSubscription();
@@ -75,9 +91,10 @@ export const useAsyncAction = (): {
   const { mutateAsync: pauseSubscription } = usePauseSubscription();
   const { mutateAsync: failedPaymentDetails } = useFailedPaymentDetails();
   const { mutateAsync: updatePaymentMethodURL } = useUpdatePaymentMethodURL();
+  const { mutateAsync: instanceSelect } = useInstanceSelect();
 
-  const onCreateSubscriptionURL = async (productItemId: string) => {
-    return await createSubscription(productItemId);
+  const onCreateSubscriptionURL = async (params: GetUpgradeSubscriptionParams) => {
+    return await createSubscription(params);
   };
 
   const onGetUpgradeSubscription = async (params: GetUpgradeSubscriptionParams) => {
@@ -99,6 +116,9 @@ export const useAsyncAction = (): {
   const onUpdatePaymentMethodURL = async (paymentOrderId: string) => {
     return await updatePaymentMethodURL(paymentOrderId);
   };
+  const onInstanceSelect = async (cloudItemId: string) => {
+    return await instanceSelect(cloudItemId);
+  };
 
   return {
     onCreateSubscriptionURL,
@@ -107,5 +127,6 @@ export const useAsyncAction = (): {
     onPauseSubscription,
     onFailedPaymentDetails,
     onUpdatePaymentMethodURL,
+    onInstanceSelect,
   };
 };

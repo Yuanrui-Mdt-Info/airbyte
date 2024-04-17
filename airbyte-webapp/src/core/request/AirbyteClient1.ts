@@ -231,6 +231,7 @@ export type SetInstancewideDestinationOauthParamsRequestBodyParams = { [key: str
 export interface SetInstancewideDestinationOauthParamsRequestBody {
   destinationDefinitionId: DestinationDefinitionId;
   params: SetInstancewideDestinationOauthParamsRequestBodyParams;
+  token?: string;
 }
 
 export type SetInstancewideSourceOauthParamsRequestBodyParams = { [key: string]: any };
@@ -238,6 +239,7 @@ export type SetInstancewideSourceOauthParamsRequestBodyParams = { [key: string]:
 export interface SetInstancewideSourceOauthParamsRequestBody {
   sourceDefinitionId: SourceDefinitionId;
   params: SetInstancewideSourceOauthParamsRequestBodyParams;
+  token?: string;
 }
 
 export interface CompleteOAuthResponse {
@@ -1263,6 +1265,7 @@ export interface DestinationCreate {
 export interface DestinationCoreConfig {
   destinationDefinitionId: DestinationDefinitionId;
   connectionConfiguration: DestinationConfiguration;
+  workspaceId: WorkspaceId;
 }
 
 export interface DestinationPageRequestBody {
@@ -1317,6 +1320,7 @@ export interface DestinationUpdate {
   destinationId: DestinationId;
   connectionConfiguration: DestinationConfiguration;
   name: string;
+  workspaceId: WorkspaceId;
 }
 
 export interface DestinationIdPageRequestBody {
@@ -1456,11 +1460,13 @@ export interface SourceUpdate {
   sourceId: SourceId;
   connectionConfiguration: SourceConfiguration;
   name: string;
+  workspaceId: WorkspaceId;
 }
 
 export interface SourceCoreConfig {
   sourceDefinitionId: SourceDefinitionId;
   connectionConfiguration: SourceConfiguration;
+  workspaceId: WorkspaceId;
 }
 
 export interface SourceCloneConfiguration {
@@ -1760,6 +1766,7 @@ export interface WorkspaceCreate {
   securityUpdates?: boolean;
   notifications?: Notification[];
   displaySetupWizard?: boolean;
+  token?: string;
 }
 
 export type CustomerId = string;

@@ -31,6 +31,7 @@ interface ValuesProps {
   name: string;
   serviceType?: string;
   connectionConfiguration?: ConnectionConfiguration;
+  workspaceId?: any;
 }
 
 interface ConnectorProps {
@@ -172,11 +173,12 @@ const useUpdateDestination = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (updateDestinationPayload: { values: ValuesProps; destinationId: string }) => {
+    (updateDestinationPayload: { values: ValuesProps; destinationId: string; workspaceId: any }) => {
       return service.update({
         name: updateDestinationPayload.values.name,
         destinationId: updateDestinationPayload.destinationId,
         connectionConfiguration: updateDestinationPayload.values.connectionConfiguration,
+        workspaceId: updateDestinationPayload?.workspaceId,
       });
     },
     {

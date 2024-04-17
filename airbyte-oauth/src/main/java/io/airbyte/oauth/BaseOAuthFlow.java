@@ -9,9 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.commons.map.MoreMaps;
-import io.airbyte.config.ConfigSchema;
-import io.airbyte.config.DestinationOAuthParameter;
-import io.airbyte.config.SourceOAuthParameter;
+import io.airbyte.config.*;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.protocol.models.OAuthConfigSpecification;
@@ -22,14 +20,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Abstract Class implementing common base methods for managing oAuth config (instance-wide) and
  * oAuth specifications
  */
+@Slf4j
 public abstract class BaseOAuthFlow implements OAuthFlowImplementation {
 
   public static final String PROPERTIES = "properties";
@@ -39,37 +39,48 @@ public abstract class BaseOAuthFlow implements OAuthFlowImplementation {
     this.configRepository = configRepository;
   }
 
-  protected JsonNode getSourceOAuthParamConfig(final UUID workspaceId, final UUID sourceDefinitionId) throws IOException, ConfigNotFoundException {
+  public JsonNode getSourceOAuthParamConfig(final UUID workspaceId, final UUID sourceDefinitionId) throws IOException, ConfigNotFoundException {
     try {
-      final Optional<SourceOAuthParameter> param = MoreOAuthParameters.getSourceOAuthParameter(
-          configRepository.listSourceOAuthParam().stream(), workspaceId, sourceDefinitionId);
-      if (param.isPresent()) {
+      if (ObjectUtils.isNotEmpty(sourceDefinitionId)) {
         // TODO: if we write a flyway migration to flatten persisted configs in db, we don't need to flatten
         // here see https://github.com/airbytehq/airbyte/issues/7624
-        return MoreOAuthParameters.flattenOAuthConfig(param.get().getConfiguration());
+
+        StandardWorkspace standardWorkspace = configRepository.getStandardWorkspace(workspaceId, Boolean.FALSE);
+        JsonNode config = DaspireOauthHttpUtil.getDaspireOauthConfig(String.valueOf(workspaceId), String.valueOf(sourceDefinitionId),
+            standardWorkspace.getToken());
+        if (ObjectUtils.isNotEmpty(config)) {
+          return MoreOAuthParameters.flattenOAuthConfig(config);
+        }
       } else {
-        throw new ConfigNotFoundException(ConfigSchema.SOURCE_OAUTH_PARAM, "Undefined OAuth Parameter.");
+        log.error("getSourceOAuthParamConfig :: sourceDefinitionId not found");
       }
     } catch (final JsonValidationException e) {
       throw new IOException("Failed to load OAuth Parameters", e);
     }
+    log.error("getSourceOAuthParamConfig :: before throw statement");
+    throw new ConfigNotFoundException(ConfigSchema.SOURCE_OAUTH_PARAM, "Undefined OAuth Parameter.");
   }
 
   protected JsonNode getDestinationOAuthParamConfig(final UUID workspaceId, final UUID destinationDefinitionId)
       throws IOException, ConfigNotFoundException {
     try {
-      final Optional<DestinationOAuthParameter> param = MoreOAuthParameters.getDestinationOAuthParameter(
-          configRepository.listDestinationOAuthParam().stream(), workspaceId, destinationDefinitionId);
-      if (param.isPresent()) {
+      if (ObjectUtils.isNotEmpty(destinationDefinitionId)) {
         // TODO: if we write a migration to flatten persisted configs in db, we don't need to flatten
         // here see https://github.com/airbytehq/airbyte/issues/7624
-        return MoreOAuthParameters.flattenOAuthConfig(param.get().getConfiguration());
+        StandardWorkspace standardWorkspace = configRepository.getStandardWorkspace(workspaceId, Boolean.FALSE);
+        JsonNode config =
+            DaspireOauthHttpUtil.getDaspireOauthConfig(String.valueOf(workspaceId), String.valueOf(destinationDefinitionId),
+                standardWorkspace.getToken());
+        if (ObjectUtils.isNotEmpty(config)) {
+          return MoreOAuthParameters.flattenOAuthConfig(config);
+        }
       } else {
-        throw new ConfigNotFoundException(ConfigSchema.DESTINATION_OAUTH_PARAM, "Undefined OAuth Parameter.");
+        log.error("getDestinationOAuthParamConfig :: destinationDefinitionId not found");
       }
     } catch (final JsonValidationException e) {
       throw new IOException("Failed to load OAuth Parameters", e);
     }
+    throw new ConfigNotFoundException(ConfigSchema.DESTINATION_OAUTH_PARAM, "Undefined OAuth Parameter.");
   }
 
   /**

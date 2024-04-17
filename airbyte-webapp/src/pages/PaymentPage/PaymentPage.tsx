@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { CircularProgress } from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import styled from "styled-components";
 
@@ -12,9 +13,14 @@ import { CreateSunscriptionUrl, GetUpgradeSubscriptionDetail, UpgradeSubscriptio
 import { ProductOptionItem } from "core/domain/product";
 import useRouter from "hooks/useRouter";
 import { RoutePaths } from "pages/routePaths";
-import { SettingsRoute } from "pages/SettingsPage/SettingsPage";
+// import { SettingsRoute } from "pages/SettingsPage/SettingsPage";
 import { useAuthenticationService } from "services/auth/AuthSpecificationService";
-import { useAsyncAction, useUserPlanDetail } from "services/payments/PaymentsService";
+import {
+  useAsyncAction,
+  useCloudPackages,
+  useCloudRegions,
+  useUserPlanDetail,
+} from "services/payments/PaymentsService";
 import { useProductOptions, usePackagesMap } from "services/products/ProductsService";
 
 import PaymentNav from "./components/PaymentNav";
@@ -38,22 +44,65 @@ export const PaymentSteps = {
 
 const PaymentPage: React.FC = () => {
   const { push } = useRouter();
-
-  const [currentStep, setCurrentStep] = useState<string>(PaymentSteps.SELECT_PLAN);
-  const [product, setProduct] = useState<ProductOptionItem | undefined>();
-  const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
-  const [planDetail, setPlanDetail] = useState<GetUpgradeSubscriptionDetail>();
-  const [updatePlanLoading, setUpdatePlanLoading] = useState<boolean>(false);
-
-  const authService = useAuthenticationService();
-  const { onCreateSubscriptionURL, onGetUpgradeSubscription, onUpgradeSubscription } = useAsyncAction();
-
   const { updateUserStatus, user } = useUser();
   const userPlanDetail = useUserPlanDetail();
   const { selectedProduct } = userPlanDetail;
-  const packagesMap = usePackagesMap();
-  const productOptions = useProductOptions();
+  const userInfoJson = localStorage.getItem("daspire-user");
+  const userInfo = JSON.parse(userInfoJson as string);
+  const packages = useCloudPackages();
+  const regions = useCloudRegions();
+  const [currentStep, setCurrentStep] = useState<string>(PaymentSteps.SELECT_PLAN);
+  const [product, setProduct] = useState<ProductOptionItem | undefined>();
+  const [price, setPrice] = useState(selectedProduct?.price ?? "");
+  const [cloudPackageId, setCloudPackageId] = useState(selectedProduct?.id ?? "");
+  const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
+  const [User, setUser] = useState(null);
+  const [planDetail, setPlanDetail] = useState<GetUpgradeSubscriptionDetail>();
+  const [updatePlanLoading, setUpdatePlanLoading] = useState<boolean>(false);
+  const [deploymentMode, setDeploymentMode] = useState("");
+  const [cloudProvider, setCloudProvider] = useState(selectedProduct?.cloudProviderName ?? "");
+  const [regionSelected, setRegionSelected] = useState(selectedProduct?.regionItemId !== null ? true : false);
+  const [jobs, setJobs] = useState(selectedProduct?.noOfJobs ?? null);
+  const [cloudItemId, setCloudItemId] = useState(selectedProduct?.cloudItemId ?? "");
+  const [selectedRegion, setSelectedRegion] = useState(selectedProduct?.regionItemId ?? "");
 
+  const [selectedInstance, setSelectedInstance] = useState(selectedProduct?.instanceItemId ?? "");
+
+  const [instance, setInstance] = useState<any>(null);
+  const [instanceSelected, setInstanceSelected] = useState(selectedProduct?.instanceItemId !== null ? true : false);
+  const cloudRef = useRef(null);
+  const regionScrollRef = useRef(null);
+  const instanceRef = useRef(null);
+
+  const [isCloud, setIsCloud] = useState(selectedProduct?.cloudItemId !== null ? true : false);
+  const [mode, setMode] = useState(false);
+  const authService = useAuthenticationService();
+  const { onCreateSubscriptionURL, onGetUpgradeSubscription, onUpgradeSubscription, onInstanceSelect } =
+    useAsyncAction();
+
+  const packagesMap = usePackagesMap();
+
+  const productOptions = useProductOptions();
+  const getUserInfo = useCallback(() => {
+    if (userInfo?.token) {
+      authService
+        .getUserInfo(userInfo?.token)
+        .then((res: any) => {
+          setUser?.({ ...res.data });
+        })
+        .catch((err) => {
+          if (err.message) {
+            console.log(err?.message);
+          }
+        });
+    }
+  }, [authService, setUser, userInfo.token]);
+
+  useEffect(() => {
+    if (userInfo?.token) {
+      getUserInfo();
+    }
+  }, []);
   useEffect(() => {
     if (!selectedProduct && product === undefined) {
       setProduct(productOptions[1]);
@@ -70,13 +119,37 @@ const PaymentPage: React.FC = () => {
     }
   }, [productOptions, selectedProduct, product]);
 
+  useEffect(() => {
+    if (selectedProduct?.cloudProviderName === "AWS" && regions?.length > 0) {
+      onInstanceSelect(regions[0]?.cloudItemId)
+        .then((response) => {
+          setInstance(response?.data);
+          // setInstanceLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, []);
+
+  const handleInstanceSelect = (cloudItemId: string) => {
+    onInstanceSelect(cloudItemId)
+      .then((response) => {
+        setInstance(response?.data);
+        // setInstanceLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const onSelectPlan = useCallback(async () => {
     setPaymentLoading(true);
     if (
       getPaymentStatus(user.status) === PAYMENT_STATUS.Subscription ||
       getPaymentStatus(user.status) === PAYMENT_STATUS.Pause_Subscription
     ) {
-      onGetUpgradeSubscription({ productItemId: product?.id as string })
+      onGetUpgradeSubscription({ cloudPackageId })
         .then((res: UpgradeSubscription) => {
           const detail = res?.data;
           setPlanDetail(detail);
@@ -87,7 +160,7 @@ const PaymentPage: React.FC = () => {
           setPaymentLoading(false);
         });
     } else {
-      onCreateSubscriptionURL(product?.id as string)
+      onCreateSubscriptionURL({ cloudPackageId })
         .then((res: CreateSunscriptionUrl) => {
           setPaymentLoading(false);
           window.open(res.data, "_self");
@@ -96,7 +169,7 @@ const PaymentPage: React.FC = () => {
           setPaymentLoading(false);
         });
     }
-  }, [product, selectedProduct]);
+  }, [product, selectedProduct, cloudPackageId]);
 
   const onUpgradePlan = useCallback(async () => {
     setUpdatePlanLoading(true);
@@ -107,7 +180,7 @@ const PaymentPage: React.FC = () => {
           .get()
           .then(() => {
             setUpdatePlanLoading(false);
-            push(`/${RoutePaths.Settings}/${SettingsRoute.PlanAndBilling}`);
+            window.open(process.env.REACT_APP_CREATE_SPACE, "_self");
           })
           .catch(() => {
             setUpdatePlanLoading(false);
@@ -125,7 +198,26 @@ const PaymentPage: React.FC = () => {
       setCurrentStep(PaymentSteps.SELECT_PLAN);
     }
   };
-
+  useEffect(() => {
+    if (isCloud && cloudRef.current) {
+      (cloudRef.current as HTMLDivElement).scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isCloud]);
+  useEffect(() => {
+    if (regionSelected && regionScrollRef.current) {
+      (regionScrollRef.current as HTMLDivElement).scrollIntoView({ behavior: "smooth" });
+    }
+  }, [regionSelected]);
+  useEffect(() => {
+    if (instanceSelected && instanceRef.current) {
+      (instanceRef.current as HTMLDivElement).scrollIntoView({ behavior: "smooth" });
+    }
+  }, [instanceSelected]);
+  useEffect(() => {
+    if (userPlanDetail?.name === "Professional") {
+      window.scrollBy(0, -500);
+    }
+  }, []);
   return (
     <MainPageWithScroll headTitle={<HeadTitle titles={[{ id: "payment.tabTitle" }]} />}>
       <PaymentNav steps={Object.values(PaymentSteps)} currentStep={currentStep} />
@@ -140,6 +232,38 @@ const PaymentPage: React.FC = () => {
               productOptions={productOptions}
               packagesMap={packagesMap}
               onSelectPlan={onSelectPlan}
+              deploymentMode={deploymentMode}
+              setDeploymentMode={setDeploymentMode}
+              mode={mode}
+              setMode={setMode}
+              regions={regions}
+              cloudProvider={cloudProvider}
+              setCloudProvider={setCloudProvider}
+              handleInstanceSelect={handleInstanceSelect}
+              setCloudItemId={setCloudItemId}
+              cloudItemId={cloudItemId}
+              setSelectedRegion={setSelectedRegion}
+              setSelectedInstance={setSelectedInstance}
+              selectedRegion={selectedRegion}
+              selectedInstance={selectedInstance}
+              instance={instance}
+              packages={packages}
+              setCloudPackageId={setCloudPackageId}
+              setPrice={setPrice}
+              price={price}
+              jobs={jobs}
+              setJobs={setJobs}
+              planDetail={userPlanDetail?.planDetail}
+              setInstanceSelected={setInstanceSelected}
+              instanceSelected={instanceSelected}
+              setIsCloud={setIsCloud}
+              cloudRef={cloudRef}
+              setRegionSelected={setRegionSelected}
+              regionScrollRef={regionScrollRef}
+              instanceRef={instanceRef}
+              isCloud={isCloud}
+              regionSelected={regionSelected}
+              user={User}
             />
           )}
           {currentStep === PaymentSteps.BILLING_PAYMENT && (
@@ -156,7 +280,11 @@ const PaymentPage: React.FC = () => {
           </BigButton>
           {currentStep === PaymentSteps.BILLING_PAYMENT && (
             <BigButton isLoading={updatePlanLoading} onClick={onUpgradePlan}>
-              <FormattedMessage id="plan.update.btn" />
+              {updatePlanLoading ? (
+                <CircularProgress color="inherit" size={20} />
+              ) : (
+                <FormattedMessage id="plan.update.btn" />
+              )}
             </BigButton>
           )}
         </ButtonRows>

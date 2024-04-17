@@ -2501,6 +2501,8 @@ components:
             $ref: "#/components/schemas/Notification"
         displaySetupWizard:
           type: boolean
+        token:
+          type: string
     Notification:
       type: object
       required:
@@ -3000,11 +3002,14 @@ components:
       required:
         - sourceDefinitionId
         - connectionConfiguration
+        - workspaceId
       properties:
         sourceDefinitionId:
           $ref: "#/components/schemas/SourceDefinitionId"
         connectionConfiguration:
           $ref: "#/components/schemas/SourceConfiguration"
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
     SourceCreate:
       type: object
       required:
@@ -3036,6 +3041,7 @@ components:
         - sourceId
         - connectionConfiguration
         - name
+        - workspaceId
       properties:
         sourceId:
           $ref: "#/components/schemas/SourceId"
@@ -3043,6 +3049,8 @@ components:
           $ref: "#/components/schemas/SourceConfiguration"
         name:
           type: string
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
     SourceRead:
       type: object
       required:
@@ -3336,6 +3344,8 @@ components:
           $ref: "#/components/schemas/DestinationDefinitionId"
         connectionConfiguration:
           $ref: "#/components/schemas/DestinationConfiguration"
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
     DestinationCreate:
       type: object
       required:
@@ -3358,6 +3368,7 @@ components:
         - destinationId
         - connectionConfiguration
         - name
+        - workspaceId
       properties:
         destinationId:
           $ref: "#/components/schemas/DestinationId"
@@ -3365,6 +3376,8 @@ components:
           $ref: "#/components/schemas/DestinationConfiguration"
         name:
           type: string
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
     DestinationCloneRequestBody:
       description: The values required to configure the destination. The schema for this should have an id of the existing destination along with the configuration you want to change in case.
       type: object
@@ -4943,6 +4956,8 @@ components:
         params:
           type: object
           additionalProperties: true
+        token:
+          type: string
     SetInstancewideDestinationOauthParamsRequestBody:
       type: object
       required:
@@ -4954,6 +4969,8 @@ components:
         params:
           type: object
           additionalProperties: true
+        token:
+          type: string
     # Web Backend
     WebBackendConnectionFilterParamItem:
       type: object

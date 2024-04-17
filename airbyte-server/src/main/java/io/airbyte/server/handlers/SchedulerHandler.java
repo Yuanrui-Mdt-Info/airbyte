@@ -146,7 +146,8 @@ public class SchedulerHandler {
     // technically declared as required.
     final SourceConnection source = new SourceConnection()
         .withSourceDefinitionId(sourceConfig.getSourceDefinitionId())
-        .withConfiguration(partialConfig);
+        .withConfiguration(partialConfig)
+        .withWorkspaceId(sourceConfig.getWorkspaceId());
 
     final String imageName = DockerUtils.getTaggedImageName(sourceDef.getDockerRepository(), sourceDef.getDockerImageTag());
     return reportConnectionStatus(synchronousSchedulerClient.createSourceCheckConnectionJob(source, imageName));
@@ -162,7 +163,8 @@ public class SchedulerHandler {
 
     final SourceCoreConfig sourceCoreConfig = new SourceCoreConfig()
         .connectionConfiguration(updatedSource.getConfiguration())
-        .sourceDefinitionId(updatedSource.getSourceDefinitionId());
+        .sourceDefinitionId(updatedSource.getSourceDefinitionId())
+        .workspaceId(sourceUpdate.getWorkspaceId());
 
     return checkSourceConnectionFromSourceCreate(sourceCoreConfig);
   }
@@ -186,7 +188,8 @@ public class SchedulerHandler {
     // technically declared as required.
     final DestinationConnection destination = new DestinationConnection()
         .withDestinationDefinitionId(destinationConfig.getDestinationDefinitionId())
-        .withConfiguration(partialConfig);
+        .withConfiguration(partialConfig)
+        .withWorkspaceId(destinationConfig.getWorkspaceId());
 
     final String imageName = DockerUtils.getTaggedImageName(destDef.getDockerRepository(), destDef.getDockerImageTag());
     return reportConnectionStatus(synchronousSchedulerClient.createDestinationCheckConnectionJob(destination, imageName));
@@ -202,7 +205,8 @@ public class SchedulerHandler {
 
     final DestinationCoreConfig destinationCoreConfig = new DestinationCoreConfig()
         .connectionConfiguration(updatedDestination.getConfiguration())
-        .destinationDefinitionId(updatedDestination.getDestinationDefinitionId());
+        .destinationDefinitionId(updatedDestination.getDestinationDefinitionId())
+        .workspaceId(destinationUpdate.getWorkspaceId());
 
     return checkDestinationConnectionFromDestinationCreate(destinationCoreConfig);
   }
@@ -245,7 +249,7 @@ public class SchedulerHandler {
   }
 
   public SourceDiscoverSchemaRead discoverSchemaForSourceFromSourceCreate(final SourceCoreConfig sourceCreate)
-      throws ConfigNotFoundException, IOException, JsonValidationException {
+      throws ConfigNotFoundException, IOException, JsonValidationException { //
     final StandardSourceDefinition sourceDef = configRepository.getStandardSourceDefinition(sourceCreate.getSourceDefinitionId());
     final var partialConfig = secretsRepositoryWriter.statefulSplitEphemeralSecrets(
         sourceCreate.getConnectionConfiguration(),
@@ -256,7 +260,8 @@ public class SchedulerHandler {
     // technically declared as required.
     final SourceConnection source = new SourceConnection()
         .withSourceDefinitionId(sourceCreate.getSourceDefinitionId())
-        .withConfiguration(partialConfig);
+        .withConfiguration(partialConfig)
+        .withWorkspaceId(sourceCreate.getWorkspaceId());
     final SynchronousResponse<AirbyteCatalog> response = synchronousSchedulerClient.createDiscoverSchemaJob(source, imageName);
     return discoverJobToOutput(response);
   }

@@ -7,7 +7,7 @@ import { TickIcon } from "components/icons/TickIcon";
 import { Separator } from "components/Separator";
 import { Row, Cell } from "components/SimpleTableComponents";
 
-import { ProductOptionItem, ProcessedPackageMap } from "core/domain/product";
+import { ProductOptionItem } from "core/domain/product";
 import { getKeyProp } from "utils/common";
 
 import EnterpriseCell from "./EnterpriseCell";
@@ -18,7 +18,13 @@ interface IProps {
   selectPlanBtnDisability: boolean;
   product?: ProductOptionItem;
   paymentLoading: boolean;
-  packagesMap: ProcessedPackageMap;
+  packagesMap: any;
+  price?: any;
+  planDetail?: any;
+  selectedProduct?: any;
+  jobs?: any;
+  instanceRef?: any;
+  user?: any;
 }
 
 const CardContainer = styled.div`
@@ -63,12 +69,16 @@ const FeatureBodyCell = styled(Cell)`
 const FeaturesCard: React.FC<IProps> = ({
   onSelectPlan,
   selectPlanBtnDisability,
-  product,
   paymentLoading,
   packagesMap,
+  price,
+  selectedProduct,
+  jobs,
+  instanceRef,
+  user,
 }) => {
   return (
-    <CardContainer>
+    <CardContainer ref={instanceRef}>
       <Row borderBottom="1px solid #E5E7EB">
         <HeaderCell>
           <FormattedMessage id="feature.header.plan" />
@@ -86,10 +96,12 @@ const FeaturesCard: React.FC<IProps> = ({
         </BodyCell>
         <BodyCell>
           <ProfessionalCell
-            price={product?.price}
+            price={price}
             selectPlanBtnDisability={selectPlanBtnDisability}
             paymentLoading={paymentLoading}
             onSelectPlan={onSelectPlan}
+            selectedProduct={selectedProduct}
+            userInfo={user}
           />
         </BodyCell>
         <BodyCell>
@@ -102,7 +114,7 @@ const FeaturesCard: React.FC<IProps> = ({
           <FormattedMessage id="plan.feature.heading" />
         </HeaderCell>
       </HighlightedRow>
-      {packagesMap.features.map((item) => (
+      {packagesMap.features.map((item: any) => (
         <FeatureBodyRow borderBottom="1px solid #E5E7EB" key={getKeyProp()}>
           <FeatureBodyCell>{item.itemName}</FeatureBodyCell>
           <FeatureBodyCell>{item.professional?.itemScopeLang}</FeatureBodyCell>
@@ -114,11 +126,21 @@ const FeaturesCard: React.FC<IProps> = ({
           <FormattedMessage id="plan.dataReplication.heading" />
         </HeaderCell>
       </HighlightedRow>
-      {packagesMap.dataReplication.map((item) => (
+      {packagesMap.dataReplication.map((item: any) => (
         <FeatureBodyRow borderBottom="1px solid #E5E7EB" key={getKeyProp()}>
           <FeatureBodyCell>{item.itemName}</FeatureBodyCell>
-          <FeatureBodyCell>{item.professional?.itemScopeLang}</FeatureBodyCell>
-          <FeatureBodyCell>{item.enterprise?.itemScopeLang}</FeatureBodyCell>
+          <FeatureBodyCell>
+            {item?.professional?.itemName === "No. of concurrent Jobs" ||
+            (item?.professional?.itemName === "并行运行的数据接口数" && jobs !== null)
+              ? jobs
+              : item.professional?.itemScopeLang}
+          </FeatureBodyCell>
+          <FeatureBodyCell>
+            {item?.enterprise?.itemName === "No. of concurrent Jobs" ||
+            (item?.professional?.itemName === "并行运行的数据接口数" && jobs !== null)
+              ? jobs
+              : item.enterprise?.itemScopeLang}
+          </FeatureBodyCell>
         </FeatureBodyRow>
       ))}
       <HighlightedRow borderBottom="1px solid #E5E7EB">
@@ -126,7 +148,7 @@ const FeaturesCard: React.FC<IProps> = ({
           <FormattedMessage id="plan.support.heading" />
         </HeaderCell>
       </HighlightedRow>
-      {packagesMap.support.map((item) => (
+      {packagesMap.support.map((item: any) => (
         <FeatureBodyRow borderBottom="1px solid #E5E7EB" key={getKeyProp()}>
           <FeatureBodyCell>{item.itemName}</FeatureBodyCell>
           <FeatureBodyCell>

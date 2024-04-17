@@ -157,11 +157,14 @@ export const userPlan = (options?: SecondParameter<typeof apiOverride>) => {
   );
 };
 
-export const createSubscription = (productItemId: string, options?: SecondParameter<typeof apiOverride>) => {
+export const createSubscription = (
+  params: GetUpgradeSubscriptionParams,
+  options?: SecondParameter<typeof apiOverride>
+) => {
   return apiOverride<CreateSunscriptionUrl>(
     {
-      url: `/sub/create?productItemId=${productItemId}`,
-      method: "get",
+      url: `/sub/create?cloudPackageId=${params.cloudPackageId}`,
+      method: "post",
       headers: { "Content-Type": "application/json" },
     },
     options
@@ -174,7 +177,7 @@ export const getUpgradeSubscription = (
 ) => {
   return apiOverride<UpgradeSubscription>(
     {
-      url: `/sub/get/upgrade?productItemId=${params.productItemId}&testProrationDate=${
+      url: `/sub/get/upgrade?cloudPackageId=${params.cloudPackageId}&testProrationDate=${
         params?.testProrationDate ? params?.testProrationDate : ""
       }`,
       method: "get",
@@ -199,6 +202,36 @@ export const failedPaymentDetails = (options?: SecondParameter<typeof apiOverrid
   return apiOverride<UpgradeSubscription>(
     {
       url: `/sub/getFailedPaymentDetails?`,
+      method: "get",
+      headers: { "Content-Type": "application/json" },
+    },
+    options
+  );
+};
+export const cloudRegions = (options?: SecondParameter<typeof apiOverride>) => {
+  return apiOverride<any>(
+    {
+      url: `/cloud/list/region`,
+      method: "get",
+      headers: { "Content-Type": "application/json" },
+    },
+    options
+  );
+};
+export const cloudPackages = (options?: SecondParameter<typeof apiOverride>) => {
+  return apiOverride<any>(
+    {
+      url: `/cloud/package/item/list`,
+      method: "get",
+      headers: { "Content-Type": "application/json" },
+    },
+    options
+  );
+};
+export const instanceSelected = (cloudItemId: string, options?: SecondParameter<typeof apiOverride>) => {
+  return apiOverride<any>(
+    {
+      url: `/cloud/list/instance?cloudItemId=${cloudItemId}`,
       method: "get",
       headers: { "Content-Type": "application/json" },
     },

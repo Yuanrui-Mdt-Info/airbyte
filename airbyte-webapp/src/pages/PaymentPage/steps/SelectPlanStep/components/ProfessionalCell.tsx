@@ -6,7 +6,12 @@ import { LoadingButton, Button } from "components";
 import { Separator } from "components/Separator";
 
 import { useUser } from "core/AuthContext";
-import { getPaymentStatus, PAYMENT_STATUS } from "core/Constants/statuses";
+import {
+  CHINESE_PAYMENT_STATUS,
+  getChinesePaymentStatus,
+  getPaymentStatus,
+  PAYMENT_STATUS,
+} from "core/Constants/statuses";
 import { useUserPlanDetail } from "services/payments/PaymentsService";
 import { remainingDaysForFreeTrial } from "utils/common";
 
@@ -17,6 +22,8 @@ interface IProps {
   selectPlanBtnDisability: boolean;
   paymentLoading: boolean;
   onSelectPlan?: () => void;
+  selectedProduct?: any;
+  userInfo?: any;
 }
 
 const Container = styled.div`
@@ -58,7 +65,14 @@ const Message = styled.div`
   color: #6b6b6f;
 `;
 
-const ProfessionalCell: React.FC<IProps> = ({ price = 0, selectPlanBtnDisability, paymentLoading, onSelectPlan }) => {
+const ProfessionalCell: React.FC<IProps> = ({
+  price = 0,
+  selectPlanBtnDisability,
+  paymentLoading,
+  onSelectPlan,
+  selectedProduct,
+  userInfo,
+}) => {
   const { user } = useUser();
   const { formatMessage } = useIntl();
   const userPlanDetail = useUserPlanDetail();
@@ -103,9 +117,13 @@ const ProfessionalCell: React.FC<IProps> = ({ price = 0, selectPlanBtnDisability
           size="lg"
           onClick={onSelectPlan}
           disabled={
-            ((Number(price) > 0 ? false : true) || remainingDaysForFreeTrial(expiresTime) <= 0
-              ? false
-              : selectPlanBtnDisability) && getPaymentStatus(user.status) !== PAYMENT_STATUS.Pause_Subscription
+            ((remainingDaysForFreeTrial(expiresTime) <= 0 ? false : selectPlanBtnDisability) &&
+              getPaymentStatus(user.status) !== PAYMENT_STATUS.Pause_Subscription &&
+              getChinesePaymentStatus(user?.status) !== CHINESE_PAYMENT_STATUS.Pause_Subscription) ||
+            (remainingDaysForFreeTrial(expiresTime) > 0 &&
+              selectedProduct?.price === Number(price) &&
+              userInfo?.statusDesc !== PAYMENT_STATUS.Pause_Subscription &&
+              getChinesePaymentStatus(user?.status) !== CHINESE_PAYMENT_STATUS.Pause_Subscription)
           }
           isLoading={paymentLoading}
         >
