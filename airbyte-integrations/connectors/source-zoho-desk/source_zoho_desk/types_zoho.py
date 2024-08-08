@@ -8,7 +8,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, Iterable, List, MutableMapping, Optional, Union
 
-from exceptions import IncompleteMetaDataException, UnknownDataTypeException
+from .exceptions import IncompleteMetaDataException, UnknownDataTypeException
 
 
 @dataclasses.dataclass
@@ -219,3 +219,14 @@ class ModuleMeta(FromDictMixin):
         field_to_properties = {field_.api_name: field_.schema for field_ in self.fields}
         properties = {"id": {"type": "string"}, "Modified_Time": {"type": "string", "format": "date-time"}, **field_to_properties}
         return Schema(description=self.module_name, properties=properties, required=required)
+
+    @classmethod
+    def from_dict(cls, data):
+        mapped_data = {
+                'api_name': data.get('apiName'),
+                'module_name': data.get('displayLabel'),
+                'api_supported': not data.get('isCustomModule', False),
+                'fields': [FieldMeta.from_dict(field) for field in data.get('fields', [])]
+            }
+        
+        return cls(**mapped_data)

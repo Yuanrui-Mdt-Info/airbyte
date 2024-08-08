@@ -29,7 +29,8 @@ class SourceZohoDesk(AbstractSource):
 
     def streams(self, config: Mapping[str, Any]) -> List["Stream"]:
         """
-        :param config: A Mapping of the user input configuration as defined in the connector spec.
+        :param config: A Mapping of the user inurlsplit(self._DC_REGION_TO_API_URL[self.config["dc_region"].upper()])
+            put configuration as defined in the connector spec.
         """
         stream_factory = ZohoStreamFactory(config)
         return stream_factory.produce()

@@ -9,7 +9,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 import requests
 
-from auth import ZohoOauth2Authenticator
+from .auth import ZohoOauth2Authenticator
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,7 @@ class ZohoAPI:
 
     @property
     def api_url(self) -> str:
+        # import pdb;pdb.set_trace()
         schema, domain, *_ = urlsplit(self._DC_REGION_TO_API_URL[self.config["dc_region"].upper()])
         prefix = self._API_ENV_TO_URL_PREFIX[self.config["environment"].lower()]
         if prefix:

@@ -34,6 +34,3 @@ class ZohoOauth2Authenticator(Oauth2Authenticator):
         except Exception as e:
             raise Exception(f"Error while refreshing access token: {e}") from e
 
-
-
-# print(aa.get_auth_header())
