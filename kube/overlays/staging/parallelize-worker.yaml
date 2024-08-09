@@ -4,3 +4,4 @@ metadata:
   name: airbyte-worker
 spec:
   replicas: 1
+

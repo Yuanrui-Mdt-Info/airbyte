@@ -112,6 +112,7 @@ public class ConnectionsHandler {
         .withDestinationId(connectionCreate.getDestinationId())
         .withOperationIds(operationIds)
         .withStatus(ApiPojoConverters.toPersistenceStatus(connectionCreate.getStatus()))
+        .withAdvanceSetting(ApiPojoConverters.advanceSettingToInternal(connectionCreate.getAdvanceSetting()))
         .withSourceCatalogId(connectionCreate.getSourceCatalogId());
     if (connectionCreate.getResourceRequirements() != null) {
       standardSync.withResourceRequirements(ApiPojoConverters.resourceRequirementsToInternal(connectionCreate.getResourceRequirements()));
@@ -441,8 +442,17 @@ public class ConnectionsHandler {
     return new ConnectionDisplayFlag().flag(configRepository.disabledConnections(workspaceIdRequestBody.getWorkspaceId()) > 0);
   }
 
+  public ConnectionDisplayFlag connectionsDisabledAllForWorkspaceAll(WorkspaceIdListRequestBody workspaceIdListRequestBody) throws IOException {
+    return new ConnectionDisplayFlag()
+        .flag(configRepository.disabledConnectionsForWorkspacesAll(workspaceIdListRequestBody.getWorkspaceIdList()) > 0);
+  }
+
   public ConnectionsCount connectionsCountForWorkspace(WorkspaceIdRequestBody workspaceIdRequestBody) throws IOException {
     return new ConnectionsCount().count(configRepository.connectionsCount(workspaceIdRequestBody.getWorkspaceId()));
+  }
+
+  public ConnectionsCount connectionsCountForWorkspaces(WorkspaceIdListRequestBody workspaceIdListRequestBody) throws IOException {
+    return new ConnectionsCount().count(configRepository.connectionsCount(workspaceIdListRequestBody.getWorkspaceIdList()));
   }
 
   public List<WebBackendConnectionFilterParamItem> listStatus() {

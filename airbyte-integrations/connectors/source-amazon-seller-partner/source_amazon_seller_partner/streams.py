@@ -8,10 +8,12 @@ import json as json_lib
 import time
 import zlib
 from abc import ABC, abstractmethod
-from io import StringIO
+from io import StringIO, BytesIO
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Union
 from urllib.parse import urljoin
 import json
+import pandas as pd
+import os
 
 import pendulum
 import requests
@@ -28,7 +30,7 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
 from Crypto.Cipher import AES
 from source_amazon_seller_partner.auth import AWSSignature
 
-REPORTS_API_VERSION = "2020-09-04"
+REPORTS_API_VERSION = "2021-06-30"
 ORDERS_API_VERSION = "v0"
 VENDORS_API_VERSION = "v1"
 FINANCES_API_VERSION = "v0"
@@ -61,12 +63,11 @@ class AmazonSPStream(HttpStream, ABC):
         self.marketplace_id = marketplace_id
         self.source_name = source_name
         self._session.auth = aws_signature
-        
+
         # added by Jerry 2023.6.20, if replication_start_date is none, set the replication_start_date to the previous day
-        if self._replication_start_date is None or len(replication_start_date.strip())<=0:
+        if self._replication_start_date is None or len(replication_start_date.strip()) <= 0:
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
             self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
-
 
     @property
     def url_base(self) -> str:
@@ -194,7 +195,7 @@ class ReportsAmazonSPStream(Stream, ABC):
         self._report_options = report_options
         self.max_wait_seconds = max_wait_seconds
         self.source_name = source_name
-        
+
         # added by Jerry 2023.6.15, if replication_start_date is none, set the replication_start_date to the previous day
         if self._replication_start_date is None:
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
@@ -288,16 +289,23 @@ class ReportsAmazonSPStream(Stream, ABC):
             data=json_lib.dumps(report_data),
         )
         report_response = self._send_request(create_report_request)
-        return report_response.json()[self.data_field]
+        
+        #return report_response.json()[self.data_field]
+        # update to api 2021-06-30
+        return report_response.json()
 
     def _retrieve_report(self, report_id: str) -> Mapping[str, Any]:
         request_headers = self.request_headers()
+        path = f"{self.path_prefix}/reports/{report_id}"
         retrieve_report_request = self._create_prepared_request(
             path=f"{self.path_prefix}/reports/{report_id}",
             headers=dict(request_headers, **self.authenticator.get_auth_header()),
         )
         retrieve_report_response = self._send_request(retrieve_report_request)
-        report_payload = retrieve_report_response.json().get(self.data_field, {})
+
+        #report_payload = retrieve_report_response.json().get(self.data_field, {})
+        # update to api 2021-06-30
+        report_payload = retrieve_report_response.json()
         return report_payload
 
     @staticmethod
@@ -321,32 +329,56 @@ class ReportsAmazonSPStream(Stream, ABC):
         raise Exception([{"message": "Only AES decryption is implemented."}])
 
     def parse_response(self, response: requests.Response) -> Iterable[Mapping]:
-        payload = response.json().get(self.data_field, {})
-        document = self.decrypt_report_document(
-            payload.get("url"),
-            payload.get("encryptionDetails", {}).get("initializationVector"),
-            payload.get("encryptionDetails", {}).get("key"),
-            payload.get("encryptionDetails", {}).get("standard"),
-            payload,
-        )
+        #payload = response.json().get(self.data_field, {})
+        payload = response.json()
 
-        results = []
-        """
-        if self.name == "GET_SALES_AND_TRAFFIC_REPORT":
-            result_json = json.loads(document)
-            result_json["source_name"] = self.source_name
-            results.append(result_json)
+        document = ""
+        
+        # deal with xlxs file
+        if self.name == "ReferralFeeDiscountsReport":
+            
+            # decrypted = self.decrypt_aes(
+            #     requests.get(payload.get("url")).content,
+            #     payload.get("encryptionDetails", {}).get("key"),
+            #     payload.get("encryptionDetails", {}).get("initializationVector"),
+            # )
+            # update to api 2021-06-30
+            decrypted = requests.get(payload.get("url")).content
+            
+            df = pd.read_excel(BytesIO(decrypted), engine="openpyxl", skiprows=2)
+            for index, row in df.iterrows():
+                col_index = 0
+                for column in df.columns:
+                    value = row[column]
+                    document += str(value)
+                    if col_index < df.columns.size - 1:
+                        document += "\t"
+                        col_index += 1
+                    else:
+                        document += "\n"
         else:
-            document_records = self.parse_document(document)
-            for item in document_records:
-                item["source_name"] = self.source_name
-                results.append(item)
-        """
+            # document = self.decrypt_report_document(
+            #     payload.get("url"),
+            #     payload.get("encryptionDetails", {}).get("initializationVector"),
+            #     payload.get("encryptionDetails", {}).get("key"),
+            #     payload.get("encryptionDetails", {}).get("standard"),
+            #     payload,
+            # )
+            # update to api 2021-06-30
+            content = requests.get(payload.get("url")).content
+            
+            if "compressionAlgorithm" in payload:
+                document = zlib.decompress(content, 15 + 32).decode("iso-8859-1")
+            else:
+                document = content.decode("iso-8859-1")
+            
+        results = []
+
         document_records = self.parse_document(document)
         for item in document_records:
             item["source_name"] = self.source_name
             results.append(item)
-                   
+
         yield from results
 
     def parse_document(self, document):
@@ -376,11 +408,13 @@ class ReportsAmazonSPStream(Stream, ABC):
         # create and retrieve the report
         while not is_processed and seconds_waited < self.max_wait_seconds:
             report_payload = self._retrieve_report(report_id=report_id)
+            
             seconds_waited = (pendulum.now("utc") - start_time).seconds
             is_processed = report_payload.get("processingStatus") not in ["IN_QUEUE", "IN_PROGRESS"]
             is_done = report_payload.get("processingStatus") == "DONE"
             is_cancelled = report_payload.get("processingStatus") == "CANCELLED"
             is_fatal = report_payload.get("processingStatus") == "FATAL"
+                
             time.sleep(self.sleep_seconds)
 
         if is_done:
@@ -393,6 +427,7 @@ class ReportsAmazonSPStream(Stream, ABC):
                 params=self.request_params(),
             )
             response = self._send_request(request)
+
             yield from self.parse_response(response)
         elif is_fatal:
             raise Exception(f"The report for stream '{self.name}' was aborted due to a fatal error")
@@ -415,6 +450,7 @@ class FlatFileOrdersReports(ReportsAmazonSPStream):
     name = "GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_GENERAL"
     report_type = "GET_FLAT_FILE_ALL_ORDERS_DATA_BY_ORDER_DATE_GENERAL"
 
+
 class FbaInventoryPlanningReports(ReportsAmazonSPStream):
     """
     Field definitions: https://sellercentral.amazon.com/gp/help/help.html?itemID=200453120
@@ -425,9 +461,11 @@ class FbaInventoryPlanningReports(ReportsAmazonSPStream):
     name = "GET_FBA_INVENTORY_PLANNING_DATA"
     report_type = "GET_FBA_INVENTORY_PLANNING_DATA"
 
+
 class FBAInboundPerformanceReport(ReportsAmazonSPStream):
     name = "GET_FBA_FULFILLMENT_INBOUND_NONCOMPLIANCE_DATA"
     report_type = "GET_FBA_FULFILLMENT_INBOUND_NONCOMPLIANCE_DATA"
+
 
 class FBAManageInventory(ReportsAmazonSPStream):
     name = "GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA"
@@ -622,7 +660,7 @@ class BrandAnalyticsItemComparisonReports(BrandAnalyticsStream):
 class SalesAndTrafficReports(ReportsAmazonSPStream):
     name = "GET_SALES_AND_TRAFFIC_REPORT"
     report_type = "GET_SALES_AND_TRAFFIC_REPORT"
-    
+
     def __init__(
         self,
         url_base: str,
@@ -636,22 +674,30 @@ class SalesAndTrafficReports(ReportsAmazonSPStream):
         source_name: str,
         authenticator: HttpAuthenticator = None,
     ):
-        super().__init__(url_base=url_base, aws_signature=aws_signature, replication_start_date=replication_start_date, 
-                         marketplace_id=marketplace_id, period_in_days=period_in_days, report_options=report_options, 
-                         max_wait_seconds=max_wait_seconds, replication_end_date=replication_end_date, source_name=source_name, 
-                         authenticator=authenticator)
-        
+        super().__init__(
+            url_base=url_base,
+            aws_signature=aws_signature,
+            replication_start_date=replication_start_date,
+            marketplace_id=marketplace_id,
+            period_in_days=period_in_days,
+            report_options=report_options,
+            max_wait_seconds=max_wait_seconds,
+            replication_end_date=replication_end_date,
+            source_name=source_name,
+            authenticator=authenticator
+        )
+
         # added by Jerry 2023.6.29, if replication_start_date is none, set the replication_start_date to the previous day
-        if replication_start_date is None or len(replication_start_date.strip())<=0:
+        if replication_start_date is None or len(replication_start_date.strip()) <= 0:
             self._replication_start_date = pendulum.yesterday("utc").subtract(days=1).strftime(DATE_TIME_FORMAT)
             self._replication_end_date = pendulum.yesterday("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
-    
+
     def parse_document(self, document):
         results = []
         parsed = json_lib.loads(document)
         results.append(parsed)
         return results
-    
+
     def _report_data(
         self,
         sync_mode: SyncMode,
@@ -664,10 +710,11 @@ class SalesAndTrafficReports(ReportsAmazonSPStream):
             options = self.report_options()
             if options is not None:
                 data["reportOptions"] = options
-                
+
         logger.info(f"****** the data with report options is {data}")
 
         return data
+
 
 class IncrementalReportsAmazonSPStream(ReportsAmazonSPStream):
     @property
@@ -1083,7 +1130,88 @@ class FlatFileSettlementV2Reports(ReportsAmazonSPStream):
 class FBALongTermStorageFeeChargesReport(ReportsAmazonSPStream):
     name = "LongTermStorageFeeCharges"
     report_type = "GET_FBA_FULFILLMENT_LONGTERM_STORAGE_FEE_CHARGES_DATA"
-    
+
+
 class FBAReimbursementsReport(ReportsAmazonSPStream):
     name = "GET_FBA_REIMBURSEMENTS_DATA"
     report_type = "GET_FBA_REIMBURSEMENTS_DATA"
+
+
+class OpenListingsReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#open-listings-report
+    """
+
+    name = "OpenListingsReport"
+    report_type = "GET_MERCHANT_LISTINGS_DATA_BACK_COMPAT"
+
+
+class OpenListingsReportLite(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#open-listings-report-lite
+    """
+
+    name = "OpenListingsReportLite"
+    report_type = "GET_MERCHANT_LISTINGS_DATA_LITE"
+
+
+class OpenListingsReportLiter(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#open-listings-report-liter
+    """
+
+    name = "OpenListingsReportLiter"
+    report_type = "GET_MERCHANT_LISTINGS_DATA_LITER"
+
+
+class ReferralFeeDiscountsReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-amazon-business#referral-fee-discounts-report
+    """
+
+    name = "ReferralFeeDiscountsReport"
+    report_type = "FEE_DISCOUNTS_REPORT"
+
+
+class ActiveListingsReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#active-listings-report
+    """
+
+    name = "ActiveListingsReport"
+    report_type = "GET_MERCHANT_LISTINGS_DATA"
+
+
+class InactiveListingsReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#inactive-listings-report
+    """
+
+    name = "InactiveListingsReport"
+    report_type = "GET_MERCHANT_LISTINGS_INACTIVE_DATA"
+
+
+class CanceledListingsReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#canceled-listings-report
+    """
+
+    name = "CanceledListingsReport"
+    report_type = "GET_MERCHANT_CANCELLED_LISTINGS_DATA"
+
+
+class ReferralFeePreviewReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-inventory#referral-fee-preview-report
+    """
+
+    name = "ReferralFeePreviewReport"
+    report_type = "GET_REFERRAL_FEE_PREVIEW_REPORT"
+
+class FBAFeePreviewReport(ReportsAmazonSPStream):
+    """
+    API docs: https://developer-docs.amazon.com/sp-api/docs/report-type-values-fba#fba-fee-preview-report
+    """
+
+    name = "FBAFeePreviewReport"
+    report_type = "GET_FBA_ESTIMATED_FBA_FEES_TXT_DATA"

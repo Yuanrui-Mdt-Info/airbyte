@@ -226,7 +226,9 @@ font-style: italic;
   <h4><a href="#Connection">Connection</a></h4>
   <ul>
   <li><a href="#connectionsCountForWorkspace"><code><span class="http-method">post</span> /v1/connections/count</code></a></li>
+  <li><a href="#connectionsCountForWorkspaces"><code><span class="http-method">post</span> /v1/connections/countByWorkspaces</code></a></li>
   <li><a href="#connectionsDisabledAllForWorkspace"><code><span class="http-method">post</span> /v1/connections/disabled_all</code></a></li>
+  <li><a href="#connectionsDisabledAllForWorkspaceAll"><code><span class="http-method">post</span> /v1/connections/disabled_all_workspace</code></a></li>
   <li><a href="#createConnection"><code><span class="http-method">post</span> /v1/connections/create</code></a></li>
   <li><a href="#createOrUpdateState"><code><span class="http-method">post</span> /v1/state/create_or_update</code></a></li>
   <li><a href="#deleteConnection"><code><span class="http-method">post</span> /v1/connections/delete</code></a></li>
@@ -506,6 +508,64 @@ font-style: italic;
         <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
   </div> <!-- method -->
   <hr/>
+  <div class="method"><a name="connectionsCountForWorkspaces"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/connections/countByWorkspaces</code></pre></div>
+    <div class="method-summary">connections count for workspaces. (<span class="nickname">connectionsCountForWorkspaces</span>)</div>
+    <div class="method-notes">connections count for workspaces.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">WorkspaceIdListRequestBody <a href="#WorkspaceIdListRequestBody">WorkspaceIdListRequestBody</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ConnectionsCount">ConnectionsCount</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "count" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#ConnectionsCount">ConnectionsCount</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
   <div class="method"><a name="connectionsDisabledAllForWorkspace"/>
     <div class="method-path">
     <a class="up" href="#__Methods">Up</a>
@@ -523,6 +583,64 @@ font-style: italic;
     <h3 class="field-label">Request body</h3>
     <div class="field-items">
       <div class="param">WorkspaceIdRequestBody <a href="#WorkspaceIdRequestBody">WorkspaceIdRequestBody</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "flag" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="connectionsDisabledAllForWorkspaceAll"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/connections/disabled_all_workspace</code></pre></div>
+    <div class="method-summary">disabled all connections for workspaces. (<span class="nickname">connectionsDisabledAllForWorkspaceAll</span>)</div>
+    <div class="method-notes">for workspace.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">WorkspaceIdListRequestBody <a href="#WorkspaceIdListRequestBody">WorkspaceIdListRequestBody</a> (required)</div>
 
       <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
 
@@ -651,6 +769,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -896,6 +1018,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -1153,6 +1279,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -1215,6 +1345,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -1335,6 +1469,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -1397,6 +1535,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -1692,6 +1834,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -1754,6 +1900,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -2045,6 +2195,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -8965,6 +9119,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -9174,6 +9332,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -9447,6 +9609,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -9603,6 +9769,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -9817,6 +9987,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -9973,6 +10147,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -10258,6 +10436,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -10414,6 +10596,10 @@ font-style: italic;
     "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
     "namespaceFormat" : "${SOURCE_NAMESPACE}",
     "operationIds" : [ null, null ],
+    "advanceSetting" : {
+      "endDate" : "endDate",
+      "startDate" : "startDate"
+    },
     "scheduleData" : {
       "cron" : {
         "cronExpression" : "cronExpression",
@@ -10624,6 +10810,10 @@ font-style: italic;
   "connectionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
   "namespaceFormat" : "${SOURCE_NAMESPACE}",
   "operationIds" : [ null, null ],
+  "advanceSetting" : {
+    "endDate" : "endDate",
+    "startDate" : "startDate"
+  },
   "scheduleData" : {
     "cron" : {
       "cronExpression" : "cronExpression",
@@ -11286,6 +11476,7 @@ font-style: italic;
     <li><a href="#CheckOperationRead"><code>CheckOperationRead</code> - </a></li>
     <li><a href="#CompleteDestinationOAuthRequest"><code>CompleteDestinationOAuthRequest</code> - </a></li>
     <li><a href="#CompleteSourceOauthRequest"><code>CompleteSourceOauthRequest</code> - </a></li>
+    <li><a href="#ConnectionAdvanceSetting"><code>ConnectionAdvanceSetting</code> - </a></li>
     <li><a href="#ConnectionCreate"><code>ConnectionCreate</code> - </a></li>
     <li><a href="#ConnectionDisplayFlag"><code>ConnectionDisplayFlag</code> - </a></li>
     <li><a href="#ConnectionIdListRequestBody"><code>ConnectionIdListRequestBody</code> - </a></li>
@@ -11443,6 +11634,7 @@ font-style: italic;
     <li><a href="#WebBackendWorkspaceStateResult"><code>WebBackendWorkspaceStateResult</code> - </a></li>
     <li><a href="#WorkspaceCreate"><code>WorkspaceCreate</code> - </a></li>
     <li><a href="#WorkspaceGiveFeedback"><code>WorkspaceGiveFeedback</code> - </a></li>
+    <li><a href="#WorkspaceIdListRequestBody"><code>WorkspaceIdListRequestBody</code> - </a></li>
     <li><a href="#WorkspaceIdPageRequestBody"><code>WorkspaceIdPageRequestBody</code> - </a></li>
     <li><a href="#WorkspaceIdRequestBody"><code>WorkspaceIdRequestBody</code> - </a></li>
     <li><a href="#WorkspaceRead"><code>WorkspaceRead</code> - </a></li>
@@ -11654,6 +11846,14 @@ font-style: italic;
     </div>  <!-- field-items -->
   </div>
   <div class="model">
+    <h3><a name="ConnectionAdvanceSetting"><code>ConnectionAdvanceSetting</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>advance setting for when the the connection should run</div>
+    <div class="field-items">
+      <div class="param">startDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">endDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
     <h3><a name="ConnectionCreate"><code>ConnectionCreate</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
@@ -11671,6 +11871,7 @@ font-style: italic;
 <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#ConnectionStatus">ConnectionStatus</a></span>  </div>
 <div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceRequirements">ResourceRequirements</a></span>  </div>
 <div class="param">sourceCatalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -11713,6 +11914,7 @@ font-style: italic;
 <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#ConnectionStatus">ConnectionStatus</a></span>  </div>
 <div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceRequirements">ResourceRequirements</a></span>  </div>
 <div class="param">sourceCatalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -11831,6 +12033,7 @@ font-style: italic;
 <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#ConnectionStatus">ConnectionStatus</a></span>  </div>
 <div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceRequirements">ResourceRequirements</a></span>  </div>
 <div class="param">sourceCatalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -11942,6 +12145,7 @@ font-style: italic;
     <div class="field-items">
       <div class="param">destinationDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">connectionConfiguration </div><div class="param-desc"><span class="param-type"><a href="#DestinationConfiguration">DestinationConfiguration</a></span>  </div>
+<div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -12130,6 +12334,7 @@ font-style: italic;
       <div class="param">destinationId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">connectionConfiguration </div><div class="param-desc"><span class="param-type"><a href="#DestinationConfiguration">DestinationConfiguration</a></span>  </div>
 <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -12647,6 +12852,7 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <div class="field-items">
       <div class="param">sourceDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">connectionConfiguration </div><div class="param-desc"><span class="param-type"><a href="#SourceConfiguration">SourceConfiguration</a></span>  </div>
+<div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -12835,6 +13041,7 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
       <div class="param">sourceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">connectionConfiguration </div><div class="param-desc"><span class="param-type"><a href="#SourceConfiguration">SourceConfiguration</a></span>  </div>
 <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -12921,6 +13128,7 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
 <div class="param">scheduleData (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionScheduleData">ConnectionScheduleData</a></span>  </div>
 <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#ConnectionStatus">ConnectionStatus</a></span>  </div>
 <div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceRequirements">ResourceRequirements</a></span>  </div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
 <div class="param">operations (optional)</div><div class="param-desc"><span class="param-type"><a href="#OperationCreate">array[OperationCreate]</a></span>  </div>
 <div class="param">sourceCatalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
@@ -12996,6 +13204,7 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
 <div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceRequirements">ResourceRequirements</a></span>  </div>
 <div class="param">catalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">catalogDiff (optional)</div><div class="param-desc"><span class="param-type"><a href="#CatalogDiff">CatalogDiff</a></span>  </div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -13067,6 +13276,7 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
 <div class="param">skipReset (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
 <div class="param">operations (optional)</div><div class="param-desc"><span class="param-type"><a href="#WebBackendOperationCreateOrUpdate">array[WebBackendOperationCreateOrUpdate]</a></span>  </div>
 <div class="param">sourceCatalogId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">advanceSetting (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionAdvanceSetting">ConnectionAdvanceSetting</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
@@ -13125,6 +13335,13 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <div class='model-description'></div>
     <div class="field-items">
       <div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WorkspaceIdListRequestBody"><code>WorkspaceIdListRequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">workspaceIdList </div><div class="param-desc"><span class="param-type"><a href="#UUID">array[UUID]</a></span>  format: uuid</div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
