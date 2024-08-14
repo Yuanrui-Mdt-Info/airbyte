@@ -52,6 +52,7 @@ class AmazonSPStream(HttpStream, ABC):
         report_options: Optional[str],
         max_wait_seconds: Optional[int],
         replication_end_date: Optional[str],
+        replication_span_period: Optional[str],
         *args,
         **kwargs,
     ):
@@ -60,10 +61,20 @@ class AmazonSPStream(HttpStream, ABC):
         self._url_base = url_base.rstrip("/") + "/"
         self._replication_start_date = replication_start_date
         self._replication_end_date = replication_end_date
+        self._replication_span_period = replication_span_period
         self.marketplace_id = marketplace_id
         self.source_name = source_name
         self._session.auth = aws_signature
-
+        
+        if self._replication_span_period is not None and self._replication_span_period > 0:
+            if self._replication_start_date is not None and self._replication_start_date > 0:
+                start_date = pendulum.parse(self._replication_start_date)
+                self._replication_start_date = start_date.subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
+            else:
+                self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
+                
         # added by Jerry 2023.6.20, if replication_start_date is none, set the replication_start_date to the previous day
         if self._replication_start_date is None or len(replication_start_date.strip()) <= 0:
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
@@ -181,6 +192,7 @@ class ReportsAmazonSPStream(Stream, ABC):
         report_options: Optional[str],
         max_wait_seconds: Optional[int],
         replication_end_date: Optional[str],
+        replication_span_period: Optional[str],
         source_name: str,
         authenticator: HttpAuthenticator = None,
     ):
@@ -190,11 +202,21 @@ class ReportsAmazonSPStream(Stream, ABC):
         self._session.auth = aws_signature
         self._replication_start_date = replication_start_date
         self._replication_end_date = replication_end_date
+        self._replication_span_period = replication_span_period
         self.marketplace_id = marketplace_id
         self.period_in_days = period_in_days
         self._report_options = report_options
         self.max_wait_seconds = max_wait_seconds
         self.source_name = source_name
+        
+        if self._replication_span_period is not None and self._replication_span_period > 0:
+            if self._replication_start_date:
+                start_date = pendulum.parse(self._replication_start_date)
+                self._replication_start_date = start_date.subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
+            else:
+                self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
 
         # added by Jerry 2023.6.15, if replication_start_date is none, set the replication_start_date to the previous day
         if self._replication_start_date is None:
@@ -671,6 +693,7 @@ class SalesAndTrafficReports(ReportsAmazonSPStream):
         report_options: Optional[str],
         max_wait_seconds: Optional[int],
         replication_end_date: Optional[str],
+        replication_span_period: Optional[str],
         source_name: str,
         authenticator: HttpAuthenticator = None,
     ):
@@ -683,14 +706,25 @@ class SalesAndTrafficReports(ReportsAmazonSPStream):
             report_options=report_options,
             max_wait_seconds=max_wait_seconds,
             replication_end_date=replication_end_date,
+            replication_span_period=replication_span_period,    
             source_name=source_name,
             authenticator=authenticator
         )
-
-        # added by Jerry 2023.6.29, if replication_start_date is none, set the replication_start_date to the previous day
+        
+        if replication_span_period is not None and replication_span_period > 0:
+            if replication_start_date:
+                start_date = pendulum.parse(replication_start_date)
+                replication_start_date = start_date.subtract(days=replication_span_period).strftime(DATE_TIME_FORMAT)
+                replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
+            else:
+                replication_start_date = pendulum.today("utc").subtract(days=replication_span_period).strftime(DATE_TIME_FORMAT)
+                replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
+         
+        # added by Jerry 2023.6.29, if replication_start_date is none, set the replication_start_date to the previous day 
         if replication_start_date is None or len(replication_start_date.strip()) <= 0:
-            self._replication_start_date = pendulum.yesterday("utc").subtract(days=1).strftime(DATE_TIME_FORMAT)
-            self._replication_end_date = pendulum.yesterday("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
+            replication_start_date = pendulum.yesterday("utc").subtract(days=1).strftime(DATE_TIME_FORMAT)
+            replication_end_date = pendulum.yesterday("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
+
 
     def parse_document(self, document):
         results = []
