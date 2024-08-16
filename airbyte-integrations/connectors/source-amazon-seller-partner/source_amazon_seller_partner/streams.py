@@ -67,16 +67,23 @@ class AmazonSPStream(HttpStream, ABC):
         self._session.auth = aws_signature
         
         if self._replication_span_period is not None and self._replication_span_period > 0:
-            if self._replication_start_date is not None and self._replication_start_date > 0:
+            # if self._replication_start_date is not None and self._replication_start_date > 0:
+            if self._replication_start_date :
                 start_date = pendulum.parse(self._replication_start_date)
                 self._replication_start_date = start_date.subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
                 self._replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
             else:
                 self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = pendulum.today("utc").strftime(DATE_TIME_FORMAT)
+        else:
+            if self._replication_start_date and self._replication_end_date is None:
                 self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
-                
+            
+            else:
+                pass
+        
         # added by Jerry 2023.6.20, if replication_start_date is none, set the replication_start_date to the previous day
-        if self._replication_start_date is None or len(replication_start_date.strip()) <= 0:
+        if self._replication_start_date is None :
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
             self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
 
@@ -208,7 +215,6 @@ class ReportsAmazonSPStream(Stream, ABC):
         self._report_options = report_options
         self.max_wait_seconds = max_wait_seconds
         self.source_name = source_name
-        
         if self._replication_span_period is not None and self._replication_span_period > 0:
             if self._replication_start_date:
                 start_date = pendulum.parse(self._replication_start_date)
@@ -216,8 +222,13 @@ class ReportsAmazonSPStream(Stream, ABC):
                 self._replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
             else:
                 self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+                self._replication_end_date = pendulum.today("utc").strftime(DATE_TIME_FORMAT)
+        else:
+            if self._replication_start_date and self._replication_end_date is None:
                 self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
-
+            
+            else:
+                pass
         # added by Jerry 2023.6.15, if replication_start_date is none, set the replication_start_date to the previous day
         if self._replication_start_date is None:
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
@@ -311,7 +322,6 @@ class ReportsAmazonSPStream(Stream, ABC):
             data=json_lib.dumps(report_data),
         )
         report_response = self._send_request(create_report_request)
-        
         #return report_response.json()[self.data_field]
         # update to api 2021-06-30
         return report_response.json()
@@ -1148,7 +1158,6 @@ class FlatFileSettlementV2Reports(ReportsAmazonSPStream):
             report_response = self._send_request(get_reports)
             response = report_response.json()
             data = response.get(self.data_field, list())
-
             records = [e.get("reportId") for e in data if e and e.get("reportId") not in unique_records]
             unique_records += records
             reports = [{"report_id": report_id} for report_id in records]
