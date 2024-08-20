@@ -84,7 +84,7 @@ class AmazonSellerPartnerConfig(BaseModel):
 
     region: AWSRegion = Field(description="Select the AWS Region.", title="AWS Region")
     
-    replication_span_period: object = Field(description="Select span period.", title="span period")
+    replication_span_period: int = Field(None, description="Select span period.", title="span period")
 
 
 advanced_auth = AdvancedAuth(
