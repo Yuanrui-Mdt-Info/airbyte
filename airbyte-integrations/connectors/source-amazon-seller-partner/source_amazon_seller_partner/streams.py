@@ -52,7 +52,7 @@ class AmazonSPStream(HttpStream, ABC):
         report_options: Optional[str],
         max_wait_seconds: Optional[int],
         replication_end_date: Optional[str],
-        replication_span_period: Optional[str],
+        replication_span_period: Optional[int],
         *args,
         **kwargs,
     ):
@@ -67,14 +67,9 @@ class AmazonSPStream(HttpStream, ABC):
         self._session.auth = aws_signature
         
         if self._replication_span_period is not None and self._replication_span_period > 0:
-            # if self._replication_start_date is not None and self._replication_start_date > 0:
-            if self._replication_start_date :
-                start_date = pendulum.parse(self._replication_start_date)
-                self._replication_start_date = start_date.subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
-                self._replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
-            else:
-                self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
-                self._replication_end_date = pendulum.today("utc").strftime(DATE_TIME_FORMAT)
+        
+            self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
+            self._replication_end_date = pendulum.today("utc").strftime(DATE_TIME_FORMAT)
         else:
             if self._replication_start_date and self._replication_end_date is None:
                 self._replication_end_date = pendulum.today("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
