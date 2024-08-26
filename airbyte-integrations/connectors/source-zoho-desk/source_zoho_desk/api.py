@@ -74,19 +74,20 @@ class ZohoAPI:
             return []
         if response.status_code == 403:
             return {""}
-        return response.json()['data']
+        return response.json()[key]
     
     
     def module_settings(self, module_name: str, params: MutableMapping[str, str] = None) -> List[MutableMapping[Any, Any]]:
-        return self._json_from_path(f"/api/v1/{module_name}", key="modules", params=params)
+        return self._json_from_path(f"/api/v1/{module_name}", key="data", params=params)
 
 
     def modules_settings(self) -> List[MutableMapping[Any, Any]]:
-        return self._json_from_path("/api/v1/organizationModules", key="modules")
+        
+        return self._json_from_path("/api/v1/modules", key="data")
     
 
     def fields_settings(self, module_name: str) -> List[MutableMapping[Any, Any]]:
-        return self._json_from_path("/api/v1/organizationFields", key="fields", params={"module": module_name})
+        return self._json_from_path("/api/v1/organizationFields", key="data", params={"module": module_name})
 
     def check_connection(self) -> Tuple[bool, Any]:
         path = "/api/v1/settings"
@@ -96,4 +97,5 @@ class ZohoAPI:
         response.raise_for_status()
         return True, None
 
+ 
 
