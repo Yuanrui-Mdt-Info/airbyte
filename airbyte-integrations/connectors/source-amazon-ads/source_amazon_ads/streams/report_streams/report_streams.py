@@ -111,7 +111,7 @@ class ReportStream(BasicAmazonAdsStream, ABC):
         super().__init__(config, profiles)
 
         if self.attribute_window:
-            self._start_date = pendulum.today().subtract(days=self.attribute_window)
+            self._start_date = pendulum.today(tz = profiles[0].timezone).subtract(days=self.attribute_window)
         
 
     @property
@@ -278,18 +278,19 @@ class ReportStream(BasicAmazonAdsStream, ABC):
 
     def get_date_range(self, start_date: Date, timezone: str) -> Iterable[str]:
         while True:
-            if start_date > pendulum.today(tz=timezone).date():
+            if start_date.date() > pendulum.today(tz=timezone).date():
                 break
             yield start_date.format(self.REPORT_DATE_FORMAT)
             start_date = start_date.add(days=1)
 
     def get_start_date(self, profile: Profile, stream_state: Mapping[str, Any]) -> Date:
-        today = pendulum.today(tz=profile.timezone).date()
+        today = pendulum.today(tz=profile.timezone)
         start_date = stream_state.get(str(profile.profileId), {}).get(self.cursor_field)
         if start_date:
             start_date = pendulum.from_format(start_date, self.REPORT_DATE_FORMAT).date()
             return max(start_date, today.subtract(days=self.REPORTING_PERIOD))
         if self._start_date:
+
             return max(self._start_date, today.subtract(days=self.REPORTING_PERIOD))
         return today
 
