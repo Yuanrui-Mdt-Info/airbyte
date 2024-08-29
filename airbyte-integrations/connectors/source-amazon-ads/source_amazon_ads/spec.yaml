@@ -91,6 +91,16 @@ connectionSpecification:
       type: array
       items:
         type: integer
+    attribute_window:
+      title: Attribute Window (Optional)
+      description:
+        The attribution window is a specific period during which any purchases made after a customer sees or clicks an ad are attributed to that ad's influence
+      default: 7
+      examples:
+        - 7
+        - 14
+      order: 10
+      type: integer
   required:
     - client_id
     - client_secret
