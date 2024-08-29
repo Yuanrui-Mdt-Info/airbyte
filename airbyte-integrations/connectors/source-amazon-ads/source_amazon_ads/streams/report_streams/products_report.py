@@ -210,16 +210,19 @@ class SponsoredProductsReportStream(ReportStreamV3):
     def _get_init_report_body(self, report_date: str, record_type: str, profile):
         metrics_list = self.metrics_map[record_type]
         today = pendulum.today(tz=profile.timezone).date()
-
-        start_date = pendulum.from_format(report_date, self.REPORT_DATE_FORMAT).date()       
-        end_date = today.subtract(days=1)
-        
-        if end_date.diff(start_date).in_days() > self.REPORTING_PERIOD:
-            start_date = end_date.subtract(days=1)
+        if self.attribute_window:
+            start_date = today.subtract(days=self.attribute_window)
+            end_date = start_date.add(days=1)
+        else:
+            start_date = pendulum.from_format(report_date, self.REPORT_DATE_FORMAT).date()       
+            end_date = today.subtract(days=1)
             
-        if start_date >= today:
-            start_date = end_date.subtract(days=1)
-            
+            if end_date.diff(start_date).in_days() > self.REPORTING_PERIOD:
+                start_date = end_date.subtract(days=1)
+                
+            if start_date >= today:
+                start_date = end_date.subtract(days=1)
+                
         start_time = start_date.strftime("%Y-%m-%d")
         end_time = end_date.strftime("%Y-%m-%d")
         body = {
