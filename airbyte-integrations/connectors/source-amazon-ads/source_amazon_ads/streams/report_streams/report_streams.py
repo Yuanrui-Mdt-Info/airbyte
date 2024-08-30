@@ -286,19 +286,30 @@ class ReportStream(BasicAmazonAdsStream, ABC):
     def get_start_date(self, profile: Profile, stream_state: Mapping[str, Any]) -> Date:
         today = pendulum.today(tz=profile.timezone)
         start_date = stream_state.get(str(profile.profileId), {}).get(self.cursor_field)
+        
         if start_date:
             start_date = pendulum.from_format(start_date, self.REPORT_DATE_FORMAT).date()
             return max(start_date, today.subtract(days=self.REPORTING_PERIOD))
+        
+        if self.attribute_window:
+            start_date = today.subtract(days=self.attribute_window)
+            return max(start_date, today.subtract(days=self.REPORTING_PERIOD))
+        
         if self._start_date:
 
             return max(self._start_date, today.subtract(days=self.REPORTING_PERIOD))
+        
         return today
 
     def stream_profile_slices(self, profile: Profile, stream_state: Mapping[str, Any]) -> Iterable[Mapping[str, Any]]:
        
         start_date = self.get_start_date(profile, stream_state)
-        for report_date in self.get_date_range(start_date, profile.timezone):
-            yield {"profile": profile, self.cursor_field: report_date}
+
+        if self.attribute_window:
+            yield {"profile": profile, self.cursor_field: start_date.format(self.REPORT_DATE_FORMAT)}
+        else:
+            for report_date in self.get_date_range(start_date, profile.timezone):
+                yield {"profile": profile, self.cursor_field: report_date}
 
     def stream_slices(
         self, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None

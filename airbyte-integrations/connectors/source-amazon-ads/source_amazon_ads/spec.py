@@ -85,6 +85,14 @@ class AmazonAdsConfig(BaseModel):
         description='Profile IDs you want to fetch data for. See <a href="https://advertising.amazon.com/API/docs/en-us/concepts/authorization/profiles">docs</a> for more details.',
         order=8,
     )
+    
+    attribute_window: int = Field(None, 
+        description="Set up an attribute window.", 
+        title="Attribute Window",
+        default=7,
+        examples=[7, 14],
+        order=9
+    )
 
     @classmethod
     def schema(cls, **kwargs):
