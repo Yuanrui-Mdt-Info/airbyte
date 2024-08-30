@@ -1,68 +1,230 @@
-#
-# Copyright (c) 2022 Airbyte, Inc., all rights reserved.
-#
-
-import concurrent.futures
-import datetime
-import math
-from abc import ABC
-from dataclasses import asdict
-from http import HTTPStatus
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional
-
+from airbyte_cdk.sources.streams.http.http import HttpStream
+from typing import Mapping, Any, List, Optional, Iterable, MutableMapping, Union
 import requests
-from airbyte_cdk.sources.streams.http import HttpStream
-
 from .api import ZohoAPI
-from .exceptions import IncompleteMetaDataException, UnknownDataTypeException
-from .types_zoho import FieldMeta, ModuleMeta, ZohoPickListItem
-
-# 204 and 304 status codes are valid successful responses,
-# but `.json()` will fail because the response body is empty
-EMPTY_BODY_STATUSES = (HTTPStatus.NO_CONTENT, HTTPStatus.NOT_MODIFIED)
-
-
-
 
 class ZohoStreamFactory:
     def __init__(self, config: Mapping[str, Any]):
-        self.api = ZohoAPI(config)
-        self._config = config
+        self.config = config
 
-
-    def _init_modules_meta(self) -> List[ModuleMeta]:
-        modules_meta_json = self.api.modules_settings()
-        modules = [ModuleMeta.from_dict(module) for module in modules_meta_json]
-        return list(filter(lambda module: module, modules))
-    
-    
-    def _populate_module_meta(self, module: ModuleMeta):
-        module_meta_json = self.api.module_settings(module.api_name)
-      
-        module.update_from_dict(module_meta_json)
-
-    
     def produce(self) -> List[HttpStream]:
-        modules = self._init_modules_meta()
-        streams = []
-        def populate_module(module):
-            self._populate_module_meta(module)
+        stream_classes = [
+            IncrementalAccountsZohoDeskStream,
+            IncrementalContactsZohoDeskStream,
+            IncrementalTicketsZohoDeskStream,
+            IncrementalAgentsZohoDeskStream
+        ]
+        return [stream_class(self.config) for stream_class in stream_classes]
 
-        def chunk(max_len, lst):
-            for i in range(math.ceil(len(lst) / max_len)):
-                yield lst[i * max_len : (i + 1) * max_len]
+class ZohoDeskStream(HttpStream):
+    def __init__(self, config: Mapping[str, Any], stream_name: str):
+        self.config = config
+        self.stream_name = stream_name.lower()
+        self.zoho_api = ZohoAPI(config)
+        authenticator = self.zoho_api.authenticator
+        super().__init__(authenticator=authenticator)
 
-      
-        max_concurrent_request = self.api.max_concurrent_requests
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent_request) as executor:
-            for batch in chunk(max_concurrent_request, modules):
-                executor.map(lambda module: populate_module(module), batch)
-        for module in modules:
-            
-            streams.append(module)
-        
-        return streams
+    @property
+    def primary_key(self) -> Union[str, List[str]]:
+        return "id" 
     
+    def extract_fields(self, item: Mapping[str, Any]) -> Mapping[str, Any]:
+        fields_meta = self.zoho_api.fields_settings(self.stream_name)
         
-
+        extracted_fields = {}
+        for field in fields_meta:
+            field_name = field["api_name"]
+            extracted_fields[field_name] = item.get(field_name)
+        
+        return extracted_fields
     
+    def get_json_schema(self) -> dict:
+        fields_meta = self.zoho_api.fields_settings(self.stream_name)
+        
+        properties = {}
+        for field in fields_meta:
+            field_name = field.get("apiName")
+            json_type = field.get("json_type", "string")  
+            properties[field_name] = {"type": json_type}
+        
+        return {"type": "object", "properties": properties}
+class IncrementalAccountsZohoDeskStream(ZohoDeskStream):
+    def __init__(self, config: Mapping[str, Any]):
+        super().__init__(config, "accounts")
+        self.schema = {"type": "object", "properties": {"id": {"type": "string"}, "Modified_Time": {"type": "string"}}}
+        self._module_meta = None
+
+    def next_page_token(self, response: requests.Response) -> Optional[Any]:
+        next_page = response.json().get('next_page_token')
+        return next_page
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+    ) -> MutableMapping[str, Any]:
+        return {"module": "Accounts"}
+
+    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping[str, Any]]:
+        if isinstance(response, list):
+            data = response
+        else:
+            data = response.json().get("data", [])
+
+        for item in data:
+            yield item
+
+    def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+        response = self._send_request(self.request_params(stream_slice))
+        yield from self.parse_response(response)
+
+    def _send_request(self, params: MutableMapping[str, Any]) -> requests.Response:
+        return self.zoho_api.module_settings("accounts")
+
+    def path(self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None) -> str:
+        return f"/api/v1/accounts"
+
+    @property
+    def primary_key(self) -> str:
+        return "id"
+
+
+    def url_base(self) -> str:
+        return self.zoho_api.api_url
+
+class IncrementalContactsZohoDeskStream(ZohoDeskStream):
+    def __init__(self, config: Mapping[str, Any]):
+        super().__init__(config, stream_name="Contacts")
+        self.schema = {"type": "object", "properties": {"id": {"type": "string"}, "Modified_Time": {"type": "string"}}}
+
+    def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
+        next_page = response.json().get('next_page_token')
+        return next_page
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+    ) -> MutableMapping[str, Any]:
+        return {"module": "Contacts"}
+
+    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping[str, Any]]:
+        if isinstance(response, list):
+            data = response
+        else:
+            data = response.json().get("data", [])
+
+        for item in data:
+            yield item
+
+    def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+        response = self._send_request(self.request_params(stream_slice))
+        yield from self.parse_response(response)
+
+    def _send_request(self, params: MutableMapping[str, Any]) -> requests.Response:
+        return self.zoho_api.module_settings("contacts")
+
+    def path(self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None) -> str:
+        return f"/api/v1/contacts"
+
+    @property
+    def primary_key(self) -> str:
+        return "id"
+
+
+    def url_base(self) -> str:
+        return self.zoho_api.api_url
+
+class IncrementalTicketsZohoDeskStream(ZohoDeskStream):
+    def __init__(self, config: Mapping[str, Any]):
+        super().__init__(config, stream_name="tickets")
+        self.schema = {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "Modified_Time": {"type": "string"}
+            }
+        }
+
+    def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
+        next_page = response.json().get('next_page_token')
+        return next_page
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+    ) -> MutableMapping[str, Any]:
+        return {"module": "Tickets"}
+
+    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping[str, Any]]:
+        if isinstance(response, list):
+            data = response
+        else:
+            data = response.json().get("data", [])
+
+        for item in data:
+            yield item
+
+    def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+        response = self._send_request(self.request_params(stream_slice))
+        yield from self.parse_response(response)
+
+    def _send_request(self, params: MutableMapping[str, Any]) -> requests.Response:
+        return self.zoho_api.module_settings("tickets")
+
+    def path(self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None) -> str:
+        return f"/api/v1/tickets"
+
+    @property
+    def primary_key(self) -> str:
+        return "id"
+
+
+    def url_base(self) -> str:
+        return self.zoho_api.api_url
+
+
+class IncrementalAgentsZohoDeskStream(ZohoDeskStream):
+    def __init__(self, config: Mapping[str, Any]):
+        super().__init__(config, stream_name="Agents")
+        self.schema = {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "Modified_Time": {"type": "string"}
+            }
+        }
+
+    def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
+        next_page = response.json().get('next_page_token')
+        return next_page
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+    ) -> MutableMapping[str, Any]:
+        params = {"module": "Agents"}
+        if next_page_token:
+            params['page'] = next_page_token
+        return params
+
+    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping[str, Any]]:
+        if isinstance(response, list):
+            data = response
+        else:
+            data = response.json().get("data", [])
+
+        for item in data:
+            yield item
+
+    def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+        response = self._send_request(self.request_params(stream_slice))
+        yield from self.parse_response(response)
+
+    def _send_request(self, params: MutableMapping[str, Any]) -> requests.Response:
+        return self.zoho_api.module_settings("agents")
+
+    def path(self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None) -> str:
+        return f"/api/v1/agents"
+
+    @property
+    def primary_key(self) -> str:
+        return "id"
+
+
+    def url_base(self) -> str:
+        return self.zoho_api.api_url
