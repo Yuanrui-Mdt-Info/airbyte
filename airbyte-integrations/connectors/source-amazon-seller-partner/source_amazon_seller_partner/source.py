@@ -17,6 +17,7 @@ from airbyte_cdk.models import (
     Type,
 )
 import copy
+import pendulum
 from airbyte_cdk.sources.connector_state_manager import ConnectorStateManager
 from airbyte_cdk.utils.event_timing import create_timer
 from airbyte_cdk.models import ConnectorSpecification, SyncMode
@@ -69,7 +70,7 @@ from source_amazon_seller_partner.streams import (
     ReferralFeePreviewReport,
     FBAFeePreviewReport
 )
-
+DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 class SourceAmazonSellerPartner(AbstractSource):
     def _get_stream_kwargs(self, config: AmazonSellerPartnerConfig) -> Mapping[str, Any]:
@@ -102,8 +103,18 @@ class SourceAmazonSellerPartner(AbstractSource):
             "report_options": config.report_options,
             "max_wait_seconds": config.max_wait_seconds,
             "replication_end_date": config.replication_end_date,
+            "replication_span_period": config.replication_span_period,
             "source_name": config.source_name
         }
+        if config.replication_span_period is not None and config.replication_span_period > 0:
+            if config.replication_start_date:
+                start_date = pendulum.parse(config.replication_start_date)
+                config.replication_start_date = start_date.subtract(days=config.replication_span_period).strftime(DATE_TIME_FORMAT)
+                config.replication_end_date = start_date.strftime(DATE_TIME_FORMAT)
+            else:
+                config.replication_start_date = pendulum.now("utc").subtract(days=config.replication_span_period).strftime(DATE_TIME_FORMAT)
+                config.replication_end_date = pendulum.now("utc").subtract(seconds=1).strftime(DATE_TIME_FORMAT)
+         
         return stream_kwargs
 
     @staticmethod
