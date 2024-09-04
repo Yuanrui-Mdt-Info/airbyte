@@ -9,32 +9,6 @@ from airbyte_cdk.sources.streams.http.requests_native_auth import Oauth2Authenti
 
 class ZohoOauth2Authenticator(Oauth2Authenticator):
 
-    def __init__(self, token_refresh_endpoint: str, 
-                 client_id: str, client_secret: str, 
-                 refresh_token: str, scopes: List[str] = None, 
-                 token_expiry_date: DateTime = None, 
-                 token_expiry_date_format: str = None, 
-                 access_token_name: str = "access_token", 
-                 expires_in_name: str = "expires_in", 
-                 refresh_request_body: Mapping[str, Any] = None, 
-                 grant_type: str = "refresh_token", 
-                 token_expiry_is_time_of_expiration: bool = False, 
-                 refresh_token_error_status_codes: Tuple[int] = ..., 
-                 refresh_token_error_key: str = "", 
-                 refresh_token_error_values: Tuple[str] = ...):
-        
-        super().__init__(token_refresh_endpoint, 
-                         client_id, client_secret, 
-                         refresh_token, 
-                         scopes, 
-                         token_expiry_date, 
-                         token_expiry_date_format, 
-                         access_token_name, expires_in_name, 
-                         refresh_request_body, 
-                         grant_type, token_expiry_is_time_of_expiration, 
-                         refresh_token_error_status_codes, refresh_token_error_key, 
-                         refresh_token_error_values)
-
     def _prepare_refresh_token_params(self) -> Dict[str, str]:
         return {
             "refresh_token": self._refresh_token,
