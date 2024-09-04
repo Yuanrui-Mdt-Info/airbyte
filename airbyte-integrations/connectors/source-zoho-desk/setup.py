@@ -7,6 +7,7 @@ from setuptools import find_packages, setup
 
 MAIN_REQUIREMENTS = [
     "airbyte-cdk~=0.1",
+    "PyYAML~=6.0.1"
 ]
 
 TEST_REQUIREMENTS = [

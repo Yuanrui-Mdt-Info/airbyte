@@ -1,15 +1,12 @@
 #
 # Copyright (c) 2022 Airbyte, Inc., all rights reserved.
 #
-import logging
 from typing import Any, Dict, List, Mapping, Tuple
 
 from pendulum.datetime import DateTime
 import requests
 from airbyte_cdk.sources.streams.http.requests_native_auth import Oauth2Authenticator
 
-logger = logging.getLogger("ZohoOauth2Authenticator")
-logger.setLevel(logging.DEBUG)
 class ZohoOauth2Authenticator(Oauth2Authenticator):
 
     def __init__(self, token_refresh_endpoint: str, 
@@ -25,11 +22,6 @@ class ZohoOauth2Authenticator(Oauth2Authenticator):
                  refresh_token_error_status_codes: Tuple[int] = ..., 
                  refresh_token_error_key: str = "", 
                  refresh_token_error_values: Tuple[str] = ...):
-        
-        logger.debug(f"Initializing ZohoOauth2Authenticator with token_refresh_endpoint: {token_refresh_endpoint}, "
-                     f"client_id: {client_id}, client_secret: {client_secret}, refresh_token: {refresh_token}, "
-                     f"scopes: {scopes}, token_expiry_date: {token_expiry_date}, "
-                     f"token_expiry_date_format: {token_expiry_date_format}")
         
         super().__init__(token_refresh_endpoint, 
                          client_id, client_secret, 
@@ -60,15 +52,11 @@ class ZohoOauth2Authenticator(Oauth2Authenticator):
         This method is overridden because token parameters should be passed via URL params, not via the request payload.
         Returns a tuple of (access_token, token_lifespan_in_seconds)
         """
-        safe_dict = self.__dict__.copy()
-        logger.debug(f"refresh_access_token self parameters. {safe_dict}")
         try:
             response = requests.request(method="POST", url=self._token_refresh_endpoint, params=self._prepare_refresh_token_params())
             response.raise_for_status()
             response_json = response.json()
-            logger.debug(f"Access token refreshed successfully. Token expires in {response_json[self._expires_in_name]} seconds.")
             return response_json[self._access_token_name], response_json[self._expires_in_name]
         except Exception as e:
-            logger.error(f"Error while refreshing access token(logger message): {e}", exc_info=True)
             raise Exception(f"Error while refreshing access token: {e}") from e
 
