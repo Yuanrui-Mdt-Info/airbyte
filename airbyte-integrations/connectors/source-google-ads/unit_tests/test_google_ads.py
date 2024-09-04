@@ -62,7 +62,7 @@ def test_send_request(mocker, customers):
     mocker.patch("source_google_ads.google_ads.GoogleAdsClient.get_service", return_value=MockGoogleAdsService())
     google_ads_client = GoogleAds(**SAMPLE_CONFIG)
     query = "Query"
-    page_size = 1000
+    page_size = 100
     customer_id = next(iter(customers)).id
     response = list(google_ads_client.send_request(query, customer_id=customer_id))
 
