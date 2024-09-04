@@ -9,7 +9,7 @@ import pytest
 from airbyte_cdk import AirbyteLogger
 from freezegun import freeze_time
 from google.ads.googleads.errors import GoogleAdsException
-from google.ads.googleads.v11.errors.types.authorization_error import AuthorizationErrorEnum
+from google.ads.googleads.v17.errors.types.authorization_error import AuthorizationErrorEnum
 from pendulum import today
 from source_google_ads.custom_query_stream import CustomQuery
 from source_google_ads.google_ads import GoogleAds
@@ -143,7 +143,7 @@ def test_chunk_date_range():
 def test_streams_count(config, mock_account_info):
     source = SourceGoogleAds()
     streams = source.streams(config)
-    expected_streams_number = 19
+    expected_streams_number = 28
     assert len(streams) == expected_streams_number
 
 

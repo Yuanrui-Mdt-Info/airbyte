@@ -8,7 +8,7 @@ from typing import Any, Iterator, List, Mapping, MutableMapping
 
 import pendulum
 from google.ads.googleads.client import GoogleAdsClient
-from google.ads.googleads.v11.services.types.google_ads_service import GoogleAdsRow, SearchGoogleAdsResponse
+from google.ads.googleads.v17.services.types.google_ads_service import GoogleAdsRow, SearchGoogleAdsResponse
 from proto.marshal.collections import Repeated, RepeatedComposite
 
 REPORT_MAPPING = {
@@ -30,11 +30,10 @@ REPORT_MAPPING = {
     "geographic_report": "geographic_view",
     "keyword_report": "keyword_view",
 }
-API_VERSION = "v11"
+API_VERSION = "v17"
 
 
 class GoogleAds:
-    DEFAULT_PAGE_SIZE = 1000
 
     def __init__(self, credentials: MutableMapping[str, Any]):
         # `google-ads` library version `14.0.0` and higher requires an additional required parameter `use_proto_plus`.
@@ -47,7 +46,6 @@ class GoogleAds:
         client = self.client
         search_request = client.get_type("SearchGoogleAdsRequest")
         search_request.query = query
-        search_request.page_size = self.DEFAULT_PAGE_SIZE
         search_request.customer_id = customer_id
         yield self.ga_service.search(search_request)
 
