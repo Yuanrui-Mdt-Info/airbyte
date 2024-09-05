@@ -36,7 +36,7 @@ class ZohoAPI:
         }
     )
     _API_ENV_TO_URL_PREFIX = MappingProxyType({"production": "", "developer": "developer", "sandbox": "sandbox"})
-    _CONCURRENCY_API_LIMITS = MappingProxyType({"Free": 50000, "Standard": 10, "Professional": 15, "Enterprise": 20, "Ultimate": 25})
+    _CONCURRENCY_API_LIMITS = MappingProxyType({"Free": 5, "Standard": 10, "Professional": 15, "Enterprise": 20, "Ultimate": 25})
 
     def __init__(self, config: Mapping[str, Any]):
         self.config = config
@@ -46,7 +46,10 @@ class ZohoAPI:
     def authenticator(self) -> ZohoOauth2Authenticator:
         if not self._authenticator:
             authenticator = ZohoOauth2Authenticator(
-                f"{self._access_url}/oauth/v2/token", self.config["client_id"], self.config["client_secret"], self.config["refresh_token"]
+                token_refresh_endpoint=f"{self._access_url}/oauth/v2/token",
+                client_id=self.config["client_id"],
+                client_secret=self.config["client_secret"],
+                refresh_token=self.config["refresh_token"],
             )
             self._authenticator = authenticator
         return self._authenticator
