@@ -52,6 +52,7 @@ class ZohoAPI:
                 refresh_token=self.config["refresh_token"],
             )
             self._authenticator = authenticator
+        logging.debug(f"self._authentication {self._authenticator}")
         return self._authenticator
 
     @property
