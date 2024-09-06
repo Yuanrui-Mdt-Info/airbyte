@@ -2,6 +2,7 @@ from airbyte_cdk.sources.streams.http.http import HttpStream
 from typing import Mapping, Any, List, Optional, Iterable, MutableMapping, Union
 import requests
 from .api import ZohoAPI
+from datetime import datetime
 
 class ZohoStreamFactory:
     def __init__(self, config: Mapping[str, Any]):
@@ -20,6 +21,7 @@ class ZohoDeskStream(HttpStream):
     def __init__(self, config: Mapping[str, Any], stream_name: str):
         self.config = config
         self.stream_name = stream_name.lower()
+        self.start_datetime = datetime.fromisoformat(config.get("start_datetime", "2000-01-01T00:00:00+00:00"))
         self.zoho_api = ZohoAPI(config)
         authenticator = self.zoho_api.authenticator
         super().__init__(authenticator=authenticator)
@@ -70,7 +72,11 @@ class IncrementalAccountsZohoDeskStream(ZohoDeskStream):
             data = response.json().get("data", [])
 
         for item in data:
-            yield item
+            created_time_str = item.get("createdTime")
+            if created_time_str:
+                created_time = datetime.fromisoformat(created_time_str.replace("Z", "+00:00"))
+                if created_time >= self.start_datetime:
+                    yield item
 
     def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
         response = self._send_request(self.request_params(stream_slice))
@@ -111,7 +117,11 @@ class IncrementalContactsZohoDeskStream(ZohoDeskStream):
             data = response.json().get("data", [])
 
         for item in data:
-            yield item
+            created_time_str = item.get("createdTime")
+            if created_time_str:
+                created_time = datetime.fromisoformat(created_time_str.replace("Z", "+00:00"))
+                if created_time >= self.start_datetime:
+                    yield item
 
     def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
         response = self._send_request(self.request_params(stream_slice))
@@ -126,7 +136,6 @@ class IncrementalContactsZohoDeskStream(ZohoDeskStream):
     @property
     def primary_key(self) -> str:
         return "id"
-
 
     def url_base(self) -> str:
         return self.zoho_api.api_url
@@ -158,7 +167,11 @@ class IncrementalTicketsZohoDeskStream(ZohoDeskStream):
             data = response.json().get("data", [])
 
         for item in data:
-            yield item
+            created_time_str = item.get("createdTime")
+            if created_time_str:
+                created_time = datetime.fromisoformat(created_time_str.replace("Z", "+00:00"))
+                if created_time >= self.start_datetime:
+                    yield item
 
     def read_records(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
         response = self._send_request(self.request_params(stream_slice))
