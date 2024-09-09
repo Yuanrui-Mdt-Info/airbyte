@@ -68,6 +68,7 @@ public class OAuthImplementationFactory {
         .put("yuanrui2014/source-snowflake", new SourceSnowflakeOAuthFlow(configRepository, httpClient))
         .put("yuanrui2014/source-okta", new OktaOAuthFlow(configRepository, httpClient))
         .put("yuanrui2014/source-paypal-transaction", new PayPalTransactionOAuthFlow(configRepository, httpClient))
+        .put("yuanrui2014/source-zoho-desk", new ZohoDeskOAuthFlow(configRepository, httpClient))
         .build();
   }
 
