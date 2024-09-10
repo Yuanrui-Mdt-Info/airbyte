@@ -11,6 +11,8 @@ import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.oauth.flows.*;
 import io.airbyte.oauth.flows.facebook.*;
 import io.airbyte.oauth.flows.google.*;
+import io.airbyte.oauth.flows.zoho.ZohoDeskOAuthFlow;
+
 import java.net.http.HttpClient;
 import java.util.Map;
 
@@ -68,6 +70,7 @@ public class OAuthImplementationFactory {
         .put("yuanrui2014/source-snowflake", new SourceSnowflakeOAuthFlow(configRepository, httpClient))
         .put("yuanrui2014/source-okta", new OktaOAuthFlow(configRepository, httpClient))
         .put("yuanrui2014/source-paypal-transaction", new PayPalTransactionOAuthFlow(configRepository, httpClient))
+        .put("yuanrui2014/source-zoho-desk", new ZohoDeskOAuthFlow(configRepository, httpClient))
         .build();
   }
 
