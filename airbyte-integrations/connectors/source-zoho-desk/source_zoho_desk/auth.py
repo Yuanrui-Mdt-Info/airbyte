@@ -10,6 +10,9 @@ from airbyte_cdk.sources.streams.http.requests_native_auth import Oauth2Authenti
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 class ZohoOauth2Authenticator(Oauth2Authenticator):
+    def __init__(self, token_refresh_endpoint, client_id, client_secret, refresh_token, org_id):
+        super().__init__(token_refresh_endpoint=token_refresh_endpoint, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token)
+        self._org_id = org_id 
 
     def _prepare_refresh_token_params(self) -> Dict[str, str]:
         return {
@@ -21,15 +24,17 @@ class ZohoOauth2Authenticator(Oauth2Authenticator):
 
     def get_auth_header(self) -> Mapping[str, Any]:
         token = self.get_access_token()
-        return {"Authorization": f"Zoho-oauthtoken {token}"}
+        headers = {
+            "Authorization": f"Zoho-oauthtoken {token}",
+            "orgId": self._org_id  
+        }
+        return headers
 
     def refresh_access_token(self) -> Tuple[str, int]:
         """
         This method is overridden because token parameters should be passed via URL params, not via the request payload.
         Returns a tuple of (access_token, token_lifespan_in_seconds)
         """
-        logger.info("Attempting to refresh access token...")
-        logger.debug(f"Current object state: {self.__dict__}")  # Log the internal state of the object
         
         try:
             logger.debug(f"Requesting new token from {self._token_refresh_endpoint} with params: {self._prepare_refresh_token_params()}")
