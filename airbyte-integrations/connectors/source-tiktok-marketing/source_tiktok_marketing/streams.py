@@ -187,8 +187,8 @@ class TiktokStream(HttpStream, ABC):
         Docs: https://business-api.tiktok.com/marketing_api/docs?id=1701890920013825
         """
         if self.is_sandbox:
-            return "https://sandbox-ads.tiktok.com/open_api/v1.2/"
-        return "https://business-api.tiktok.com/open_api/v1.2/"
+            return "https://sandbox-ads.tiktok.com/open_api/v1.3/"
+        return "https://business-api.tiktok.com/open_api/v1.3/"
 
     def next_page_token(self, *args, **kwargs) -> Optional[Mapping[str, Any]]:
         # this data without listing
@@ -218,6 +218,48 @@ class TiktokStream(HttpStream, ABC):
         # All apps are set to basic call limit level by default.
         # Returns maximum possible delay
         return 0.6
+
+    def read_records(
+        self,
+        sync_mode: SyncMode,
+        cursor_field: List[str] = None,
+        stream_slice: Mapping[str, Any] = None,
+        stream_state: Mapping[str, Any] = None,
+    ) -> Iterable[Mapping[str, Any]]:
+        stream_state = stream_state or {}
+        pagination_complete = False
+
+        next_page_token = None
+        while not pagination_complete:
+            request_headers = self.request_headers(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token)
+            
+            request = self._create_prepared_request(
+                path=self.path(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token),
+                headers=dict(request_headers, **self.authenticator.get_auth_header()),
+                params=self.request_params(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token),
+                json=self.request_body_json(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token),
+                data=self.request_body_data(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token),
+            )
+            if  'Access-Token' not in request.headers :
+                request.headers['Access-Token'] = self._access_token
+                request.headers['Content-Type'] = 'application/json'
+            request_kwargs = self.request_kwargs(stream_state=stream_state, stream_slice=stream_slice, next_page_token=next_page_token)
+
+            if self.use_cache:
+                with self.cache_file as cass:
+                    self.cassete = cass
+                    
+                    response = self._send_request(request, request_kwargs)
+
+            else:
+                response = self._send_request(request, request_kwargs)
+            yield from self.parse_response(response, stream_state=stream_state, stream_slice=stream_slice)
+
+            next_page_token = self.next_page_token(response)
+            if not next_page_token:
+                pagination_complete = True
+
+        yield from []
 
 
 class AdvertiserIds(TiktokStream):
@@ -578,7 +620,6 @@ class BasicReports(IncrementalTiktokStream, ABC):
             "real_time_app_install_cost",
             "app_install",
         ]
-
         if self.report_level == ReportLevel.ADVERTISER and self.report_granularity == ReportGranularity.DAY:
             # https://ads.tiktok.com/marketing_api/docs?id=1707957200780290
             result.extend(["cash_spend", "voucher_spend"])
@@ -591,7 +632,6 @@ class BasicReports(IncrementalTiktokStream, ABC):
                 [
                     "campaign_id",
                     "adgroup_name",
-                    "placement",
                     "tt_app_id",
                     "tt_app_name",
                     "mobile_app_id",
@@ -642,7 +682,7 @@ class BasicReports(IncrementalTiktokStream, ABC):
                 yield slice
 
     def path(self, *args, **kwargs) -> str:
-        return "reports/integrated/get/"
+        return "report/integrated/get/"
 
     def request_params(
         self, stream_state: Mapping[str, Any] = None, stream_slice: Mapping[str, Any] = None, **kwargs
@@ -660,7 +700,6 @@ class BasicReports(IncrementalTiktokStream, ABC):
         else:
             params["start_date"] = stream_slice["start_date"]
             params["end_date"] = stream_slice["end_date"]
-
         return params
 
     def get_json_schema(self) -> Mapping[str, Any]:
@@ -720,6 +759,10 @@ class AudienceReport(BasicReports):
         params = super().request_params(stream_state=stream_state, stream_slice=stream_slice, **kwargs)
 
         dimensions = self._get_reporting_dimensions()
+        if "stat_time_hour" in dimensions:
+            dimensions.remove('stat_time_hour')
+        else: 
+            pass
         dimensions += self.audience_dimensions
         params["dimensions"] = json.dumps(dimensions)
         params["report_type"] = "AUDIENCE"
