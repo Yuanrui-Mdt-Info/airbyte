@@ -40,7 +40,7 @@
         "enum": ["US","AU","EU","IN","JP","UK","SA","CA"]
       },
       
-      "start_datetime": {
+      "start_date": {
         "title": "Start Date",
         "type": ["null", "string"],
         "examples": [
