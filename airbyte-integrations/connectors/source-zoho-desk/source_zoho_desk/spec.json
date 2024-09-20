@@ -4,6 +4,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Zoho Desk Configuration",
     "type": "object",
+    "order": 0,
     "required": [
       "client_id",
       "client_secret",
@@ -18,30 +19,35 @@
       "client_id": {
         "type": "string",
         "title": "Client ID",
+        "order": 0,
         "description": "OAuth2.0 Client ID",
         "airbyte_secret": true
       },
       "client_secret": {
         "type": "string",
         "title": "Client Secret",
+        "order": 1,
         "description": "OAuth2.0 Client Secret",
         "airbyte_secret": true
       },
       "refresh_token": {
         "type": "string",
         "title": "Refresh Token",
+        "order": 2,
         "description": "OAuth2.0 Refresh Token",
         "airbyte_secret": true
       },
       "dc_region": {
         "title": "Data Center Location",
         "type": "string",
+        "order": 3,
         "description": "Please choose the region of your Data Center location. More info by this <a href=\"https://www.zoho.com/desk/developer/docs/api/v2/multi-dc.html\">Link</a>",
         "enum": ["US","AU","EU","IN","JP","UK","SA","CA"]
       },
       
       "start_date": {
         "title": "Start Date",
+        "order": 4,
         "type": ["null", "string"],
         "examples": [
           "2000-01-01",
@@ -56,6 +62,7 @@
       "edition": {
         "title": "Zoho Desk Edition",
         "type": "string",
+        "order": 5,
         "description": "Choose your Edition of Zoho DESK to determine API Concurrency Limits",
         "enum": ["Free", "Standard", "Professional", "Enterprise"],
         "default": "Free"
@@ -63,11 +70,13 @@
       "org_id": {
         "type": "string",
         "title": "Organization ID",
+        "order": 6,
         "description": "The organization ID for Zoho Desk"
       },
       "auth_type" : {
         "type" : "string",
         "title" : "oauth2.0 authentication",
+        "order": 7,
         "description": "The authentication type for Zoho Desk"
         
       }
