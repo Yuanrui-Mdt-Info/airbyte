@@ -172,7 +172,12 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
     // TODO: Handle error response to report better messages
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-      return extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
+      // add location to response because which is help in connector to identify api region
+      Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
+      if (output.containsKey("refresh_token")) {
+        output.put("dc_region", queryParams.get("location").toString().toUpperCase());
+      }
+      return output;
     } catch (final InterruptedException e) {
       throw new IOException("Failed to complete OAuth flow", e);
     }
