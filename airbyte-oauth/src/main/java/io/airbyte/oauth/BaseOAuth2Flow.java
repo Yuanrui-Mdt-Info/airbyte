@@ -365,7 +365,7 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
     }
   }
 
-  private static String toUrlEncodedString(final Map<String, String> body) {
+  protected static String toUrlEncodedString(final Map<String, String> body) {
     final StringBuilder result = new StringBuilder();
     for (final var entry : body.entrySet()) {
       if (result.length() > 0) {
