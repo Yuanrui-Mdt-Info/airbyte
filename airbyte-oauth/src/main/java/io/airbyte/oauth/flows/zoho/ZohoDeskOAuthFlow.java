@@ -18,10 +18,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -172,14 +169,37 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
     // TODO: Handle error response to report better messages
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-      // add location to response because which is help in connector to identify api region
       Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
+      // add location to response because which is help in connector to identify api region
       if (output.containsKey("refresh_token")) {
         output.put("dc_region", queryParams.get("location").toString().toUpperCase());
+        List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), queryParams.get("location").toString());
+        output.put("org_id", String.join(",", orgIds));
       }
       return output;
     } catch (final InterruptedException e) {
       throw new IOException("Failed to complete OAuth flow", e);
+    }
+  }
+
+  public List<String> getOrgIds(String accessToken, String topLevelDomain) throws IOException {
+    try {
+      String url = "https://desk.zoho.%s/api/v1/organizations";
+      String token = "Zoho-oauthtoken %s";
+      HttpRequest request = HttpRequest.newBuilder()
+          .GET()
+          .uri(URI.create(String.format(url, topLevelDomain)))
+          .header("Authorization", String.format(token, accessToken))
+          .build();
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      List<String> orgIds = new ArrayList<>();
+      JsonNode jsonNode = Jsons.deserialize(response.body());
+      for (JsonNode data : jsonNode.get("data")) {
+        orgIds.add(data.get("id").asText());
+      }
+      return orgIds;
+    } catch (InterruptedException | IOException e) {
+      throw new IOException("Failed to fetch Org ids ", e);
     }
   }
 
