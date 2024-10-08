@@ -174,7 +174,7 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
       if (output.containsKey("refresh_token")) {
         output.put("dc_region", queryParams.get("location").toString().toUpperCase());
         List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), queryParams.get("location").toString());
-        output.put("org_id", String.join(",", orgIds));
+        output.put("org_ids", String.join(",", orgIds));
       }
       return output;
     } catch (final InterruptedException e) {
