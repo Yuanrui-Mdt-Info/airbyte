@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: airbyte-webapp-container
-          image: yuanrui2014/webapp
+          image: harbor.nekteck.cloud/airbyte/webapp:dev.1.114
           env:
             - name: AIRBYTE_VERSION
               valueFrom:
@@ -50,3 +50,5 @@ spec:
                   key: INTERNAL_API_HOST
           ports:
             - containerPort: 80
+      imagePullSecrets:
+        - name: harbor-secert

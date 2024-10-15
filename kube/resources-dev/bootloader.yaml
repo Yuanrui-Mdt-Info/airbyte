@@ -17,7 +17,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: airbyte-bootloader-container
-          image: yuanrui2014/bootloader
+          image: harbor.nekteck.cloud/airbyte/bootloader:dev.1.114
           env:
             - name: AIRBYTE_VERSION
               valueFrom:
@@ -49,3 +49,5 @@ spec:
                 secretKeyRef:
                   name: airbyte-secrets
                   key: DATABASE_USER
+      imagePullSecrets:
+        - name: harbor-secert
