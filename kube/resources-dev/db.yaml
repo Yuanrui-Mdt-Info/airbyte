@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: airbyte-db-container
-          image: yuanrui2014/db
+          image: harbor.nekteck.cloud/airbyte/db:dev.1.114
           env:
             - name: POSTGRES_DB
               value: db-airbyte
@@ -44,6 +44,8 @@ spec:
           volumeMounts:
             - name: airbyte-volume-db
               mountPath: /var/lib/postgresql/data
+      imagePullSecrets:
+        - name: harbor-secert
       volumes:
         - name: airbyte-volume-db
           persistentVolumeClaim:
