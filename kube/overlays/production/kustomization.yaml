@@ -7,17 +7,17 @@ bases:
   - ../../resources-dev
 
 images:
-  - name: yuanrui2014/bootloader
+  - name: harbor.nekteck.cloud/airbyte/bootloader
     newTag: 2.0.1
-  - name: yuanrui2014/server
+  - name: harbor.nekteck.cloud/airbyte/server
     newTag: 2.0.1
-  - name: yuanrui2014/webapp
+  - name: harbor.nekteck.cloud/airbyte/webapp
     newTag: 2.0.1
-  - name: yuanrui2014/worker
+  - name: harbor.nekteck.cloud/airbyte/worker
     newTag: 2.0.1
   - name: temporalio/auto-setup
     newTag: 1.13.0
-  - name: yuanrui2014/cron
+  - name: harbor.nekteck.cloud/airbyte/cron
     newTag: 2.0.1
 
 configMapGenerator:
