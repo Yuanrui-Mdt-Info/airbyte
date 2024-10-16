@@ -1148,13 +1148,13 @@
   public: false
 - name: TikTok Marketing
   sourceDefinitionId: 4bfac00d-ce15-44ff-95b9-9e3c3e8fbd35
-  dockerRepository: airbyte/source-tiktok-marketing
+  dockerRepository: yuanrui2014/source-tiktok-marketing
   dockerImageTag: 0.1.15
   documentationUrl: https://docs.airbyte.io/integrations/sources/tiktok-marketing
   icon: tiktok.svg
   sourceType: api
   releaseStage: generally_available
-  public: false
+  public: true
 - name: Timely
   sourceDefinitionId: bc617b5f-1b9e-4a2d-bebe-782fd454a771
   dockerRepository: airbyte/source-timely
