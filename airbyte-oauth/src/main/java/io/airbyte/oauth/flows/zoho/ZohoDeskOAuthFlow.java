@@ -6,15 +6,19 @@ package io.airbyte.oauth.flows.zoho;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
+import io.airbyte.commons.json.Jsons;
+import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.oauth.BaseOAuth2Flow;
+import io.airbyte.protocol.models.OAuthConfigSpecification;
+import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -57,6 +61,10 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
 
   }
 
+  private static final String AUTHORIZE_URL = "https://accounts.zoho.com/oauth/v2/auth";
+
+  private static final String TOKEN_URL = "%s/oauth/v2/token";
+
   public ZohoDeskOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
   }
@@ -78,10 +86,9 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
   @Override
   protected String formatConsentUrl(UUID definitionId, String clientId, String redirectUrl, JsonNode inputOAuthConfiguration) throws IOException {
     try {
-      final String regionCountry = getConfigValueUnsafe(inputOAuthConfiguration, "dc_region");
-      String authUrl = ZohoDeskOAuthFlow.RegionHost.valueOf(regionCountry).getHost();
-
-      return new URIBuilder(authUrl)
+      // final String regionCountry = getConfigValueUnsafe(inputOAuthConfiguration, "dc_region");
+      // String authUrl = ZohoDeskOAuthFlow.RegionHost.valueOf(regionCountry).getHost();
+      return new URIBuilder(AUTHORIZE_URL)
           .addParameter("client_id", clientId)
           .addParameter("scope", getScopes())
           .addParameter("response_type", "code")
@@ -109,10 +116,91 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
         .build();
   }
 
+  /*
+   * This method is not actually called because, for Zoho Desk, we custom implement a
+   * completeOAuthFlow()
+   */
   @Override
   protected String getAccessTokenUrl(JsonNode inputOAuthConfiguration) {
-    final String regionCountry = getConfigValueUnsafe(inputOAuthConfiguration, "dc_region");
-    return ZohoDeskOAuthFlow.RegionHost.valueOf(regionCountry).getTokenUrl();
+    return TOKEN_URL;
+  }
+
+  @Override
+  public Map<String, Object> completeSourceOAuth(final UUID workspaceId,
+                                                 final UUID sourceDefinitionId,
+                                                 final Map<String, Object> queryParams,
+                                                 final String redirectUrl,
+                                                 final JsonNode inputOAuthConfiguration,
+                                                 final OAuthConfigSpecification oAuthConfigSpecification)
+      throws IOException, ConfigNotFoundException, JsonValidationException {
+    validateInputOAuthConfiguration(oAuthConfigSpecification, inputOAuthConfiguration);
+    final JsonNode oAuthParamConfig = getSourceOAuthParamConfig(workspaceId, sourceDefinitionId);
+    return formatOAuthOutput(
+        oAuthParamConfig,
+        completeOAuthFlow(
+            getClientIdUnsafe(oAuthParamConfig),
+            getClientSecretUnsafe(oAuthParamConfig),
+            extractCodeParameter(queryParams),
+            redirectUrl,
+            inputOAuthConfiguration,
+            oAuthParamConfig,
+            queryParams),
+        oAuthConfigSpecification);
+  }
+
+  protected Map<String, Object> completeOAuthFlow(final String clientId,
+                                                  final String clientSecret,
+                                                  final String authCode,
+                                                  final String redirectUrl,
+                                                  final JsonNode inputOAuthConfiguration,
+                                                  final JsonNode oAuthParamConfig,
+                                                  final Map<String, Object> queryParams)
+      throws IOException {
+
+    final var accessTokenUrl = TOKEN_URL.formatted(queryParams.get("accounts-server"));
+
+    HttpRequest request = HttpRequest.newBuilder()
+        .POST(HttpRequest.BodyPublishers
+            .ofString(BaseOAuth2Flow.toUrlEncodedString(getAccessTokenQueryParameters(clientId, clientSecret, authCode, redirectUrl))))
+        .uri(URI.create(accessTokenUrl))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .header("Accept", "application/json")
+        .build();
+    // TODO: Handle error response to report better messages
+    try {
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
+      // add location to response because which is help in connector to identify api region
+      if (output.containsKey("refresh_token")) {
+        output.put("dc_region", queryParams.get("location").toString().toUpperCase());
+        List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), queryParams.get("location").toString());
+        output.put("org_ids", String.join(",", orgIds));
+      }
+      return output;
+    } catch (final InterruptedException e) {
+      throw new IOException("Failed to complete OAuth flow", e);
+    }
+  }
+
+  public List<String> getOrgIds(String accessToken, String topLevelDomain) throws IOException {
+    try {
+      String url = "https://desk.zoho.%s/api/v1/organizations";
+      String token = "Zoho-oauthtoken %s";
+      HttpRequest request = HttpRequest.newBuilder()
+          .GET()
+          .uri(URI.create(String.format(url, topLevelDomain)))
+          .header("Authorization", String.format(token, accessToken))
+          .build();
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      List<String> orgIds = new ArrayList<>();
+      JsonNode jsonNode = Jsons.deserialize(response.body());
+      for (JsonNode data : jsonNode.get("data")) {
+        orgIds.add(data.get("id").asText());
+      }
+      return orgIds;
+    } catch (InterruptedException | IOException e) {
+      throw new IOException("Failed to fetch Org ids ", e);
+    }
   }
 
 }

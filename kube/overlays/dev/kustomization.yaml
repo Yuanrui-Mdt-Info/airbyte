@@ -9,17 +9,17 @@ bases:
 images:
   #- name: yuanrui2014/db
   #  newTag: dev
-  - name: yuanrui2014/bootloader
+  - name: harbor.nekteck.cloud/airbyte/bootloader
     newTag: dev
-  - name: yuanrui2014/server
+  - name: harbor.nekteck.cloud/airbyte/server
     newTag: dev
-  - name: yuanrui2014/webapp
+  - name: harbor.nekteck.cloud/airbyte/webapp
     newTag: dev
-  - name: yuanrui2014/worker
+  - name: harbor.nekteck.cloud/airbyte/worker
     newTag: dev
   - name: temporalio/auto-setup
     newTag: 1.13.0
-  - name: yuanrui2014/cron
+  - name: harbor.nekteck.cloud/airbyte/cron
     newTag: dev
 
 configMapGenerator:
