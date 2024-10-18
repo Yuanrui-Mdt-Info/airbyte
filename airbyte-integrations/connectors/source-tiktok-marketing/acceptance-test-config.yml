@@ -1,7 +1,7 @@
 # See [Source Acceptance Tests](https://docs.airbyte.io/connector-development/testing-connectors/source-acceptance-tests-reference)
 # for more information about how to configure these tests
 
-connector_image: airbyte/source-tiktok-marketing:dev
+connector_image: yuanrui2014/source-tiktok-marketing:dev
 tests:
   spec:
     - spec_path: "integration_tests/spec.json"
