@@ -24,46 +24,48 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
 
-  enum RegionHost {
+  private static String defaultDeskUrl = "https://desk.zoho.com";
+  private static final String AUTHORIZE_URL = "https://accounts.zoho.com/oauth/v2/auth";
+  private static final String TOKEN_URL = "%s/oauth/v2/token";
 
-    EU("https://accounts.zoho.eu/oauth/v2/auth", "https://accounts.zoho.eu/oauth/v2/token"),
+  enum LocationWiseHost {
 
-    AU("https://accounts.zoho.com.au/oauth/v2/auth", "https://accounts.zoho.com.au/oauth/v2/token"),
+    EU("https://desk.zoho.eu"),
 
-    IN("https://accounts.zoho.in/oauth/v2/auth", "https://accounts.zoho.in/oauth/v2/token"),
+    AU("https://desk.zoho.com.au"),
 
-    JP("https://accounts.zoho.jp/oauth/v2/auth", "https://accounts.zoho.jp/oauth/v2/token"),
+    IN("https://desk.zoho.in"),
 
-    UK("https://accounts.zoho.uk/oauth/v2/auth", "https://accounts.zoho.uk/oauth/v2/token"),
+    JP("https://desk.zoho.jp"),
 
-    US("https://accounts.zoho.com/oauth/v2/auth", "https://accounts.zoho.com/oauth/v2/token"),
+    UK("https://desk.zoho.uk"),
 
-    CA("https://accounts.zohocloud.ca/oauth/v2/auth", "https://accounts.zohocloud.ca/oauth/v2/token"),
+    US("https://desk.zoho.com"),
 
-    SA("https://accounts.zoho.sa/oauth/v2/auth", "https://accounts.zoho.sa/oauth/v2/token"),
+    CA("https://desk.zoho.ca"),
+
+    SA("https://desk.zoho.sa"),
     ;
 
-    private final String host;
-    private final String tokenUrl;
+    private final String deskUrl;
 
-    RegionHost(String host, String tokenUrl) {
-      this.host = host;
-      this.tokenUrl = tokenUrl;
+    LocationWiseHost(String deskUrl) {
+      this.deskUrl = deskUrl;
     }
 
-    public String getHost() {
-      return host;
+    public String getDeskUrl() {
+      return deskUrl;
     }
 
-    public String getTokenUrl() {
-      return tokenUrl;
+    public static String getDeskHost(String location) {
+      try {
+        return LocationWiseHost.valueOf(location.toUpperCase()).getDeskUrl();
+      } catch (IllegalArgumentException e) {
+        return defaultDeskUrl;
+      }
     }
 
   }
-
-  private static final String AUTHORIZE_URL = "https://accounts.zoho.com/oauth/v2/auth";
-
-  private static final String TOKEN_URL = "%s/oauth/v2/token";
 
   public ZohoDeskOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
@@ -166,14 +168,15 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json")
         .build();
-    // TODO: Handle error response to report better messages
+    
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
       // add location to response because which is help in connector to identify api region
       if (output.containsKey("refresh_token")) {
         output.put("dc_region", queryParams.get("location").toString().toUpperCase());
-        List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), queryParams.get("location").toString());
+        String host = LocationWiseHost.getDeskHost(queryParams.get("location").toString().toUpperCase());
+        List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), host);
         output.put("org_ids", String.join(",", orgIds));
       }
       return output;
@@ -182,13 +185,13 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
     }
   }
 
-  public List<String> getOrgIds(String accessToken, String topLevelDomain) throws IOException {
+  public List<String> getOrgIds(String accessToken, String host) throws IOException {
     try {
-      String url = "https://desk.zoho.%s/api/v1/organizations";
+      String url = "%s/api/v1/organizations";
       String token = "Zoho-oauthtoken %s";
       HttpRequest request = HttpRequest.newBuilder()
           .GET()
-          .uri(URI.create(String.format(url, topLevelDomain)))
+          .uri(URI.create(String.format(url, host)))
           .header("Authorization", String.format(token, accessToken))
           .build();
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -199,7 +202,7 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
       }
       return orgIds;
     } catch (InterruptedException | IOException e) {
-      throw new IOException("Failed to fetch Org ids ", e);
+      throw new IOException("Failed to fetch Org ids", e);
     }
   }
 
