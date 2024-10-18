@@ -9,7 +9,7 @@ services:
   # hook in case we need to add init behavior
   # every root service (no depends_on) should depend on init
   init:
-    image: yuanrui2014/init:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/init:${VERSION}
     logging: *default-logging
     container_name: init
     command: /bin/sh -c "./scripts/create_mount_directories.sh /local_parent ${HACK_LOCAL_ROOT_PARENT} ${LOCAL_ROOT}"
@@ -19,7 +19,7 @@ services:
     volumes:
       - ${HACK_LOCAL_ROOT_PARENT}:/local_parent
   bootloader:
-    image: yuanrui2014/bootloader:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/bootloader:${VERSION}
     logging: *default-logging
     container_name: daspire-bootloader
     environment:
@@ -33,7 +33,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - RUN_DATABASE_MIGRATION_ON_STARTUP=${RUN_DATABASE_MIGRATION_ON_STARTUP}
   db:
-    image: yuanrui2014/db:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/db:${VERSION}
     logging: *default-logging
     container_name: daspire-db
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
   worker:
-    image: yuanrui2014/worker:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/worker:${VERSION}
     logging: *default-logging
     container_name: daspire-worker
     restart: unless-stopped
@@ -109,7 +109,7 @@ services:
       - workspace:${WORKSPACE_ROOT}
       - ${LOCAL_ROOT}:${LOCAL_ROOT}
   server:
-    image: yuanrui2014/server:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/server:${VERSION}
     logging: *default-logging
     container_name: daspire-server
     restart: unless-stopped
@@ -147,7 +147,7 @@ services:
       - data:${CONFIG_ROOT}
       - ${LOCAL_ROOT}:${LOCAL_ROOT}
   webapp:
-    image: yuanrui2014/webapp:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/webapp:${VERSION}
     logging: *default-logging
     container_name: daspire-webapp
     restart: unless-stopped
@@ -162,7 +162,7 @@ services:
       - PAPERCUPS_STORYTIME=${PAPERCUPS_STORYTIME:-}
       - TRACKING_STRATEGY=${TRACKING_STRATEGY}
   daspire-temporal:
-    image: yuanrui2014/temporal:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/temporal:${VERSION}
     logging: *default-logging
     container_name: daspire-temporal
     restart: unless-stopped
@@ -179,7 +179,7 @@ services:
     volumes:
       - ./temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
   daspire-cron:
-    image: yuanrui2014/cron:${VERSION}
+    image: harbor.nekteck.cloud/airbyte/cron:${VERSION}
     logging: *default-logging
     container_name: daspire-cron
     restart: unless-stopped
