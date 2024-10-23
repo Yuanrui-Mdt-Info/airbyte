@@ -1148,13 +1148,13 @@
   public: false
 - name: TikTok Marketing
   sourceDefinitionId: 4bfac00d-ce15-44ff-95b9-9e3c3e8fbd35
-  dockerRepository: airbyte/source-tiktok-marketing
+  dockerRepository: yuanrui2014/source-tiktok-marketing
   dockerImageTag: 0.1.15
   documentationUrl: https://docs.airbyte.io/integrations/sources/tiktok-marketing
   icon: tiktok.svg
   sourceType: api
   releaseStage: generally_available
-  public: false
+  public: true
 - name: Timely
   sourceDefinitionId: bc617b5f-1b9e-4a2d-bebe-782fd454a771
   dockerRepository: airbyte/source-timely
@@ -1346,6 +1346,14 @@
   dockerRepository: airbyte/source-zoho-crm
   dockerImageTag: 0.1.0
   documentationUrl: https://docs.airbyte.com/integrations/sources/zoho-crm
+  sourceType: api
+  releaseStage: alpha
+  public: false
+- name: ZohoDesk
+  sourceDefinitionId: e4754180-caae-43b8-a2d0-7d2775b74318
+  dockerRepository: yuanrui2014/source-zoho-desk
+  dockerImageTag: 0.0.1
+  documentationUrl: https://docs.daspire.com/integrations/sources/zoho-desk
   sourceType: api
   releaseStage: alpha
   public: false

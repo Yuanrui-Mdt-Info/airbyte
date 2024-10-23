@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: airbyte-cron-container
-          image: yuanrui2014/cron
+          image: harbor.nekteck.cloud/airbyte/cron:dev.1.114
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -49,6 +49,8 @@ spec:
             - name: gcs-log-creds-volume
               mountPath: /secrets/gcs-log-creds
               readOnly: true
+      imagePullSecrets:
+        - name: harbor-secert
       volumes:
         - name: airbyte-volume-configs
           persistentVolumeClaim:

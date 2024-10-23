@@ -5,9 +5,13 @@
 
 from setuptools import find_packages, setup
 
-# pin protobuf==3.20.0 as other versions may cause problems on different architectures
-# (see https://github.com/airbytehq/airbyte/issues/13580)
-MAIN_REQUIREMENTS = ["airbyte-cdk~=0.1", "google-ads==17.0.0", "protobuf==3.20.0", "pendulum"]
+MAIN_REQUIREMENTS = [
+    "airbyte-cdk~=0.1",
+    "google-ads==25.0.0",
+    "protobuf>=4.25.0,<6.0.0", 
+    "pendulum",
+    "PyYAML~=5.4",
+]
 
 TEST_REQUIREMENTS = ["pytest~=6.1", "pytest-mock", "freezegun", "requests-mock"]
 

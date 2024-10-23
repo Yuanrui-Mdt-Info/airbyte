@@ -126,12 +126,12 @@ def test_stream_slices_report(advertiser_ids, granularity, slices_expected, pend
 @pytest.mark.parametrize(
     "stream, metrics_number",
     [
-        (AdsReports, 54),
-        (AdGroupsReports, 51),
+        (AdsReports, 53),
+        (AdGroupsReports, 50),
         (AdvertisersReports, 29),
         (CampaignsReports, 28),
         (AdvertisersAudienceReports, 6),
-        (AdsAudienceReports, 30),
+        (AdsAudienceReports, 29),
     ],
 )
 def test_basic_reports_get_metrics_day(stream, metrics_number):
@@ -142,8 +142,8 @@ def test_basic_reports_get_metrics_day(stream, metrics_number):
 @pytest.mark.parametrize(
     "stream, metrics_number",
     [
-        (AdsReports, 54),
-        (AdGroupsReports, 51),
+        (AdsReports, 53),
+        (AdGroupsReports, 50),
         (AdvertisersReports, 27),
         (CampaignsReports, 28),
         (AdvertisersAudienceReports, 6),
