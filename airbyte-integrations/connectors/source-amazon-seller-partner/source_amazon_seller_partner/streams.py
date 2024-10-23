@@ -210,6 +210,7 @@ class ReportsAmazonSPStream(Stream, ABC):
         self._report_options = report_options
         self.max_wait_seconds = max_wait_seconds
         self.source_name = source_name
+
         if self._replication_span_period is not None and self._replication_span_period > 0:
            
             self._replication_start_date = pendulum.today("utc").subtract(days=self._replication_span_period).strftime(DATE_TIME_FORMAT)
@@ -220,6 +221,7 @@ class ReportsAmazonSPStream(Stream, ABC):
             
             else:
                 pass
+
         # added by Jerry 2023.6.15, if replication_start_date is none, set the replication_start_date to the previous day
         if self._replication_start_date is None:
             self._replication_start_date = pendulum.yesterday("utc").strftime(DATE_TIME_FORMAT)
@@ -313,6 +315,7 @@ class ReportsAmazonSPStream(Stream, ABC):
             data=json_lib.dumps(report_data),
         )
         report_response = self._send_request(create_report_request)
+
         #return report_response.json()[self.data_field]
         # update to api 2021-06-30
         return report_response.json()
