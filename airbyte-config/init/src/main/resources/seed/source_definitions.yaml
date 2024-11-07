@@ -1417,3 +1417,11 @@
   sourceType: api
   releaseStage: alpha
   public: true
+- name: Hubstaff
+  sourceDefinitionId: a9497464-34f2-4f7b-9f12-9b873a69d2ea
+  dockerRepository: yuanrui2014/source-hubstaff
+  dockerImageTag: 0.0.1
+  documentationUrl: https://docs.daspire.com/setup-guide/sources/hubstaff
+  sourceType: api
+  releaseStage: alpha
+  public: true

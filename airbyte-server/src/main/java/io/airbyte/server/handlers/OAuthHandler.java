@@ -27,8 +27,12 @@ import io.airbyte.scheduler.persistence.job_factory.OAuthConfigSupplier;
 import io.airbyte.scheduler.persistence.job_tracker.TrackingMetadata;
 import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.net.http.HttpClient;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +69,9 @@ public class OAuthHandler {
           sourceDefinitionIdRequestBody.getRedirectUrl(),
           sourceDefinitionIdRequestBody.getoAuthInputConfiguration(),
           spec.getAdvancedAuth().getOauthConfigSpecification()));
+      if ("a9497464-34f2-4f7b-9f12-9b873a69d2ea".equalsIgnoreCase(sourceDefinitionIdRequestBody.getSourceDefinitionId().toString())) {
+        result.setConsentUrl(decodeScopeForHubstaff(result.getConsentUrl()));
+      }
     } else {
       result = new OAuthConsentRead().consentUrl(oAuthFlowImplementation.getSourceConsentUrl(
           sourceDefinitionIdRequestBody.getWorkspaceId(),
@@ -77,6 +84,27 @@ public class OAuthHandler {
       LOGGER.error(ERROR_MESSAGE, e);
     }
     return result;
+  }
+
+  private String decodeScopeForHubstaff(String consentUrl) {
+    try {
+      URI uri = new URI(consentUrl);
+      String query = uri.getQuery();
+      Optional<String> scopeOpt = Arrays.stream(query.split("&"))
+          .filter(param -> param.startsWith("scope="))
+          .map(param -> param.substring("scope=".length()))
+          .findFirst();
+      if (scopeOpt.isPresent()) {
+        String scope = scopeOpt.get();
+        String decodedScope = URLDecoder.decode(scope, "UTF-8");
+        // Reconstruct the URL with the decoded scope
+        String newQuery = query.replace(scope, decodedScope);
+        return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment()).toString();
+      }
+    } catch (Exception e) {
+      LOGGER.error(ERROR_MESSAGE, e);
+    }
+    return consentUrl;
   }
 
   public OAuthConsentRead getDestinationOAuthConsent(final DestinationOauthConsentRequest destinationDefinitionIdRequestBody)
