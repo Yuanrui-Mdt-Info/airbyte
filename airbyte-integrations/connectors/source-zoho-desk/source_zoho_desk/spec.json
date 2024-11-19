@@ -10,7 +10,8 @@
       "refresh_token",
       "dc_region",
       "edition",
-      "org_id"
+      "org_id",
+      "auth_type"
     ],
     "additionalProperties": false,
     "properties": {
@@ -39,7 +40,7 @@
         "enum": ["US","AU","EU","IN","JP","UK","SA","CA"]
       },
       
-      "start_datetime": {
+      "start_date": {
         "title": "Start Date",
         "type": ["null", "string"],
         "examples": [
@@ -63,6 +64,12 @@
         "type": "string",
         "title": "Organization ID",
         "description": "The organization ID for Zoho Desk"
+      },
+      "auth_type" : {
+        "type" : "string",
+        "title" : "oauth2.0 authentication",
+        "description": "The authentication type for Zoho Desk"
+        
       }
     }
   }

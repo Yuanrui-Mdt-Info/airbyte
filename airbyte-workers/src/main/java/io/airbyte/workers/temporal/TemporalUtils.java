@@ -181,6 +181,7 @@ public class TemporalUtils {
   public static WorkflowOptions getWorkflowOptionsWithWorkflowId(final TemporalJobType jobType, final String workflowId) {
 
     return WorkflowOptions.newBuilder()
+        .setWorkflowTaskTimeout(Duration.ofSeconds(90))
         .setWorkflowId(workflowId)
         .setRetryOptions(NO_RETRY)
         .setTaskQueue(jobType.name())
