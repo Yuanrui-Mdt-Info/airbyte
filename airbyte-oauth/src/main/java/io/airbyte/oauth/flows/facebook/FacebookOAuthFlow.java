@@ -18,6 +18,8 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -27,8 +29,8 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
 
-  private static final String ACCESS_TOKEN_URL = "https://graph.facebook.com/v12.0/oauth/access_token";
-  private static final String AUTH_CODE_TOKEN_URL = "https://www.facebook.com/v12.0/dialog/oauth";
+  private static final String ACCESS_TOKEN_URL = "https://graph.facebook.com/v21.0/oauth/access_token";
+  private static final String AUTH_CODE_TOKEN_URL = "https://www.facebook.com/v21.0/dialog/oauth";
   private static final String ACCESS_TOKEN = "access_token";
 
   public FacebookOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
@@ -72,6 +74,25 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     return Map.of(ACCESS_TOKEN, data.get(ACCESS_TOKEN).asText());
   }
 
+  protected List<String> getAdAccountIds(final String accessToken) throws IOException {
+    try {
+      final String url = "https://graph.facebook.com/v21.0/me/adaccounts?access_token=" + accessToken;
+      final HttpRequest request = HttpRequest.newBuilder()
+              .GET()
+              .uri(URI.create(url))
+              .build();
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      final JsonNode jsonNode = Jsons.deserialize(response.body());
+      List<String> account_ids = new ArrayList<>();
+      for (JsonNode data : jsonNode.get("data")) {
+        account_ids.add(data.get("account_id").asText());
+      }
+      return account_ids;
+    } catch (final InterruptedException e) {
+      throw new IOException("Failed to complete OAuth flow", e);
+    }
+  }
+
   @Override
   protected Map<String, Object> completeOAuthFlow(final String clientId,
                                                   final String clientSecret,
@@ -91,7 +112,15 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     Preconditions.checkArgument(data.containsKey(ACCESS_TOKEN));
     final String shortLivedAccessToken = (String) data.get(ACCESS_TOKEN);
     final String longLivedAccessToken = getLongLivedAccessToken(clientId, clientSecret, shortLivedAccessToken);
-    return Map.of(ACCESS_TOKEN, longLivedAccessToken);
+
+    List<String> adsAccountIds = getAdAccountIds(shortLivedAccessToken);
+
+    Map<String, Object> output = new HashMap<>();
+    output.put(ACCESS_TOKEN, longLivedAccessToken);
+    output.put("org_ids", String.join(",", adsAccountIds));
+
+    return output;
+    //return Map.of(ACCESS_TOKEN, longLivedAccessToken);
   }
 
   protected URI createLongLivedTokenURI(final String clientId, final String clientSecret, final String shortLivedAccessToken)
