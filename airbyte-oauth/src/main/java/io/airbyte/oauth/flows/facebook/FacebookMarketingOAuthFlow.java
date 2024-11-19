@@ -11,7 +11,9 @@ import java.util.function.Supplier;
 
 public class FacebookMarketingOAuthFlow extends FacebookOAuthFlow {
 
-  private static final String SCOPES = "ads_management,ads_read,read_insights,business_management";
+  //private static final String SCOPES = "ads_management,ads_read,read_insights,business_management";
+  // remove the read_insights scope as it is not supported by the Marketing API
+  private static final String SCOPES = "ads_management,ads_read,business_management";
 
   public FacebookMarketingOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
