@@ -5,6 +5,7 @@
 package io.airbyte.oauth.flows.facebook;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.persistence.ConfigRepository;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
 
+
 /**
  * Following docs from
  * https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow
@@ -32,6 +34,39 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
   private static final String ACCESS_TOKEN_URL = "https://graph.facebook.com/v21.0/oauth/access_token";
   private static final String AUTH_CODE_TOKEN_URL = "https://www.facebook.com/v21.0/dialog/oauth";
   private static final String ACCESS_TOKEN = "access_token";
+
+  class Account {
+    private String id;
+    private String name;
+    private String account_id;
+
+    public Account(String id, String name, String account_id) {
+      this.id = id;
+      this.name = name;
+      this.account_id = account_id;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getAccountId() {
+      return account_id;
+    }
+
+    public String toJsonString() {
+      try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to convert Account object to JSON string", e);
+      }
+    }
+  }
 
   public FacebookOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
@@ -74,18 +109,20 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     return Map.of(ACCESS_TOKEN, data.get(ACCESS_TOKEN).asText());
   }
 
-  protected List<String> getAdAccountIds(final String accessToken) throws IOException {
+  protected List<Account> getAdAccountIds(final String accessToken) throws IOException {
     try {
-      final String url = "https://graph.facebook.com/v21.0/me/adaccounts?access_token=" + accessToken;
+      final String url = "https://graph.facebook.com/v21.0/me/adaccounts?fields=id,name,account_id&access_token=" + accessToken;
       final HttpRequest request = HttpRequest.newBuilder()
               .GET()
               .uri(URI.create(url))
               .build();
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       final JsonNode jsonNode = Jsons.deserialize(response.body());
-      List<String> account_ids = new ArrayList<>();
+      List<Account> account_ids = new ArrayList<>();
       for (JsonNode data : jsonNode.get("data")) {
-        account_ids.add(data.get("account_id").asText());
+        Account account = new Account(data.get("id").asText(), data.get("name").asText(), data.get("account_id").asText());
+        //account_ids.add(data.get("account_id").asText());
+        account_ids.add(account);
       }
       return account_ids;
     } catch (final InterruptedException e) {
@@ -113,11 +150,14 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     final String shortLivedAccessToken = (String) data.get(ACCESS_TOKEN);
     final String longLivedAccessToken = getLongLivedAccessToken(clientId, clientSecret, shortLivedAccessToken);
 
-    List<String> adsAccountIds = getAdAccountIds(shortLivedAccessToken);
+    List<Account> adsAccountIds = getAdAccountIds(shortLivedAccessToken);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String accountsJsonArray = objectMapper.writeValueAsString(adsAccountIds);
 
     Map<String, Object> output = new HashMap<>();
     output.put(ACCESS_TOKEN, longLivedAccessToken);
-    output.put("org_ids", String.join(",", adsAccountIds));
+    //output.put("org_ids", String.join(",", adsAccountIds));
+    output.put("org_ids", accountsJsonArray);
 
     return output;
     //return Map.of(ACCESS_TOKEN, longLivedAccessToken);
