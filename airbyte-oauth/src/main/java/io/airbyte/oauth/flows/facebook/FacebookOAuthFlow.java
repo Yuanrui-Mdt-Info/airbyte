@@ -16,14 +16,13 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
-
 
 /**
  * Following docs from
@@ -36,9 +35,10 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
   private static final String ACCESS_TOKEN = "access_token";
 
   class Account {
-    private String id;
-    private String name;
-    private String account_id;
+
+    private final String id;
+    private final String name;
+    private final String account_id;
 
     public Account(String id, String name, String account_id) {
       this.id = id;
@@ -66,6 +66,7 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
         throw new RuntimeException("Failed to convert Account object to JSON string", e);
       }
     }
+
   }
 
   public FacebookOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
@@ -113,15 +114,15 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     try {
       final String url = "https://graph.facebook.com/v21.0/me/adaccounts?fields=id,name,account_id&access_token=" + accessToken;
       final HttpRequest request = HttpRequest.newBuilder()
-              .GET()
-              .uri(URI.create(url))
-              .build();
+          .GET()
+          .uri(URI.create(url))
+          .build();
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       final JsonNode jsonNode = Jsons.deserialize(response.body());
       List<Account> account_ids = new ArrayList<>();
       for (JsonNode data : jsonNode.get("data")) {
         Account account = new Account(data.get("id").asText(), data.get("name").asText(), data.get("account_id").asText());
-        //account_ids.add(data.get("account_id").asText());
+        // account_ids.add(data.get("account_id").asText());
         account_ids.add(account);
       }
       return account_ids;
@@ -156,11 +157,11 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
 
     Map<String, Object> output = new HashMap<>();
     output.put(ACCESS_TOKEN, longLivedAccessToken);
-    //output.put("org_ids", String.join(",", adsAccountIds));
+    // output.put("org_ids", String.join(",", adsAccountIds));
     output.put("org_ids", accountsJsonArray);
 
     return output;
-    //return Map.of(ACCESS_TOKEN, longLivedAccessToken);
+    // return Map.of(ACCESS_TOKEN, longLivedAccessToken);
   }
 
   protected URI createLongLivedTokenURI(final String clientId, final String clientSecret, final String shortLivedAccessToken)
