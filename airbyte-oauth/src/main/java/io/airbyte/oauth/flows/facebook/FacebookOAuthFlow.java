@@ -5,6 +5,7 @@
 package io.airbyte.oauth.flows.facebook;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.persistence.ConfigRepository;
@@ -15,6 +16,8 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,9 +30,44 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
 
-  private static final String ACCESS_TOKEN_URL = "https://graph.facebook.com/v12.0/oauth/access_token";
-  private static final String AUTH_CODE_TOKEN_URL = "https://www.facebook.com/v12.0/dialog/oauth";
+  private static final String ACCESS_TOKEN_URL = "https://graph.facebook.com/v21.0/oauth/access_token";
+  private static final String AUTH_CODE_TOKEN_URL = "https://www.facebook.com/v21.0/dialog/oauth";
   private static final String ACCESS_TOKEN = "access_token";
+
+  class Account {
+
+    private final String id;
+    private final String name;
+    private final String account_id;
+
+    public Account(String id, String name, String account_id) {
+      this.id = id;
+      this.name = name;
+      this.account_id = account_id;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getAccountId() {
+      return account_id;
+    }
+
+    public String toJsonString() {
+      try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to convert Account object to JSON string", e);
+      }
+    }
+
+  }
 
   public FacebookOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
@@ -72,6 +110,27 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     return Map.of(ACCESS_TOKEN, data.get(ACCESS_TOKEN).asText());
   }
 
+  protected List<Account> getAdAccountIds(final String accessToken) throws IOException {
+    try {
+      final String url = "https://graph.facebook.com/v21.0/me/adaccounts?fields=id,name,account_id&access_token=" + accessToken;
+      final HttpRequest request = HttpRequest.newBuilder()
+          .GET()
+          .uri(URI.create(url))
+          .build();
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      final JsonNode jsonNode = Jsons.deserialize(response.body());
+      List<Account> account_ids = new ArrayList<>();
+      for (JsonNode data : jsonNode.get("data")) {
+        Account account = new Account(data.get("id").asText(), data.get("name").asText(), data.get("account_id").asText());
+        // account_ids.add(data.get("account_id").asText());
+        account_ids.add(account);
+      }
+      return account_ids;
+    } catch (final InterruptedException e) {
+      throw new IOException("Failed to complete OAuth flow", e);
+    }
+  }
+
   @Override
   protected Map<String, Object> completeOAuthFlow(final String clientId,
                                                   final String clientSecret,
@@ -91,7 +150,18 @@ public abstract class FacebookOAuthFlow extends BaseOAuth2Flow {
     Preconditions.checkArgument(data.containsKey(ACCESS_TOKEN));
     final String shortLivedAccessToken = (String) data.get(ACCESS_TOKEN);
     final String longLivedAccessToken = getLongLivedAccessToken(clientId, clientSecret, shortLivedAccessToken);
-    return Map.of(ACCESS_TOKEN, longLivedAccessToken);
+
+    List<Account> adsAccountIds = getAdAccountIds(shortLivedAccessToken);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String accountsJsonArray = objectMapper.writeValueAsString(adsAccountIds);
+
+    Map<String, Object> output = new HashMap<>();
+    output.put(ACCESS_TOKEN, longLivedAccessToken);
+    // output.put("org_ids", String.join(",", adsAccountIds));
+    output.put("org_ids", accountsJsonArray);
+
+    return output;
+    // return Map.of(ACCESS_TOKEN, longLivedAccessToken);
   }
 
   protected URI createLongLivedTokenURI(final String clientId, final String clientSecret, final String shortLivedAccessToken)
