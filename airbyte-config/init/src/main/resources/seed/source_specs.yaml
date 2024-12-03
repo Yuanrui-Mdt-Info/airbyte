@@ -12012,9 +12012,7 @@
         - "client_id"
         - "client_secret"
         - "refresh_token"
-        - "environment"
         - "dc_region"
-        - "edition"
     
       additionalProperties: false
       properties: 
@@ -12040,48 +12038,28 @@
           title: "Data Center Location"
           type: "string"
           description: "Please choose the region of your Data Center location. More info by this <a href=\"https://www.zoho.com/desk/developer/docs/api/v2/multi-dc.html\">Link</a>"
-          enum": 
-            - "US"
-            - "AU" 
-            - "EU"
-            - "IN" 
-            - "CN"
-            - "JP"
-
-        environment: 
-          title: "Environment"
-          type: "string"
-          description: "Please choose the environment"
-          enum: 
-            - "Production"
-            - "Developer"
-            - "Sandbox"
-      
-        start_datetime: 
-          title: "Start Date"
+          airbyte_secret: true
+            
+        start_date: 
+          title: "Start Date (Optional, Only for the stream tickets_resolution_time and response_time)"
           type: 
             - "null"
             - "string"
           examples: 
             - "2000-01-01"
-            - "2000-01-01 13:00"
-            - "2000-01-01 13:00:00"
-            - "2000-01-01T13:00+00:00"
-            - "2000-01-01T13:00:00-07:00"
-    
-          description: "ISO 8601, for instance: `YYYY-MM-DD`, `YYYY-MM-DD HH:MM:SS+HH:MM`"
-          format: "date-time"  
-        edition: 
-          title: "Zoho Desk Edition"
-          type: "string"
-          description: "Choose your Edition of Zoho DESK to determine API Concurrency Limits"
-          enum: 
-            - "Free"
-            - "Standard"
-            - "Professional"
-            - "Enterprise"
-            - "Ultimate"
-          default": "Free"
+          description: "The start date for syncing data, In YYYY-MM-DD format."
+          format: "date"  
+          
+        end_date: 
+          title: "End Date (Optional, Only for the stream tickets_resolution_time and response_time)"
+          type: 
+            - "null"
+            - "string"
+          examples: 
+            - "2000-01-01"
+          description: "The end date for syncing data, In YYYY-MM-DD format."
+          format: "date"  
+
     supportsNormalization: false
     supportsDBT: false
     supported_destination_sync_modes: []
