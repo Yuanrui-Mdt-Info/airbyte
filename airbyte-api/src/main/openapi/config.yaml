@@ -634,7 +634,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageSourceReadList"
+                $ref: "#/components/schemas/SourcePageReadList"
         "404":
           $ref: "#/components/responses/NotFoundResponse"
         "422":
@@ -1200,7 +1200,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageDestinationReadList"
+                $ref: "#/components/schemas/DestinationPageReadList"
         "404":
           $ref: "#/components/responses/NotFoundResponse"
         "422":
@@ -3130,17 +3130,6 @@ components:
           type: string
         sourceName:
           type: string
-    PageSourceRead:
-      type: object
-      required:
-        - sourceRead
-      properties:
-        sourceRead:
-          $ref: "#/components/schemas/SourceRead"
-        connectionCount:
-          type: integer
-        updatedAt:
-          type: string
     SourceReadWithConnectionPage:
       type: object
       required:
@@ -3485,17 +3474,6 @@ components:
           type: string
         destinationName:
           type: string
-    PageDestinationRead:
-      type: object
-      required:
-        - destinationRead
-      properties:
-        destinationRead:
-          $ref: "#/components/schemas/DestinationRead"
-        connectionCount:
-          type: integer
-        updatedAt:
-          type: string
     DestinationReadWithConnectionPage:
       type: object
       required:
@@ -3521,7 +3499,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DestinationRead"
-    PageDestinationReadList:
+    DestinationPageReadList:
       type: object
       required:
         - destinations
@@ -3529,7 +3507,7 @@ components:
         destinations:
           type: array
           items:
-            $ref: "#/components/schemas/PageDestinationRead"
+            $ref: "#/components/schemas/DestinationRead"
         total:
           type: integer
           format: int64
@@ -5237,7 +5215,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WebBackendConnectionStatusRead"
-    PageSourceReadList:
+    SourcePageReadList:
       type: object
       required:
         - sources
@@ -5245,7 +5223,7 @@ components:
         sources:
           type: array
           items:
-            $ref: "#/components/schemas/PageSourceRead"
+            $ref: "#/components/schemas/SourceRead"
         total:
           type: integer
           format: int64

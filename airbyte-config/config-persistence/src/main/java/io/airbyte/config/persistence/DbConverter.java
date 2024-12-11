@@ -14,18 +14,32 @@ import static io.airbyte.db.instance.configs.jooq.generated.Tables.WORKSPACE_SER
 
 import io.airbyte.commons.enums.Enums;
 import io.airbyte.commons.json.Jsons;
-import io.airbyte.config.*;
+import io.airbyte.config.ActorCatalog;
+import io.airbyte.config.ActorDefinitionResourceRequirements;
+import io.airbyte.config.AdvanceSetting;
+import io.airbyte.config.DestinationConnection;
+import io.airbyte.config.DestinationOAuthParameter;
 import io.airbyte.config.JobSyncConfig.NamespaceDefinitionType;
+import io.airbyte.config.Notification;
+import io.airbyte.config.ResourceRequirements;
+import io.airbyte.config.Schedule;
+import io.airbyte.config.ScheduleData;
+import io.airbyte.config.SourceConnection;
+import io.airbyte.config.SourceOAuthParameter;
+import io.airbyte.config.StandardDestinationDefinition;
+import io.airbyte.config.StandardSourceDefinition;
 import io.airbyte.config.StandardSourceDefinition.SourceType;
+import io.airbyte.config.StandardSync;
 import io.airbyte.config.StandardSync.ScheduleType;
 import io.airbyte.config.StandardSync.Status;
+import io.airbyte.config.StandardWorkspace;
+import io.airbyte.config.WorkspaceServiceAccount;
 import io.airbyte.protocol.models.ConfiguredAirbyteCatalog;
 import io.airbyte.protocol.models.ConnectorSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang3.ObjectUtils;
 import org.jooq.Record;
 
 public class DbConverter {
@@ -192,13 +206,6 @@ public class DbConverter {
         .withName(record.get(ACTOR.NAME));
   }
 
-  public static PageSourceConnection buildPageSourceConnection(final Record record) {
-    String CONNECTION_COUNT = "connectionCount";
-    return new PageSourceConnection().withSourceConnection(buildSourceConnection(record))
-        .withUpdatedAt(record.get(ACTOR.UPDATED_AT, String.class))
-        .withConnectionCount(ObjectUtils.isEmpty(record.get(CONNECTION_COUNT)) ? 0l : record.get(CONNECTION_COUNT, Long.class));
-  }
-
   public static DestinationConnection buildDestinationConnection(final Record record) {
     return new DestinationConnection()
         .withDestinationId(record.get(ACTOR.ID))
@@ -207,13 +214,6 @@ public class DbConverter {
         .withDestinationDefinitionId(record.get(ACTOR.ACTOR_DEFINITION_ID))
         .withTombstone(record.get(ACTOR.TOMBSTONE))
         .withName(record.get(ACTOR.NAME));
-  }
-
-  public static PageDestinationConnection buildPageDestinationConnection(final Record record) {
-    String connectionCount = "connectionCount";
-    return new PageDestinationConnection().withDestinationConnection(buildDestinationConnection(record))
-        .withUpdatedAt(record.get(ACTOR.UPDATED_AT, String.class))
-        .withConnectionCount(ObjectUtils.isEmpty(record.get(connectionCount)) ? 0l : record.get(connectionCount, Long.class));
   }
 
 }

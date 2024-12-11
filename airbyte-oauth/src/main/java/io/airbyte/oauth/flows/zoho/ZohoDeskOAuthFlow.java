@@ -168,7 +168,7 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json")
         .build();
-
+    
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);

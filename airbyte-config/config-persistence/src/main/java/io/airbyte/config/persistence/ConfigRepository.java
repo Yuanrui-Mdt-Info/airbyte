@@ -14,7 +14,8 @@ import static io.airbyte.db.instance.configs.jooq.generated.Tables.CONNECTION;
 import static io.airbyte.db.instance.configs.jooq.generated.Tables.CONNECTION_OPERATION;
 import static io.airbyte.db.instance.configs.jooq.generated.Tables.OPERATION;
 import static io.airbyte.db.instance.configs.jooq.generated.Tables.WORKSPACE;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.asterisk;
+import static org.jooq.impl.DSL.lower;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Charsets;
@@ -23,7 +24,21 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.commons.lang.MoreBooleans;
-import io.airbyte.config.*;
+import io.airbyte.config.ActorCatalog;
+import io.airbyte.config.AirbyteConfig;
+import io.airbyte.config.ConfigSchema;
+import io.airbyte.config.DestinationConnection;
+import io.airbyte.config.DestinationOAuthParameter;
+import io.airbyte.config.SourceConnection;
+import io.airbyte.config.SourceOAuthParameter;
+import io.airbyte.config.StandardDestinationDefinition;
+import io.airbyte.config.StandardSourceDefinition;
+import io.airbyte.config.StandardSync;
+import io.airbyte.config.StandardSyncOperation;
+import io.airbyte.config.StandardSyncState;
+import io.airbyte.config.StandardWorkspace;
+import io.airbyte.config.State;
+import io.airbyte.config.WorkspaceServiceAccount;
 import io.airbyte.db.Database;
 import io.airbyte.db.ExceptionWrappingDatabase;
 import io.airbyte.db.instance.configs.jooq.generated.enums.ActorType;
@@ -730,21 +745,18 @@ public class ConfigRepository {
     }
   }
 
-  public List<PageSourceConnection> pageWorkspaceSourceConnection(final UUID workspaceId,
-                                                                  final UUID sourceDefinitionId,
-                                                                  final Integer pageSize,
-                                                                  final Integer pageCurrent,
-                                                                  final String sortFieldName,
-                                                                  final String sortDirection)
+  public List<SourceConnection> pageWorkspaceSourceConnection(final UUID workspaceId,
+                                                              final UUID sourceDefinitionId,
+                                                              final Integer pageSize,
+                                                              final Integer pageCurrent,
+                                                              final String sortFieldName,
+                                                              final String sortDirection)
       throws IOException {
     final Result<Record> result = database.query(ctx -> {
-      SelectConditionStep<Record> where =
-          ctx.select(ACTOR.asterisk(), ACTOR_DEFINITION.asterisk(), count(CONNECTION.ID).as("connectionCount"))
-              .from(ACTOR)
-              .join(ACTOR_DEFINITION).on(ACTOR.ACTOR_DEFINITION_ID.eq(ACTOR_DEFINITION.ID))
-              .leftJoin(CONNECTION).on(ACTOR.ID.eq(CONNECTION.SOURCE_ID)).and(CONNECTION.STATUS.eq(StatusType.active))
-              .where(ACTOR.TOMBSTONE.eq(Boolean.FALSE))
-              .and(ACTOR.ACTOR_TYPE.eq(ActorType.source));
+      SelectConditionStep<Record> where = ctx.select(asterisk()).from(ACTOR)
+          .join(ACTOR_DEFINITION).on(ACTOR.ACTOR_DEFINITION_ID.eq(ACTOR_DEFINITION.ID))
+          .where(ACTOR.TOMBSTONE.eq(Boolean.FALSE))
+          .and(ACTOR.ACTOR_TYPE.eq(ActorType.source));
       if (workspaceId != null) {
         where.and(ACTOR.WORKSPACE_ID.eq(workspaceId));
       }
@@ -767,32 +779,29 @@ public class ConfigRepository {
       if (sortField != null) {
         where.orderBy(sortField);
       }
-      where.groupBy(ACTOR.ID, ACTOR_DEFINITION.ID);
       return where.limit(pageSize)
           .offset(pageSize * (pageCurrent - 1));
     }).fetch();
-    final List<PageSourceConnection> sourceConnections = new ArrayList<>();
+
+    final List<SourceConnection> sourceConnections = new ArrayList<>();
     for (final Record record : result) {
-      sourceConnections.add(DbConverter.buildPageSourceConnection(record));
+      sourceConnections.add(DbConverter.buildSourceConnection(record));
     }
     return sourceConnections;
   }
 
-  public List<PageDestinationConnection> pageWorkspaceDestinationConnection(final UUID workspaceId,
-                                                                            final UUID destinationDefinitionId,
-                                                                            final Integer pageSize,
-                                                                            final Integer pageCurrent,
-                                                                            final String sortFieldName,
-                                                                            final String sortDirection)
+  public List<DestinationConnection> pageWorkspaceDestinationConnection(final UUID workspaceId,
+                                                                        final UUID destinationDefinitionId,
+                                                                        final Integer pageSize,
+                                                                        final Integer pageCurrent,
+                                                                        final String sortFieldName,
+                                                                        final String sortDirection)
       throws IOException {
     final Result<Record> result = database.query(ctx -> {
-      SelectConditionStep<Record> where =
-          ctx.select(ACTOR.asterisk(), ACTOR_DEFINITION.asterisk(), count(CONNECTION.ID).as("connectionCount"))
-              .from(ACTOR)
-              .join(ACTOR_DEFINITION).on(ACTOR.ACTOR_DEFINITION_ID.eq(ACTOR_DEFINITION.ID))
-              .leftJoin(CONNECTION).on(ACTOR.ID.eq(CONNECTION.DESTINATION_ID)).and(CONNECTION.STATUS.eq(StatusType.active))
-              .where(ACTOR.TOMBSTONE.eq(Boolean.FALSE))
-              .and(ACTOR.ACTOR_TYPE.eq(ActorType.destination));
+      SelectConditionStep<Record> where = ctx.select(asterisk()).from(ACTOR)
+          .join(ACTOR_DEFINITION).on(ACTOR.ACTOR_DEFINITION_ID.eq(ACTOR_DEFINITION.ID))
+          .where(ACTOR.TOMBSTONE.eq(Boolean.FALSE))
+          .and(ACTOR.ACTOR_TYPE.eq(ActorType.destination));
       if (workspaceId != null) {
         where.and(ACTOR.WORKSPACE_ID.eq(workspaceId));
       }
@@ -815,16 +824,15 @@ public class ConfigRepository {
       if (sortField != null) {
         where.orderBy(sortField);
       }
-      where.groupBy(ACTOR.ID, ACTOR_DEFINITION.ID);
       return where.limit(pageSize)
           .offset(pageSize * (pageCurrent - 1));
     }).fetch();
 
-    final List<PageDestinationConnection> pageDestinationConnections = new ArrayList<>();
+    final List<DestinationConnection> destinationConnections = new ArrayList<>();
     for (final Record record : result) {
-      pageDestinationConnections.add(DbConverter.buildPageDestinationConnection(record));
+      destinationConnections.add(DbConverter.buildDestinationConnection(record));
     }
-    return pageDestinationConnections;
+    return destinationConnections;
   }
 
   public Long pageWorkspaceStandardSyncsCount(final UUID workspaceId, final UUID sourceId, final UUID destinationId, final String status)

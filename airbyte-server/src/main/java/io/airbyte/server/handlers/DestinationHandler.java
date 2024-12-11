@@ -9,7 +9,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.json.Jsons;
-import io.airbyte.config.*;
+import io.airbyte.config.DestinationConnection;
+import io.airbyte.config.StandardDestinationDefinition;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.config.persistence.SecretsRepositoryReader;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.ObjectUtils;
 
 public class DestinationHandler {
 
@@ -212,7 +212,7 @@ public class DestinationHandler {
     return new DestinationReadList().destinations(reads);
   }
 
-  public PageDestinationReadList pageDestinationsForWorkspace(final DestinationPageRequestBody destinationPageRequestBody)
+  public DestinationPageReadList pageDestinationsForWorkspace(final DestinationPageRequestBody destinationPageRequestBody)
       throws IOException {
     if (destinationPageRequestBody.getPageSize() == null || destinationPageRequestBody.getPageSize() == 0) {
       destinationPageRequestBody.setPageSize(10);
@@ -220,26 +220,25 @@ public class DestinationHandler {
     if (destinationPageRequestBody.getPageCurrent() == null || destinationPageRequestBody.getPageCurrent() == 0) {
       destinationPageRequestBody.setPageCurrent(1);
     }
-    List<PageDestinationConnection> pageDestinationConnections = configRepository.pageWorkspaceDestinationConnection(
+    List<DestinationConnection> destinationConnections = configRepository.pageWorkspaceDestinationConnection(
         destinationPageRequestBody.getWorkspaceId(), destinationPageRequestBody.getDestinationDefinitionId(),
         destinationPageRequestBody.getPageSize(), destinationPageRequestBody.getPageCurrent(),
         destinationPageRequestBody.getSortDetails().getSortFieldName(),
         destinationPageRequestBody.getSortDetails().getSortDirection());
-    final List<PageDestinationRead> destinationReads = Lists.newArrayList();
-    for (final PageDestinationConnection pageDestinationConnection : pageDestinationConnections) {
+    final List<DestinationRead> destinationReads = Lists.newArrayList();
+    for (final DestinationConnection destinationConnection : destinationConnections) {
       try {
-        DestinationConnection destinationConnection = pageDestinationConnection.getDestinationConnection();
         StandardDestinationDefinition standardDestinationDefinition =
             configRepository.getStandardDestinationDefinition(destinationConnection.getDestinationDefinitionId());
         final JsonNode sanitizedConfig = secretsProcessor.prepareSecretsForOutput(destinationConnection.getConfiguration(),
             standardDestinationDefinition.getSpec().getConnectionSpecification());
         destinationConnection.setConfiguration(sanitizedConfig);
-        destinationReads.add(toPageDestinationRead(pageDestinationConnection, standardDestinationDefinition));
+        destinationReads.add(toDestinationRead(destinationConnection, standardDestinationDefinition));
       } catch (final Exception e) {
         throw new RuntimeException(e);
       }
     }
-    return new PageDestinationReadList().destinations(destinationReads)
+    return new DestinationPageReadList().destinations(destinationReads)
         .total(configRepository.pageWorkspaceDestinationCount(destinationPageRequestBody.getWorkspaceId(),
             destinationPageRequestBody.getDestinationDefinitionId()))
         .pageCurrent(destinationPageRequestBody.getPageCurrent()).pageSize(destinationPageRequestBody.getPageSize());
@@ -346,15 +345,6 @@ public class DestinationHandler {
         .connectionConfiguration(destinationConnection.getConfiguration())
         .name(destinationConnection.getName())
         .destinationName(standardDestinationDefinition.getName());
-  }
-
-  protected static PageDestinationRead toPageDestinationRead(final PageDestinationConnection pageDestinationConnection,
-                                                             final StandardDestinationDefinition standardDestinationDefinition) {
-    return new PageDestinationRead()
-        .destinationRead(toDestinationRead(pageDestinationConnection.getDestinationConnection(), standardDestinationDefinition))
-        .updatedAt(pageDestinationConnection.getUpdatedAt())
-        .connectionCount(
-            ObjectUtils.isEmpty(pageDestinationConnection.getConnectionCount()) ? 0 : pageDestinationConnection.getConnectionCount().intValue());
   }
 
   public List<WebBackendConnectionFilterParamItem> listFilterParam(UUID workspaceId) throws IOException {
