@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.lang.MoreBooleans;
+import io.airbyte.config.PageSourceConnection;
 import io.airbyte.config.SourceConnection;
 import io.airbyte.config.StandardSourceDefinition;
 import io.airbyte.config.persistence.ConfigNotFoundException;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class SourceHandler {
 
@@ -178,7 +180,7 @@ public class SourceHandler {
     return new SourceReadList().sources(reads);
   }
 
-  public SourcePageReadList pageSourcesForWorkspace(final SourcesPageRequestBody sourcesPageRequestBodys)
+  public PageSourceReadList pageSourcesForWorkspace(final SourcesPageRequestBody sourcesPageRequestBodys)
       throws IOException {
     if (sourcesPageRequestBodys.getPageSize() == null || sourcesPageRequestBodys.getPageSize() == 0) {
       sourcesPageRequestBodys.setPageSize(10);
@@ -186,24 +188,25 @@ public class SourceHandler {
     if (sourcesPageRequestBodys.getPageCurrent() == null || sourcesPageRequestBodys.getPageCurrent() == 0) {
       sourcesPageRequestBodys.setPageCurrent(1);
     }
-    List<SourceConnection> sourceConnections =
+    List<PageSourceConnection> pageSourceConnections =
         configRepository.pageWorkspaceSourceConnection(sourcesPageRequestBodys.getWorkspaceId(), sourcesPageRequestBodys.getSourceDefinitionId(),
             sourcesPageRequestBodys.getPageSize(), sourcesPageRequestBodys.getPageCurrent(),
             sourcesPageRequestBodys.getSortDetails().getSortFieldName(),
             sourcesPageRequestBodys.getSortDetails().getSortDirection());
-    final List<SourceRead> sourceReads = Lists.newArrayList();
-    for (final SourceConnection sourceConnection : sourceConnections) {
+    final List<PageSourceRead> pageSourceReads = Lists.newArrayList();
+    for (final PageSourceConnection pageSourceConnection : pageSourceConnections) {
       try {
+        SourceConnection sourceConnection = pageSourceConnection.getSourceConnection();
         StandardSourceDefinition standardSourceDefinition = configRepository.getStandardSourceDefinition(sourceConnection.getSourceDefinitionId());
         final JsonNode sanitizedConfig = secretsProcessor.prepareSecretsForOutput(sourceConnection.getConfiguration(),
             standardSourceDefinition.getSpec().getConnectionSpecification());
         sourceConnection.setConfiguration(sanitizedConfig);
-        sourceReads.add(toSourceRead(sourceConnection, standardSourceDefinition));
+        pageSourceReads.add(toPageSourceRead(pageSourceConnection, standardSourceDefinition));
       } catch (final Exception e) {
         throw new RuntimeException(e);
       }
     }
-    return new SourcePageReadList().sources(sourceReads).total(configRepository.pageWorkspaceSourceCount(sourcesPageRequestBodys.getWorkspaceId(),
+    return new PageSourceReadList().sources(pageSourceReads).total(configRepository.pageWorkspaceSourceCount(sourcesPageRequestBodys.getWorkspaceId(),
         sourcesPageRequestBodys.getSourceDefinitionId())).pageCurrent(sourcesPageRequestBodys.getPageCurrent())
         .pageSize(sourcesPageRequestBodys.getPageSize());
   }
@@ -354,6 +357,13 @@ public class SourceHandler {
         .sourceDefinitionId(sourceConnection.getSourceDefinitionId())
         .connectionConfiguration(sourceConnection.getConfiguration())
         .name(sourceConnection.getName());
+  }
+
+  protected static PageSourceRead toPageSourceRead(final PageSourceConnection pageSourceConnection,
+                                                   final StandardSourceDefinition standardSourceDefinition) {
+    return new PageSourceRead().sourceRead(toSourceRead(pageSourceConnection.getSourceConnection(), standardSourceDefinition))
+        .updatedAt(pageSourceConnection.getUpdatedAt())
+        .connectionCount(ObjectUtils.isEmpty(pageSourceConnection.getConnectionCount()) ? 0 : pageSourceConnection.getConnectionCount().intValue());
   }
 
   public List<WebBackendConnectionFilterParamItem> listFilterParam(UUID workspaceId) throws IOException {
