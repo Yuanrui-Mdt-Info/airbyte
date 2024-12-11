@@ -2939,7 +2939,7 @@ font-style: italic;
 
     <h3 class="field-label">Return type</h3>
     <div class="return-type">
-      <a href="#DestinationPageReadList">DestinationPageReadList</a>
+      <a href="#PageDestinationReadList">PageDestinationReadList</a>
       
     </div>
 
@@ -2948,28 +2948,36 @@ font-style: italic;
     <h3 class="field-label">Example data</h3>
     <div class="example-data-content-type">Content-Type: application/json</div>
     <pre class="example"><code>{
-  "total" : 0,
+  "total" : 6,
   "destinations" : [ {
-    "connectionConfiguration" : {
-      "user" : "charles"
+    "connectionCount" : 0,
+    "destinationRead" : {
+      "connectionConfiguration" : {
+        "user" : "charles"
+      },
+      "destinationName" : "destinationName",
+      "name" : "name",
+      "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "destinationId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
     },
-    "destinationName" : "destinationName",
-    "name" : "name",
-    "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "destinationId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+    "updatedAt" : "updatedAt"
   }, {
-    "connectionConfiguration" : {
-      "user" : "charles"
+    "connectionCount" : 0,
+    "destinationRead" : {
+      "connectionConfiguration" : {
+        "user" : "charles"
+      },
+      "destinationName" : "destinationName",
+      "name" : "name",
+      "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "destinationId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
     },
-    "destinationName" : "destinationName",
-    "name" : "name",
-    "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "destinationId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+    "updatedAt" : "updatedAt"
   } ],
-  "pageSize" : 6,
-  "pageCurrent" : 1
+  "pageSize" : 1,
+  "pageCurrent" : 5
 }</code></pre>
 
     <h3 class="field-label">Produces</h3>
@@ -2982,7 +2990,7 @@ font-style: italic;
     <h3 class="field-label">Responses</h3>
     <h4 class="field-label">200</h4>
     Successful operation
-        <a href="#DestinationPageReadList">DestinationPageReadList</a>
+        <a href="#PageDestinationReadList">PageDestinationReadList</a>
     <h4 class="field-label">404</h4>
     Object with given id was not found.
         <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
@@ -7297,7 +7305,7 @@ font-style: italic;
 
     <h3 class="field-label">Return type</h3>
     <div class="return-type">
-      <a href="#SourcePageReadList">SourcePageReadList</a>
+      <a href="#PageSourceReadList">PageSourceReadList</a>
       
     </div>
 
@@ -7306,28 +7314,36 @@ font-style: italic;
     <h3 class="field-label">Example data</h3>
     <div class="example-data-content-type">Content-Type: application/json</div>
     <pre class="example"><code>{
-  "total" : 0,
+  "total" : 6,
   "sources" : [ {
-    "sourceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "connectionConfiguration" : {
-      "user" : "charles"
+    "connectionCount" : 0,
+    "sourceRead" : {
+      "sourceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "connectionConfiguration" : {
+        "user" : "charles"
+      },
+      "name" : "name",
+      "sourceDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "sourceName" : "sourceName",
+      "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
     },
-    "name" : "name",
-    "sourceDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "sourceName" : "sourceName",
-    "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+    "updatedAt" : "updatedAt"
   }, {
-    "sourceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "connectionConfiguration" : {
-      "user" : "charles"
+    "connectionCount" : 0,
+    "sourceRead" : {
+      "sourceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "connectionConfiguration" : {
+        "user" : "charles"
+      },
+      "name" : "name",
+      "sourceDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
+      "sourceName" : "sourceName",
+      "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
     },
-    "name" : "name",
-    "sourceDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "sourceName" : "sourceName",
-    "workspaceId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+    "updatedAt" : "updatedAt"
   } ],
-  "pageSize" : 6,
-  "pageCurrent" : 1
+  "pageSize" : 1,
+  "pageCurrent" : 5
 }</code></pre>
 
     <h3 class="field-label">Produces</h3>
@@ -7340,7 +7356,7 @@ font-style: italic;
     <h3 class="field-label">Responses</h3>
     <h4 class="field-label">200</h4>
     Successful operation
-        <a href="#SourcePageReadList">SourcePageReadList</a>
+        <a href="#PageSourceReadList">PageSourceReadList</a>
     <h4 class="field-label">404</h4>
     Object with given id was not found.
         <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
@@ -11519,7 +11535,6 @@ font-style: italic;
     <li><a href="#DestinationIdPageRequestBody"><code>DestinationIdPageRequestBody</code> - </a></li>
     <li><a href="#DestinationIdRequestBody"><code>DestinationIdRequestBody</code> - </a></li>
     <li><a href="#DestinationOauthConsentRequest"><code>DestinationOauthConsentRequest</code> - </a></li>
-    <li><a href="#DestinationPageReadList"><code>DestinationPageReadList</code> - </a></li>
     <li><a href="#DestinationPageRequestBody"><code>DestinationPageRequestBody</code> - </a></li>
     <li><a href="#DestinationRead"><code>DestinationRead</code> - </a></li>
     <li><a href="#DestinationReadList"><code>DestinationReadList</code> - </a></li>
@@ -11572,7 +11587,11 @@ font-style: italic;
     <li><a href="#OperatorDbt"><code>OperatorDbt</code> - </a></li>
     <li><a href="#OperatorNormalization"><code>OperatorNormalization</code> - </a></li>
     <li><a href="#OperatorType"><code>OperatorType</code> - </a></li>
+    <li><a href="#PageDestinationRead"><code>PageDestinationRead</code> - </a></li>
+    <li><a href="#PageDestinationReadList"><code>PageDestinationReadList</code> - </a></li>
     <li><a href="#PageRequestBody"><code>PageRequestBody</code> - </a></li>
+    <li><a href="#PageSourceRead"><code>PageSourceRead</code> - </a></li>
+    <li><a href="#PageSourceReadList"><code>PageSourceReadList</code> - </a></li>
     <li><a href="#Pagination"><code>Pagination</code> - </a></li>
     <li><a href="#PrivateDestinationDefinitionRead"><code>PrivateDestinationDefinitionRead</code> - </a></li>
     <li><a href="#PrivateDestinationDefinitionReadList"><code>PrivateDestinationDefinitionReadList</code> - </a></li>
@@ -11602,7 +11621,6 @@ font-style: italic;
     <li><a href="#SourceIdPageRequestBody"><code>SourceIdPageRequestBody</code> - </a></li>
     <li><a href="#SourceIdRequestBody"><code>SourceIdRequestBody</code> - </a></li>
     <li><a href="#SourceOauthConsentRequest"><code>SourceOauthConsentRequest</code> - </a></li>
-    <li><a href="#SourcePageReadList"><code>SourcePageReadList</code> - </a></li>
     <li><a href="#SourceRead"><code>SourceRead</code> - </a></li>
     <li><a href="#SourceReadList"><code>SourceReadList</code> - </a></li>
     <li><a href="#SourceReadWithConnectionPage"><code>SourceReadWithConnectionPage</code> - </a></li>
@@ -12259,16 +12277,6 @@ font-style: italic;
     </div>  <!-- field-items -->
   </div>
   <div class="model">
-    <h3><a name="DestinationPageReadList"><code>DestinationPageReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
-    <div class='model-description'></div>
-    <div class="field-items">
-      <div class="param">destinations </div><div class="param-desc"><span class="param-type"><a href="#DestinationRead">array[DestinationRead]</a></span>  </div>
-<div class="param">total (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
-<div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
-<div class="param">pageCurrent (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
-    </div>  <!-- field-items -->
-  </div>
-  <div class="model">
     <h3><a name="DestinationPageRequestBody"><code>DestinationPageRequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
@@ -12720,10 +12728,48 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
           </div>  <!-- field-items -->
   </div>
   <div class="model">
+    <h3><a name="PageDestinationRead"><code>PageDestinationRead</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinationRead </div><div class="param-desc"><span class="param-type"><a href="#DestinationRead">DestinationRead</a></span>  </div>
+<div class="param">connectionCount (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">updatedAt (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageDestinationReadList"><code>PageDestinationReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinations </div><div class="param-desc"><span class="param-type"><a href="#PageDestinationRead">array[PageDestinationRead]</a></span>  </div>
+<div class="param">total (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
+<div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">pageCurrent (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
     <h3><a name="PageRequestBody"><code>PageRequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
       <div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">pageCurrent (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageSourceRead"><code>PageSourceRead</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">sourceRead </div><div class="param-desc"><span class="param-type"><a href="#SourceRead">SourceRead</a></span>  </div>
+<div class="param">connectionCount (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">updatedAt (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageSourceReadList"><code>PageSourceReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">sources </div><div class="param-desc"><span class="param-type"><a href="#PageSourceRead">array[PageSourceRead]</a></span>  </div>
+<div class="param">total (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
 <div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
 <div class="param">pageCurrent (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
     </div>  <!-- field-items -->
@@ -12980,16 +13026,6 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
 <div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">redirectUrl </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The url to redirect to after getting the user consent </div>
 <div class="param">oAuthInputConfiguration (optional)</div><div class="param-desc"><span class="param-type"><a href="#OAuthConfiguration">OAuthConfiguration</a></span>  </div>
-    </div>  <!-- field-items -->
-  </div>
-  <div class="model">
-    <h3><a name="SourcePageReadList"><code>SourcePageReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
-    <div class='model-description'></div>
-    <div class="field-items">
-      <div class="param">sources </div><div class="param-desc"><span class="param-type"><a href="#SourceRead">array[SourceRead]</a></span>  </div>
-<div class="param">total (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
-<div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
-<div class="param">pageCurrent (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
