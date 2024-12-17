@@ -17,12 +17,14 @@ import io.airbyte.config.persistence.SecretsRepositoryReader;
 import io.airbyte.config.persistence.SecretsRepositoryWriter;
 import io.airbyte.config.persistence.StatePersistence;
 import io.airbyte.db.Database;
+import io.airbyte.oauth.UnauthorizedException;
 import io.airbyte.scheduler.client.EventRunner;
 import io.airbyte.scheduler.client.SynchronousSchedulerClient;
 import io.airbyte.scheduler.persistence.JobPersistence;
 import io.airbyte.scheduler.persistence.WorkspaceHelper;
 import io.airbyte.server.errors.BadObjectSchemaKnownException;
 import io.airbyte.server.errors.IdNotFoundKnownException;
+import io.airbyte.server.errors.UnauthorizedKnownException;
 import io.airbyte.server.handlers.ArchiveHandler;
 import io.airbyte.server.handlers.AttemptHandler;
 import io.airbyte.server.handlers.ConnectionsHandler;
@@ -352,6 +354,12 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
       oAuthHandler.setSourceInstancewideOauthParams(requestBody);
       return null;
     });
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntities(@Valid @NotNull SourceEntitiesRequest sourceEntitiesRequest) {
+    return execute(
+        () -> oAuthHandler.getSourceEntities(sourceEntitiesRequest));
   }
 
   // SOURCE IMPLEMENTATION
@@ -845,6 +853,8 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
     } catch (final JsonValidationException e) {
       throw new BadObjectSchemaKnownException(
           String.format("The provided configuration does not fulfill the specification. Errors: %s", e.getMessage()), e);
+    } catch (final UnauthorizedException e) {
+      throw new UnauthorizedKnownException("Unauthorized access", e);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -852,7 +862,7 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
 
   private interface HandlerCall<T> {
 
-    T call() throws ConfigNotFoundException, IOException, JsonValidationException;
+    T call() throws ConfigNotFoundException, IOException, JsonValidationException, UnauthorizedException;
 
   }
 

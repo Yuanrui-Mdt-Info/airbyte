@@ -2078,6 +2078,31 @@ paths:
           $ref: "#/components/responses/ExceptionResponse"
         "404":
           $ref: "#/components/responses/NotFoundResponse"
+  /v1/source/entities:
+    post:
+      tags:
+        - oauth
+      summary: Using auth credential fetch accont details like files, id etc.
+      operationId: getSourceEntities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SourceEntitiesRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceEntityRead"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
+        "401":
+          $ref: "#/components/responses/ExceptionResponse"
   /v1/web_backend/connections/filter/param:
     post:
       tags:
@@ -5046,6 +5071,62 @@ components:
           additionalProperties: true
         token:
           type: string
+    SourceEntitiesRequest:
+      type: object
+      required:
+        - sourceDefinitionId
+        - accessToken
+      properties:
+        sourceDefinitionId:
+          $ref: "#/components/schemas/SourceDefinitionId"
+        accessToken:
+          $ref: "#/components/schemas/AccessToken"
+        data:
+          type: object
+          additionalProperties: true
+    AccessToken:
+      type: string
+    SourceEntityRead:
+      type: object
+      required:
+        - isMultiselect
+        - entities
+      properties:
+        isMultiselect:
+          type: boolean
+        count:
+          type: integer
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceEntity"
+    SourceEntity:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        logo:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          nullable: true
+        modified_at:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
     # Web Backend
     WebBackendConnectionFilterParamItem:
       type: object

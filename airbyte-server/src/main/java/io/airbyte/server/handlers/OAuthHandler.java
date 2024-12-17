@@ -6,13 +6,7 @@ package io.airbyte.server.handlers;
 
 import com.google.common.collect.ImmutableMap;
 import io.airbyte.analytics.TrackingClient;
-import io.airbyte.api.model.generated.CompleteDestinationOAuthRequest;
-import io.airbyte.api.model.generated.CompleteSourceOauthRequest;
-import io.airbyte.api.model.generated.DestinationOauthConsentRequest;
-import io.airbyte.api.model.generated.OAuthConsentRead;
-import io.airbyte.api.model.generated.SetInstancewideDestinationOauthParamsRequestBody;
-import io.airbyte.api.model.generated.SetInstancewideSourceOauthParamsRequestBody;
-import io.airbyte.api.model.generated.SourceOauthConsentRequest;
+import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.DestinationOAuthParameter;
 import io.airbyte.config.SourceOAuthParameter;
@@ -22,9 +16,11 @@ import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.oauth.OAuthFlowImplementation;
 import io.airbyte.oauth.OAuthImplementationFactory;
+import io.airbyte.oauth.UnauthorizedException;
 import io.airbyte.protocol.models.ConnectorSpecification;
 import io.airbyte.scheduler.persistence.job_factory.OAuthConfigSupplier;
 import io.airbyte.scheduler.persistence.job_tracker.TrackingMetadata;
+import io.airbyte.server.converters.ApiPojoConverters;
 import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
 import java.net.URI;
@@ -234,6 +230,14 @@ public class OAuthHandler {
       throws JsonValidationException, ConfigNotFoundException, IOException {
     final StandardDestinationDefinition destinationDefinition = configRepository.getStandardDestinationDefinition(destinationDefinitionId);
     return TrackingMetadata.generateDestinationDefinitionMetadata(destinationDefinition);
+  }
+
+  public SourceEntityRead getSourceEntities(SourceEntitiesRequest sourceEntitiesRequest)
+      throws JsonValidationException, ConfigNotFoundException, IOException, UnauthorizedException {
+    final StandardSourceDefinition sourceDefinition = configRepository.getStandardSourceDefinition(sourceEntitiesRequest.getSourceDefinitionId());
+    final OAuthFlowImplementation oAuthFlowImplementation = oAuthImplementationFactory.create(sourceDefinition);
+    return ApiPojoConverters
+        .toSourceEntityRead(oAuthFlowImplementation.getSourceEntity(sourceEntitiesRequest.getAccessToken(), sourceEntitiesRequest.getData()));
   }
 
 }
