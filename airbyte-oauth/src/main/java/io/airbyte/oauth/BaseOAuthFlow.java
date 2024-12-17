@@ -189,4 +189,11 @@ public abstract class BaseOAuthFlow implements OAuthFlowImplementation {
   @Deprecated
   public abstract List<String> getDefaultOAuthOutputPath();
 
+  @Override
+  public SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException {
+    // source entity api is not currently implemented for all source so here is override just to avoide
+    // individual override
+    return new SourceEntityRead();
+  }
+
 }

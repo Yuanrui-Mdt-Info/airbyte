@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.airbyte.commons.json.Jsons;
+import io.airbyte.config.SourceEntityRead;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.protocol.models.OAuthConfigSpecification;
@@ -251,6 +252,13 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
             inputOAuthConfiguration,
             oAuthParamConfig),
         oAuthConfigSpecification);
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException {
+    // source entity api is not currently implemented for all source so here is override just to avoid
+    // individual override
+    return new SourceEntityRead();
   }
 
   protected Map<String, Object> completeOAuthFlow(final String clientId,
