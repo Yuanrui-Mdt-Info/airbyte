@@ -172,7 +172,7 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json")
         .build();
-    
+
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
@@ -187,7 +187,8 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
   }
 
   @Override
-  public SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException {
+  public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException {
     try {
       String host = LocationWiseHost.getDeskHost(data.get("region").toString()); // handle exception
       String url = "%s/api/v1/organizations";
