@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -48,7 +49,8 @@ public class GoogleSheetsOAuthFlow extends GoogleOAuthFlow {
   }
 
   @Override
-  public SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException {
+  public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException {
     final var driveFilesUrl = "https://www.googleapis.com/drive/v3/files";
     try {
       HttpRequest request = HttpRequest.newBuilder()

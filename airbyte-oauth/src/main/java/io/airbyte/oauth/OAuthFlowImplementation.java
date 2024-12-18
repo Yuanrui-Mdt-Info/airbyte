@@ -53,6 +53,7 @@ public interface OAuthFlowImplementation {
                                                OAuthConfigSpecification oAuthConfigSpecification)
       throws IOException, ConfigNotFoundException, JsonValidationException;
 
-  SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException;
+  SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException, ConfigNotFoundException;
 
 }

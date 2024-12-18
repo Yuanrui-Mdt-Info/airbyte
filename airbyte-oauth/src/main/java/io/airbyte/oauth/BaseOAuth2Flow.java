@@ -254,13 +254,6 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
         oAuthConfigSpecification);
   }
 
-  @Override
-  public SourceEntityRead getSourceEntity(String accessToken, Map<String, Object> data) throws IOException, UnauthorizedException {
-    // source entity api is not currently implemented for all source so here is override just to avoid
-    // individual override
-    return new SourceEntityRead();
-  }
-
   protected Map<String, Object> completeOAuthFlow(final String clientId,
                                                   final String clientSecret,
                                                   final String authCode,
@@ -354,6 +347,14 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
   @Deprecated
   public List<String> getDefaultOAuthOutputPath() {
     return List.of("credentials");
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException, ConfigNotFoundException {
+    // source entity api is not currently implemented for all source so here is override just to avoid
+    // individual override
+    return new SourceEntityRead();
   }
 
   protected static void validateInputOAuthConfiguration(final OAuthConfigSpecification oauthConfigSpecification,

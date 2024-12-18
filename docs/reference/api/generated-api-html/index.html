@@ -11728,7 +11728,6 @@ font-style: italic;
     <li><a href="#WorkspaceReadList"><code>WorkspaceReadList</code> - </a></li>
     <li><a href="#WorkspaceUpdate"><code>WorkspaceUpdate</code> - </a></li>
     <li><a href="#WorkspaceUpdateName"><code>WorkspaceUpdateName</code> - </a></li>
-    <li><a href="#ZohodeskOrganizationsRequest"><code>ZohodeskOrganizationsRequest</code> - </a></li>
     <li><a href="#sortDetails"><code>sortDetails</code> - </a></li>
   </ol>
 
@@ -13048,7 +13047,8 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <h3><a name="SourceEntitiesRequest"><code>SourceEntitiesRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
-      <div class="param">sourceDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+      <div class="param">workspaceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">sourceDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">accessToken </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
 <div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
     </div>  <!-- field-items -->
@@ -13529,15 +13529,6 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <div class="field-items">
       <div class="param">workspaceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
-    </div>  <!-- field-items -->
-  </div>
-  <div class="model">
-    <h3><a name="ZohodeskOrganizationsRequest"><code>ZohodeskOrganizationsRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
-    <div class='model-description'></div>
-    <div class="field-items">
-      <div class="param">sourceDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
-<div class="param">accessToken </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
-<div class="param">region </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">

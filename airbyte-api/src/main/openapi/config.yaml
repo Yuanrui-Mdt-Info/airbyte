@@ -5077,6 +5077,8 @@ components:
         - sourceDefinitionId
         - accessToken
       properties:
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
         sourceDefinitionId:
           $ref: "#/components/schemas/SourceDefinitionId"
         accessToken:

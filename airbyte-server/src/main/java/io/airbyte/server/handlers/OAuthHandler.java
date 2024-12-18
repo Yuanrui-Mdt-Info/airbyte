@@ -237,7 +237,9 @@ public class OAuthHandler {
     final StandardSourceDefinition sourceDefinition = configRepository.getStandardSourceDefinition(sourceEntitiesRequest.getSourceDefinitionId());
     final OAuthFlowImplementation oAuthFlowImplementation = oAuthImplementationFactory.create(sourceDefinition);
     return ApiPojoConverters
-        .toSourceEntityRead(oAuthFlowImplementation.getSourceEntity(sourceEntitiesRequest.getAccessToken(), sourceEntitiesRequest.getData()));
+        .toSourceEntityRead(
+            oAuthFlowImplementation.getSourceEntity(sourceEntitiesRequest.getWorkspaceId(), sourceEntitiesRequest.getSourceDefinitionId(),
+                sourceEntitiesRequest.getAccessToken(), sourceEntitiesRequest.getData()));
   }
 
 }
