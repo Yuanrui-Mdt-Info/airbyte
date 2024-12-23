@@ -4,6 +4,8 @@
 
 package io.airbyte.oauth.flows.google;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -65,6 +67,14 @@ public abstract class GoogleOAuthFlow extends BaseOAuth2Flow {
    * @return the scope for the specific google oauth implementation.
    */
   protected abstract String getScope();
+
+  protected DecodedJWT decodeJWTToken(String jwtToken) {
+    return JWT.decode(jwtToken);
+  }
+
+  protected String claimEmail(DecodedJWT jwt) {
+    return jwt.getClaim("email").asString();
+  }
 
   @Override
   protected String getAccessTokenUrl(final JsonNode inputOAuthConfiguration) {

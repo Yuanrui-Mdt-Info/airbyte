@@ -116,6 +116,9 @@ public class GoogleSheetsOAuthFlow extends GoogleOAuthFlow {
       // google also returns an access token the first time you complete oauth flow
       result.put("access_token", data.get("access_token").asText());
     }
+    if (data.has("id_token")) {
+      result.put("email", claimEmail(decodeJWTToken(data.get("id_token").asText())));
+    }
     return result;
   }
 
