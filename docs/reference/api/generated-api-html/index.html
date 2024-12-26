@@ -237,6 +237,7 @@ font-style: italic;
   <li><a href="#getStateType"><code><span class="http-method">post</span> /v1/web_backend/state/get_type</code></a></li>
   <li><a href="#listAllConnectionsForWorkspace"><code><span class="http-method">post</span> /v1/connections/list_all</code></a></li>
   <li><a href="#listConnectionsForWorkspace"><code><span class="http-method">post</span> /v1/connections/list</code></a></li>
+  <li><a href="#reactivateSystemDisabledConnection"><code><span class="http-method">post</span> /v1/connections/reactivate_system_disabled</code></a></li>
   <li><a href="#resetConnection"><code><span class="http-method">post</span> /v1/connections/reset</code></a></li>
   <li><a href="#searchConnections"><code><span class="http-method">post</span> /v1/connections/search</code></a></li>
   <li><a href="#syncConnection"><code><span class="http-method">post</span> /v1/connections/sync</code></a></li>
@@ -1564,6 +1565,64 @@ font-style: italic;
     <h4 class="field-label">200</h4>
     Successful operation
         <a href="#ConnectionReadList">ConnectionReadList</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="reactivateSystemDisabledConnection"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/connections/reactivate_system_disabled</code></pre></div>
+    <div class="method-summary">reactivate all connections for workspaces. (<span class="nickname">reactivateSystemDisabledConnection</span>)</div>
+    <div class="method-notes">for workspace.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">WorkspaceIdListRequestBody <a href="#WorkspaceIdListRequestBody">WorkspaceIdListRequestBody</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "flag" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
     <h4 class="field-label">404</h4>
     Object with given id was not found.
         <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>

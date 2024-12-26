@@ -981,8 +981,23 @@ public class ConfigRepository {
           .fetchSet(ACTOR.ID);
       return ctx.update(CONNECTION)
           .set(CONNECTION.STATUS, StatusType.inactive)
+          .set(CONNECTION.UPDATED_BY_SYSTEM, Boolean.TRUE)
           .where(CONNECTION.SOURCE_ID.in(actors))
           .and(CONNECTION.STATUS.eq(StatusType.active)).execute();
+    });
+  }
+
+  public int enableSystemDisabledConnectionsForWorkspacesAll(final List<UUID> workspaceIds) throws IOException {
+    return database.transaction(ctx -> {
+      Set<UUID> actors = ctx.selectFrom(ACTOR).where(ACTOR.WORKSPACE_ID.in(workspaceIds)).and(ACTOR.ACTOR_TYPE.eq(ActorType.source))
+          .fetchSet(ACTOR.ID);
+      return ctx.update(CONNECTION)
+          .set(CONNECTION.STATUS, StatusType.active)
+          .set(CONNECTION.UPDATED_BY_SYSTEM, Boolean.FALSE)
+          .where(CONNECTION.SOURCE_ID.in(actors)
+              .and(CONNECTION.STATUS.eq(StatusType.inactive))
+              .and(CONNECTION.UPDATED_BY_SYSTEM.eq(Boolean.TRUE)))
+          .execute();
     });
   }
 
