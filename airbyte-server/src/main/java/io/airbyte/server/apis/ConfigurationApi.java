@@ -513,6 +513,11 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
   }
 
   @Override
+  public ConnectionDisplayFlag reactivateSystemDisabledConnection(WorkspaceIdListRequestBody workspaceIdListRequestBody) {
+    return execute(() -> connectionsHandler.reactivateSystemDisabledConnection(workspaceIdListRequestBody));
+  }
+
+  @Override
   public ConnectionsCount connectionsCountForWorkspace(WorkspaceIdRequestBody workspaceIdRequestBody) {
     return execute(() -> connectionsHandler.connectionsCountForWorkspace(workspaceIdRequestBody));
   }

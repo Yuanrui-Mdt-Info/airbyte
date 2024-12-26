@@ -447,6 +447,11 @@ public class ConnectionsHandler {
         .flag(configRepository.disabledConnectionsForWorkspacesAll(workspaceIdListRequestBody.getWorkspaceIdList()) > 0);
   }
 
+  public ConnectionDisplayFlag reactivateSystemDisabledConnection(WorkspaceIdListRequestBody workspaceIdListRequestBody) throws IOException {
+    return new ConnectionDisplayFlag()
+        .flag(configRepository.enableSystemDisabledConnectionsForWorkspacesAll(workspaceIdListRequestBody.getWorkspaceIdList()) > 0);
+  }
+
   public ConnectionsCount connectionsCountForWorkspace(WorkspaceIdRequestBody workspaceIdRequestBody) throws IOException {
     return new ConnectionsCount().count(configRepository.connectionsCount(workspaceIdRequestBody.getWorkspaceId()));
   }
