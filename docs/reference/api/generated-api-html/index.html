@@ -3851,7 +3851,7 @@ font-style: italic;
 
     <h3 class="field-label">Return type</h3>
     <div class="return-type">
-      <a href="#DestinationDefinitionReadList">DestinationDefinitionReadList</a>
+      <a href="#PageDestinationDefinitionReadList">PageDestinationDefinitionReadList</a>
       
     </div>
 
@@ -3890,6 +3890,7 @@ font-style: italic;
     "dockerRepository" : "dockerRepository",
     "name" : "name",
     "icon" : "icon",
+    "destinationType" : "database",
     "protocolVersion" : "protocolVersion",
     "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
   }, {
@@ -3922,6 +3923,7 @@ font-style: italic;
     "dockerRepository" : "dockerRepository",
     "name" : "name",
     "icon" : "icon",
+    "destinationType" : "database",
     "protocolVersion" : "protocolVersion",
     "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
   } ]
@@ -3937,7 +3939,7 @@ font-style: italic;
     <h3 class="field-label">Responses</h3>
     <h4 class="field-label">200</h4>
     Successful operation
-        <a href="#DestinationDefinitionReadList">DestinationDefinitionReadList</a>
+        <a href="#PageDestinationDefinitionReadList">PageDestinationDefinitionReadList</a>
   </div> <!-- method -->
   <hr/>
   <div class="method"><a name="listLatestDestinationDefinitions"/>
@@ -11715,6 +11717,8 @@ font-style: italic;
     <li><a href="#OperatorDbt"><code>OperatorDbt</code> - </a></li>
     <li><a href="#OperatorNormalization"><code>OperatorNormalization</code> - </a></li>
     <li><a href="#OperatorType"><code>OperatorType</code> - </a></li>
+    <li><a href="#PageDestinationDefinitionRead"><code>PageDestinationDefinitionRead</code> - </a></li>
+    <li><a href="#PageDestinationDefinitionReadList"><code>PageDestinationDefinitionReadList</code> - </a></li>
     <li><a href="#PageRequestBody"><code>PageRequestBody</code> - </a></li>
     <li><a href="#Pagination"><code>Pagination</code> - </a></li>
     <li><a href="#PrivateDestinationDefinitionRead"><code>PrivateDestinationDefinitionRead</code> - </a></li>
@@ -12864,6 +12868,32 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <div class='model-description'></div>
     <div class="field-items">
           </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageDestinationDefinitionRead"><code>PageDestinationDefinitionRead</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinationDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">dockerRepository </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">dockerImageTag </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">documentationUrl </div><div class="param-desc"><span class="param-type"><a href="#URI">URI</a></span>  format: uri</div>
+<div class="param">icon (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">protocolVersion (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The Airbyte Protocol version supported by the connector </div>
+<div class="param">releaseStage (optional)</div><div class="param-desc"><span class="param-type"><a href="#ReleaseStage">ReleaseStage</a></span>  </div>
+<div class="param">releaseDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> The date when this connector was first released, in yyyy-mm-dd format. format: date</div>
+<div class="param">destinationType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">database</div>
+<div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ActorDefinitionResourceRequirements">ActorDefinitionResourceRequirements</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageDestinationDefinitionReadList"><code>PageDestinationDefinitionReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinationDefinitions </div><div class="param-desc"><span class="param-type"><a href="#PageDestinationDefinitionRead">array[PageDestinationDefinitionRead]</a></span>  </div>
+    </div>  <!-- field-items -->
   </div>
   <div class="model">
     <h3><a name="PageRequestBody"><code>PageRequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
