@@ -83,7 +83,8 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
       "Desk.basic.READ",
       "Desk.contacts.READ",
       "Desk.tickets.READ",
-      "Desk.settings.READ");
+      "Desk.settings.READ",
+      "Desk.search.READ");
 
   public String getScopes() {
     return String.join(" ", SCOPES);
