@@ -95,6 +95,17 @@ public abstract class GoogleOAuthFlow extends BaseOAuth2Flow {
         .build();
   }
 
+  protected Map<String, String> rotateRefreshTokenQueryParameters(final String clientId,
+                                                                  final String clientSecret,
+                                                                  final String refreshToken) {
+    return ImmutableMap.<String, String>builder()
+        .put("client_id", clientId)
+        .put("client_secret", clientSecret)
+        .put("refresh_token", refreshToken)
+        .put("grant_type", "refresh_token")
+        .build();
+  }
+
   @Override
   protected Map<String, Object> extractOAuthOutput(final JsonNode data, final String accessTokenUrl) throws IOException {
     final Map<String, Object> result = super.extractOAuthOutput(data, accessTokenUrl);

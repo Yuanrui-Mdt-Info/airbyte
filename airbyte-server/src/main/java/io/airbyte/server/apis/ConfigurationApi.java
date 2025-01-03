@@ -22,6 +22,7 @@ import io.airbyte.scheduler.client.EventRunner;
 import io.airbyte.scheduler.client.SynchronousSchedulerClient;
 import io.airbyte.scheduler.persistence.JobPersistence;
 import io.airbyte.scheduler.persistence.WorkspaceHelper;
+import io.airbyte.scheduler.persistence.job_factory.OAuthConfigSupplier;
 import io.airbyte.server.errors.BadObjectSchemaKnownException;
 import io.airbyte.server.errors.IdNotFoundKnownException;
 import io.airbyte.server.errors.UnauthorizedKnownException;
@@ -80,6 +81,7 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
   private final WorkerEnvironment workerEnvironment;
   private final LogConfigs logConfigs;
   private final Path workspaceRoot;
+  private final OAuthConfigSupplier oAuthConfigSupplier;
 
   public ConfigurationApi(final ConfigRepository configRepository,
                           final JobPersistence jobPersistence,
@@ -142,7 +144,8 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
     workspacesHandler = new WorkspacesHandler(configRepository, connectionsHandler, destinationHandler, sourceHandler);
     jobHistoryHandler = new JobHistoryHandler(jobPersistence, workerEnvironment, logConfigs, connectionsHandler, sourceHandler,
         sourceDefinitionsHandler, destinationHandler, destinationDefinitionsHandler, airbyteVersion);
-    oAuthHandler = new OAuthHandler(configRepository, httpClient, trackingClient);
+    oAuthConfigSupplier = new OAuthConfigSupplier(configRepository, trackingClient);
+    oAuthHandler = new OAuthHandler(configRepository, httpClient, trackingClient, secretsRepositoryReader, oAuthConfigSupplier);
     webBackendConnectionsHandler = new WebBackendConnectionsHandler(
         connectionsHandler,
         stateHandler,
@@ -360,6 +363,12 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
   public SourceEntityRead getSourceEntities(@Valid @NotNull SourceEntitiesRequest sourceEntitiesRequest) {
     return execute(
         () -> oAuthHandler.getSourceEntities(sourceEntitiesRequest));
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntitiesForUpdate(@Valid @NotNull SourceEntitiesUpdateRequest entitiesUpdateRequest) {
+    return execute(
+        () -> oAuthHandler.getUpdateSourceEntities(entitiesUpdateRequest));
   }
 
   // SOURCE IMPLEMENTATION

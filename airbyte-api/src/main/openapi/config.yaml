@@ -2127,6 +2127,31 @@ paths:
           $ref: "#/components/responses/InvalidInputResponse"
         "401":
           $ref: "#/components/responses/ExceptionResponse"
+  /v1/source/entities_for_update:
+    post:
+      tags:
+        - oauth
+      summary: Using auth credential fetch accont details like files, id etc.
+      operationId: getSourceEntitiesForUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SourceEntitiesUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceEntityRead"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
+        "401":
+          $ref: "#/components/responses/ExceptionResponse"
   /v1/web_backend/connections/filter/param:
     post:
       tags:
@@ -5156,6 +5181,13 @@ components:
         data:
           type: object
           additionalProperties: true
+    SourceEntitiesUpdateRequest:
+      type: object
+      required:
+        - sourceId
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/SourceId"
     AccessToken:
       type: string
     SourceEntityRead:
