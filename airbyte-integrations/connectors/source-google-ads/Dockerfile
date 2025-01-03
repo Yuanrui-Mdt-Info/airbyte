@@ -17,4 +17,4 @@ COPY main.py ./
 ENTRYPOINT ["python", "/airbyte/integration_code/main.py"]
 
 LABEL io.airbyte.version=0.1.45
-LABEL io.airbyte.name=airbyte/source-google-ads
+LABEL io.airbyte.name=yuanrui2014/source-google-ads
