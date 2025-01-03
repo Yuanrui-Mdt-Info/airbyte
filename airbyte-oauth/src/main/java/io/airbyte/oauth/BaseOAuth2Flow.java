@@ -48,8 +48,8 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
     URL_ENCODED("application/x-www-form-urlencoded", BaseOAuth2Flow::toUrlEncodedString),
     JSON("application/json", BaseOAuth2Flow::toJson);
 
-    String contentType;
-    Function<Map<String, String>, String> converter;
+    public String contentType;
+    public Function<Map<String, String>, String> converter;
 
     public String getContentType() {
       return contentType;
@@ -353,6 +353,14 @@ public abstract class BaseOAuth2Flow extends BaseOAuthFlow {
   public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
       throws IOException, UnauthorizedException, ConfigNotFoundException {
     // source entity api is not currently implemented for all source so here is override just to avoid
+    // individual override
+    return new SourceEntityRead();
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntityForUpdate(JsonNode sourceConfiguration)
+      throws IOException, UnauthorizedException, ConfigNotFoundException {
+    // source entity api is not currently implemented for all source so here is override just to avoide
     // individual override
     return new SourceEntityRead();
   }

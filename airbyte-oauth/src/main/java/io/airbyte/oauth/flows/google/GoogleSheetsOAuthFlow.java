@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.annotations.VisibleForTesting;
+import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.SourceEntity;
 import io.airbyte.config.SourceEntityRead;
+import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.oauth.UnauthorizedException;
 import java.io.IOException;
@@ -33,6 +35,7 @@ public class GoogleSheetsOAuthFlow extends GoogleOAuthFlow {
   // https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
   @VisibleForTesting
   static final String SCOPE_URL = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/drive.readonly";
+  String ACCESS_TOKEN_CONST = "access_token";
 
   public GoogleSheetsOAuthFlow(final ConfigRepository configRepository, final HttpClient httpClient) {
     super(configRepository, httpClient);
@@ -51,6 +54,10 @@ public class GoogleSheetsOAuthFlow extends GoogleOAuthFlow {
   @Override
   public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
       throws IOException, UnauthorizedException {
+    return getSourceEntity(accessToken);
+  }
+
+  private SourceEntityRead getSourceEntity(String accessToken) throws IOException, UnauthorizedException {
     final var driveFilesUrl = "https://www.googleapis.com/drive/v3/files";
     try {
       HttpRequest request = HttpRequest.newBuilder()
@@ -112,14 +119,43 @@ public class GoogleSheetsOAuthFlow extends GoogleOAuthFlow {
   @Override
   protected Map<String, Object> extractOAuthOutput(final JsonNode data, final String accessTokenUrl) throws IOException {
     final Map<String, Object> result = super.extractOAuthOutput(data, accessTokenUrl);
-    if (data.has("access_token")) {
+    if (data.has(ACCESS_TOKEN_CONST)) {
       // google also returns an access token the first time you complete oauth flow
-      result.put("access_token", data.get("access_token").asText());
+      result.put(ACCESS_TOKEN_CONST, data.get(ACCESS_TOKEN_CONST).asText());
     }
     if (data.has("id_token")) {
       result.put("email", claimEmail(decodeJWTToken(data.get("id_token").asText())));
     }
     return result;
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntityForUpdate(JsonNode sourceConfiguration) throws IOException, UnauthorizedException, ConfigNotFoundException {
+      return getSourceEntity(rotateRefreshToken(sourceConfiguration));
+  }
+
+  public String rotateRefreshToken(JsonNode sourceConfiguration) throws IOException {
+    JsonNode credentials = sourceConfiguration.get("credentials");
+    HttpRequest request = HttpRequest.newBuilder()
+        .POST(HttpRequest.BodyPublishers
+            .ofString(tokenReqContentType.converter.apply(rotateRefreshTokenQueryParameters(getClientIdUnsafe(credentials),
+                getClientSecretUnsafe(credentials), getRefreshTokenUnsafe(credentials)))))
+        .uri(URI.create(getAccessTokenUrl(credentials)))
+        .header("Content-Type", tokenReqContentType.contentType)
+        .header("Accept", "application/json")
+        .build();
+    try {
+      final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      if (HttpStatusCodes.STATUS_CODE_OK == response.statusCode()) {
+        JsonNode resp = Jsons.deserialize(response.body());
+        if (resp.has(ACCESS_TOKEN_CONST)) {
+          return resp.get(ACCESS_TOKEN_CONST).asText();
+        }
+      }
+      throw new IOException("Failed to rotate refresh token");
+    } catch (final InterruptedException | IOException e) {
+      throw new IOException("Failed to rotate refresh token", e);
+    }
   }
 
 }
