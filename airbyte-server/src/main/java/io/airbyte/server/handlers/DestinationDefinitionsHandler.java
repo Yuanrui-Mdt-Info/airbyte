@@ -7,19 +7,7 @@ package io.airbyte.server.handlers;
 import static io.airbyte.server.ServerConstants.DEV_IMAGE_TAG;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.airbyte.api.model.generated.CustomDestinationDefinitionCreate;
-import io.airbyte.api.model.generated.CustomDestinationDefinitionUpdate;
-import io.airbyte.api.model.generated.DestinationDefinitionCreate;
-import io.airbyte.api.model.generated.DestinationDefinitionIdRequestBody;
-import io.airbyte.api.model.generated.DestinationDefinitionIdWithWorkspaceId;
-import io.airbyte.api.model.generated.DestinationDefinitionRead;
-import io.airbyte.api.model.generated.DestinationDefinitionReadList;
-import io.airbyte.api.model.generated.DestinationDefinitionUpdate;
-import io.airbyte.api.model.generated.DestinationRead;
-import io.airbyte.api.model.generated.PrivateDestinationDefinitionRead;
-import io.airbyte.api.model.generated.PrivateDestinationDefinitionReadList;
-import io.airbyte.api.model.generated.ReleaseStage;
-import io.airbyte.api.model.generated.WorkspaceIdRequestBody;
+import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.docker.DockerUtils;
 import io.airbyte.commons.util.MoreLists;
 import io.airbyte.commons.version.AirbyteProtocolVersion;
@@ -94,6 +82,25 @@ public class DestinationDefinitionsHandler {
     }
   }
 
+  static PageDestinationDefinitionRead buildPageDestinationDefinitionRead(final StandardDestinationDefinition standardDestinationDefinition) {
+    try {
+      return new PageDestinationDefinitionRead()
+          .destinationDefinitionId(standardDestinationDefinition.getDestinationDefinitionId())
+          .name(standardDestinationDefinition.getName())
+          .dockerRepository(standardDestinationDefinition.getDockerRepository())
+          .dockerImageTag(standardDestinationDefinition.getDockerImageTag())
+          .documentationUrl(new URI(standardDestinationDefinition.getDocumentationUrl()))
+          .icon(loadIcon(standardDestinationDefinition.getIcon()))
+          .protocolVersion(standardDestinationDefinition.getProtocolVersion())
+          .releaseStage(getReleaseStage(standardDestinationDefinition))
+          .releaseDate(getReleaseDate(standardDestinationDefinition))
+          .destinationType(PageDestinationDefinitionRead.DestinationTypeEnum.DATABASE)
+          .resourceRequirements(ApiPojoConverters.actorDefResourceReqsToApi(standardDestinationDefinition.getResourceRequirements()));
+    } catch (final URISyntaxException | NullPointerException e) {
+      throw new InternalServerKnownException("Unable to process retrieved latest destination definitions list", e);
+    }
+  }
+
   private static ReleaseStage getReleaseStage(final StandardDestinationDefinition standardDestinationDefinition) {
     if (standardDestinationDefinition.getReleaseStage() == null) {
       return null;
@@ -120,6 +127,13 @@ public class DestinationDefinitionsHandler {
     return new DestinationDefinitionReadList().destinationDefinitions(reads);
   }
 
+  private static PageDestinationDefinitionReadList toPageDestinationDefinitionReadList(final List<StandardDestinationDefinition> defs) {
+    final List<PageDestinationDefinitionRead> reads = defs.stream()
+        .map(DestinationDefinitionsHandler::buildPageDestinationDefinitionRead)
+        .collect(Collectors.toList());
+    return new PageDestinationDefinitionReadList().destinationDefinitions(reads);
+  }
+
   public DestinationDefinitionReadList listLatestDestinationDefinitions() {
     return toDestinationDefinitionReadList(getLatestDestinations());
   }
@@ -132,9 +146,9 @@ public class DestinationDefinitionsHandler {
     }
   }
 
-  public DestinationDefinitionReadList listDestinationDefinitionsForWorkspace(final WorkspaceIdRequestBody workspaceIdRequestBody)
+  public PageDestinationDefinitionReadList listDestinationDefinitionsForWorkspace(final WorkspaceIdRequestBody workspaceIdRequestBody)
       throws IOException {
-    return toDestinationDefinitionReadList(MoreLists.concat(
+    return toPageDestinationDefinitionReadList(MoreLists.concat(
         configRepository.listPublicDestinationDefinitions(false),
         configRepository.listGrantedDestinationDefinitions(workspaceIdRequestBody.getWorkspaceId(), false)));
   }

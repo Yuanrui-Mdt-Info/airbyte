@@ -4,27 +4,23 @@
 
 package io.airbyte.server.handlers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import io.airbyte.analytics.TrackingClient;
-import io.airbyte.api.model.generated.CompleteDestinationOAuthRequest;
-import io.airbyte.api.model.generated.CompleteSourceOauthRequest;
-import io.airbyte.api.model.generated.DestinationOauthConsentRequest;
-import io.airbyte.api.model.generated.OAuthConsentRead;
-import io.airbyte.api.model.generated.SetInstancewideDestinationOauthParamsRequestBody;
-import io.airbyte.api.model.generated.SetInstancewideSourceOauthParamsRequestBody;
-import io.airbyte.api.model.generated.SourceOauthConsentRequest;
+import io.airbyte.api.model.generated.*;
+import io.airbyte.api.model.generated.SourceEntityRead;
 import io.airbyte.commons.json.Jsons;
-import io.airbyte.config.DestinationOAuthParameter;
-import io.airbyte.config.SourceOAuthParameter;
-import io.airbyte.config.StandardDestinationDefinition;
-import io.airbyte.config.StandardSourceDefinition;
+import io.airbyte.config.*;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
+import io.airbyte.config.persistence.SecretsRepositoryReader;
 import io.airbyte.oauth.OAuthFlowImplementation;
 import io.airbyte.oauth.OAuthImplementationFactory;
+import io.airbyte.oauth.UnauthorizedException;
 import io.airbyte.protocol.models.ConnectorSpecification;
 import io.airbyte.scheduler.persistence.job_factory.OAuthConfigSupplier;
 import io.airbyte.scheduler.persistence.job_tracker.TrackingMetadata;
+import io.airbyte.server.converters.ApiPojoConverters;
 import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
 import java.net.URI;
@@ -45,13 +41,20 @@ public class OAuthHandler {
   private final ConfigRepository configRepository;
   private final OAuthImplementationFactory oAuthImplementationFactory;
   private final TrackingClient trackingClient;
+  private final SecretsRepositoryReader secretsRepositoryReader;
+  private final OAuthConfigSupplier oAuthConfigSupplier;
 
   public OAuthHandler(final ConfigRepository configRepository,
                       final HttpClient httpClient,
-                      final TrackingClient trackingClient) {
+                      final TrackingClient trackingClient,
+                      final SecretsRepositoryReader secretsRepositoryReader,
+                      final OAuthConfigSupplier oAuthConfigSupplier) {
+
     this.configRepository = configRepository;
     this.oAuthImplementationFactory = new OAuthImplementationFactory(configRepository, httpClient);
     this.trackingClient = trackingClient;
+    this.secretsRepositoryReader = secretsRepositoryReader;
+    this.oAuthConfigSupplier = oAuthConfigSupplier;
   }
 
   public OAuthConsentRead getSourceOAuthConsent(final SourceOauthConsentRequest sourceDefinitionIdRequestBody)
@@ -234,6 +237,33 @@ public class OAuthHandler {
       throws JsonValidationException, ConfigNotFoundException, IOException {
     final StandardDestinationDefinition destinationDefinition = configRepository.getStandardDestinationDefinition(destinationDefinitionId);
     return TrackingMetadata.generateDestinationDefinitionMetadata(destinationDefinition);
+  }
+
+  public SourceEntityRead getSourceEntities(SourceEntitiesRequest sourceEntitiesRequest)
+      throws JsonValidationException, ConfigNotFoundException, IOException, UnauthorizedException {
+    final StandardSourceDefinition sourceDefinition = configRepository.getStandardSourceDefinition(sourceEntitiesRequest.getSourceDefinitionId());
+    final OAuthFlowImplementation oAuthFlowImplementation = oAuthImplementationFactory.create(sourceDefinition);
+    return ApiPojoConverters
+        .toSourceEntityRead(
+            oAuthFlowImplementation.getSourceEntity(sourceEntitiesRequest.getWorkspaceId(), sourceEntitiesRequest.getSourceDefinitionId(),
+                sourceEntitiesRequest.getAccessToken(), sourceEntitiesRequest.getData()));
+  }
+
+  public SourceEntityRead getUpdateSourceEntities(SourceEntitiesUpdateRequest entitiesUpdateRequest)
+      throws ConfigNotFoundException, IOException, JsonValidationException {
+    SourceConnection sourceConnection = secretsRepositoryReader.getSourceConnectionWithSecrets(entitiesUpdateRequest.getSourceId());
+
+    final JsonNode sourceConfiguration = oAuthConfigSupplier.injectSourceOAuthParameters(
+            sourceConnection.getSourceDefinitionId(),
+            sourceConnection.getWorkspaceId(),
+            sourceConnection.getConfiguration());
+    sourceConnection.withConfiguration(sourceConfiguration);
+    SourceConnection fullConfig = secretsRepositoryReader.hydrateSourcePartialConfig(sourceConnection);
+
+    final StandardSourceDefinition sourceDefinition = configRepository.getStandardSourceDefinition(sourceConnection.getSourceDefinitionId());
+    final OAuthFlowImplementation oAuthFlowImplementation = oAuthImplementationFactory.create(sourceDefinition);
+    return ApiPojoConverters
+        .toSourceEntityRead(oAuthFlowImplementation.getSourceEntityForUpdate(fullConfig.getConfiguration()));
   }
 
 }

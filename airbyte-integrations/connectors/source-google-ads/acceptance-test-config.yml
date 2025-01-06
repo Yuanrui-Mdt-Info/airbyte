@@ -1,6 +1,6 @@
 # See [Source Acceptance Tests](https://docs.airbyte.io/connector-development/testing-connectors/source-acceptance-tests-reference)
 # for more information about how to configure these tests
-connector_image: airbyte/source-google-ads:dev
+connector_image: yuanrui2014/source-google-ads:dev
 tests:
   spec:
     - spec_path: "source_google_ads/spec.json"

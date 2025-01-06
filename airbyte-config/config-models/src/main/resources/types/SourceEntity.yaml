@@ -1,0 +1,24 @@
+---
+"$schema": http://json-schema.org/draft-07/schema#
+"$id": https://github.com/airbytehq/airbyte/blob/master/airbyte-config/models/src/main/resources/types/SourceEntity.yaml
+title: SourceEntity
+description: Authenticated source related details.
+type: object
+required:
+  - id
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  url:
+    type: string
+  logo:
+    type: string
+  created_at:
+    type: string
+  modified_at:
+    type: string
+  metadata:
+    type: object
+    existingJavaType: java.util.Map

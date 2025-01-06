@@ -119,5 +119,8 @@ properties:
         type: string
       endDate:
         type: string
+  updatedBySystem:
+    type: boolean
+    default: false
   resourceRequirements:
     "$ref": ResourceRequirements.yaml

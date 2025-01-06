@@ -1,0 +1,17 @@
+---
+"$schema": http://json-schema.org/draft-07/schema#
+"$id": https://github.com/airbytehq/airbyte/blob/master/airbyte-config/models/src/main/resources/types/SourceEntityRead.yaml
+title: SourceEntityRead
+description: Authenticated source related details.
+type: object
+required:
+  - id
+properties:
+  isMultiselect:
+    type: boolean
+  count:
+    type: integer
+  entities:
+    type: array
+    items:
+      $ref: SourceEntity.yaml

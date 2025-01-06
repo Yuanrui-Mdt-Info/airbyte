@@ -93,6 +93,10 @@ public abstract class BaseOAuthFlow implements OAuthFlowImplementation {
     return getConfigValueUnsafe(oauthConfig, "client_id");
   }
 
+  protected String getRefreshTokenUnsafe(final JsonNode oauthConfig) {
+    return getConfigValueUnsafe(oauthConfig, "refresh_token");
+  }
+
   /**
    * Throws an exception if the client secret cannot be extracted. Subclasses should override this to
    * parse the config differently.
@@ -188,5 +192,21 @@ public abstract class BaseOAuthFlow implements OAuthFlowImplementation {
    */
   @Deprecated
   public abstract List<String> getDefaultOAuthOutputPath();
+
+  @Override
+  public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException, ConfigNotFoundException {
+    // source entity api is not currently implemented for all source so here is override just to avoide
+    // individual override
+    return new SourceEntityRead();
+  }
+
+  @Override
+  public SourceEntityRead getSourceEntityForUpdate(JsonNode sourceConfiguration)
+      throws IOException, UnauthorizedException, ConfigNotFoundException {
+    // source entity api is not currently implemented for all source so here is override just to avoide
+    // individual override
+    return new SourceEntityRead();
+  }
 
 }
