@@ -1,0 +1,17 @@
+"$schema": http://json-schema.org/draft-07/schema#
+"$id": https://github.com/airbytehq/airbyte/blob/master/airbyte-config/models/src/main/resources/types/PageDestinationConnection.yaml
+title: PageDestinationConnection
+description: information required for connection to a destination.
+type: object
+required:
+  - destinationConnection
+  - connectionCount
+additionalProperties: false
+properties:
+  destinationConnection:
+    "$ref": DestinationConnection.yaml
+  connectionCount:
+    type: integer
+    minValue: 0
+  updatedAt:
+    type: string

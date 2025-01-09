@@ -3204,6 +3204,17 @@ components:
           type: string
         sourceName:
           type: string
+    SourcePageRead:
+      type: object
+      required:
+        - sourceRead
+      properties:
+        sourceRead:
+          $ref: "#/components/schemas/SourceRead"
+        connectionCount:
+          type: integer
+        updatedAt:
+          type: string
     SourceReadWithConnectionPage:
       type: object
       required:
@@ -3594,6 +3605,17 @@ components:
           type: string
         destinationName:
           type: string
+    DestinationPageRead:
+      type: object
+      required:
+        - destinationRead
+      properties:
+        destinationRead:
+          $ref: "#/components/schemas/DestinationRead"
+        connectionCount:
+          type: integer
+        updatedAt:
+          type: string
     DestinationReadWithConnectionPage:
       type: object
       required:
@@ -3627,7 +3649,7 @@ components:
         destinations:
           type: array
           items:
-            $ref: "#/components/schemas/DestinationRead"
+            $ref: "#/components/schemas/DestinationPageRead"
         total:
           type: integer
           format: int64
@@ -5328,6 +5350,43 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/ConnectionStatus"
+
+    ActorConnectionDetailsPageRead:
+      type: object
+      required:
+        - connectionId
+        - name
+        - entityName
+        - connectorName
+        - status
+      properties:
+        connectionId:
+          $ref: "#/components/schemas/ConnectionId"
+        name:
+          type: string
+        entityName:
+          type: string
+        connectorName:
+          type: string
+        status:
+          $ref: "#/components/schemas/ConnectionStatus"
+        destinationIcon:
+          type: string
+        sourceIcon:
+          type: string
+        latestSyncJobCreatedAt:
+          description: epoch time of the latest sync job. null if no sync job has taken place.
+          type: integer
+          format: int64
+        latestSyncJobStatus:
+          $ref: "#/components/schemas/JobStatus"
+        schedule:
+          $ref: "#/components/schemas/ConnectionSchedule"
+        scheduleType:
+          $ref: "#/components/schemas/ConnectionScheduleType"
+        scheduleData:
+          $ref: "#/components/schemas/ConnectionScheduleData"
+
     WebBackendConnectionStatusRead:
       type: object
       required:
@@ -5390,7 +5449,7 @@ components:
         connections:
           type: array
           items:
-            $ref: "#/components/schemas/WebBackendConnectionPageRead"
+            $ref: "#/components/schemas/ActorConnectionDetailsPageRead"
     WebBackendConnectionStatusReadList:
       type: object
       required:
@@ -5408,7 +5467,7 @@ components:
         sources:
           type: array
           items:
-            $ref: "#/components/schemas/SourceRead"
+            $ref: "#/components/schemas/SourcePageRead"
         total:
           type: integer
           format: int64

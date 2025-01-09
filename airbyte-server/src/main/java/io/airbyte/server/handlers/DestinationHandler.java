@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.DestinationConnection;
+import io.airbyte.config.DestinationPageConnection;
 import io.airbyte.config.StandardDestinationDefinition;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class DestinationHandler {
 
@@ -220,20 +222,21 @@ public class DestinationHandler {
     if (destinationPageRequestBody.getPageCurrent() == null || destinationPageRequestBody.getPageCurrent() == 0) {
       destinationPageRequestBody.setPageCurrent(1);
     }
-    List<DestinationConnection> destinationConnections = configRepository.pageWorkspaceDestinationConnection(
+    List<DestinationPageConnection> destinationPageConnections = configRepository.pageWorkspaceDestinationConnection(
         destinationPageRequestBody.getWorkspaceId(), destinationPageRequestBody.getDestinationDefinitionId(),
         destinationPageRequestBody.getPageSize(), destinationPageRequestBody.getPageCurrent(),
         destinationPageRequestBody.getSortDetails().getSortFieldName(),
         destinationPageRequestBody.getSortDetails().getSortDirection());
-    final List<DestinationRead> destinationReads = Lists.newArrayList();
-    for (final DestinationConnection destinationConnection : destinationConnections) {
+    final List<DestinationPageRead> destinationReads = Lists.newArrayList();
+    for (final DestinationPageConnection data : destinationPageConnections) {
       try {
+        DestinationConnection destinationConnection = data.getDestinationConnection();
         StandardDestinationDefinition standardDestinationDefinition =
             configRepository.getStandardDestinationDefinition(destinationConnection.getDestinationDefinitionId());
         final JsonNode sanitizedConfig = secretsProcessor.prepareSecretsForOutput(destinationConnection.getConfiguration(),
             standardDestinationDefinition.getSpec().getConnectionSpecification());
         destinationConnection.setConfiguration(sanitizedConfig);
-        destinationReads.add(toDestinationRead(destinationConnection, standardDestinationDefinition));
+        destinationReads.add(toDestinationPageRead(data, standardDestinationDefinition));
       } catch (final Exception e) {
         throw new RuntimeException(e);
       }
@@ -345,6 +348,16 @@ public class DestinationHandler {
         .connectionConfiguration(destinationConnection.getConfiguration())
         .name(destinationConnection.getName())
         .destinationName(standardDestinationDefinition.getName());
+  }
+
+  protected static DestinationPageRead toDestinationPageRead(final DestinationPageConnection destinationPageConnection,
+
+                                                             final StandardDestinationDefinition standardDestinationDefinition) {
+    return new DestinationPageRead()
+        .destinationRead(toDestinationRead(destinationPageConnection.getDestinationConnection(), standardDestinationDefinition))
+        .updatedAt(destinationPageConnection.getUpdatedAt())
+        .connectionCount(
+            ObjectUtils.isEmpty(destinationPageConnection.getConnectionCount()) ? 0 : destinationPageConnection.getConnectionCount().intValue());
   }
 
   public List<WebBackendConnectionFilterParamItem> listFilterParam(UUID workspaceId) throws IOException {

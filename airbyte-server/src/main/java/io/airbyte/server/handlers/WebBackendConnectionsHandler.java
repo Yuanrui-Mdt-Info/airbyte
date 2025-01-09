@@ -160,7 +160,7 @@ public class WebBackendConnectionsHandler {
     final SourceRead source = getSourceRead(connectionRead);
     final DestinationRead destination = getDestinationRead(connectionRead);
     final OperationReadList operations = getOperationReadList(connectionRead);
-    final JobReadList syncJobReadList = getSyncJobs(connectionRead);
+    final JobReadList syncJobReadList = getSyncJobs(connectionRead.getConnectionId().toString());
 
     final WebBackendConnectionRead webBackendConnectionRead = getWebBackendConnectionRead(connectionRead, source, destination, operations)
         .catalogId(connectionRead.getSourceCatalogId())
@@ -172,6 +172,7 @@ public class WebBackendConnectionsHandler {
     return webBackendConnectionRead;
   }
 
+  /* TODO remove if unused */
   private WebBackendConnectionPageRead buildWebBackendConnectionPageRead(final ConnectionRead connectionRead)
       throws IOException {
     long startTime = System.nanoTime();
@@ -195,11 +196,32 @@ public class WebBackendConnectionsHandler {
     return webBackendConnectionPageRead;
   }
 
-  public WebBackendConnectionList listConnectionsPageWithoutOperation(final UUID workspaceId,
-                                                                      UUID sourceId,
-                                                                      UUID destinationId,
-                                                                      final Integer pageSize,
-                                                                      final Integer pageCurrent)
+  private ActorConnectionDetailsPageRead buildActorConnectionDetailsPageRead(final ConnectionRead connectionRead)
+      throws IOException {
+    StandardDestinationDefinition sourceDefinition = configRepository.getStandardSourceDefinationBySourceId(connectionRead.getSourceId());
+    StandardDestinationDefinition destinationDefinition =
+        configRepository.getStandardDestinationDefinationByDestinationId(connectionRead.getDestinationId());
+
+    ActorConnectionDetailsPageRead actorConnectionDetailsPageRead =
+        new ActorConnectionDetailsPageRead().connectionId(connectionRead.getConnectionId())
+            .name(connectionRead.getName()).status(connectionRead.getStatus()).entityName(destinationDefinition.getName())
+            .sourceIcon(sourceDefinition.getIcon()).destinationIcon(destinationDefinition.getIcon()).connectorName(sourceDefinition.getName())
+            .schedule(connectionRead.getSchedule()).scheduleType(connectionRead.getScheduleType()).scheduleData(connectionRead.getScheduleData());
+
+    final JobReadList syncJobReadList = getSyncJobs(connectionRead.getConnectionId().toString());
+    syncJobReadList.getJobs().stream().map(JobWithAttemptsRead::getJob).findFirst()
+        .ifPresent(job -> {
+          actorConnectionDetailsPageRead.setLatestSyncJobCreatedAt(job.getCreatedAt());
+          actorConnectionDetailsPageRead.setLatestSyncJobStatus(job.getStatus());
+        });
+    return actorConnectionDetailsPageRead;
+  }
+
+  public WebBackendConnectionList listActorConnectionsDetailsPage(final UUID workspaceId,
+                                                                  UUID sourceId,
+                                                                  UUID destinationId,
+                                                                  final Integer pageSize,
+                                                                  final Integer pageCurrent)
       throws IOException {
     final List<ConnectionRead> connectionReads = Lists.newArrayList();
     if (!ObjectUtils.isEmpty(sourceId)) {
@@ -213,9 +235,9 @@ public class WebBackendConnectionsHandler {
         connectionReads.add(ApiPojoConverters.internalToConnectionPageRead(standardSync));
       }
     }
-    final List<WebBackendConnectionPageRead> reads = Lists.newArrayList();
+    final List<ActorConnectionDetailsPageRead> reads = Lists.newArrayList();
     for (final ConnectionRead connection : connectionReads) {
-      reads.add(buildWebBackendConnectionPageRead(connection));
+      reads.add(buildActorConnectionDetailsPageRead(connection));
     }
     return new WebBackendConnectionList().connections(reads);
   }
@@ -266,9 +288,9 @@ public class WebBackendConnectionsHandler {
         .resourceRequirements(connectionRead.getResourceRequirements());
   }
 
-  private JobReadList getSyncJobs(final ConnectionRead connectionRead) throws IOException {
+  private JobReadList getSyncJobs(final String connectionId) throws IOException {
     final JobListRequestBody jobListRequestBody = new JobListRequestBody()
-        .configId(connectionRead.getConnectionId().toString())
+        .configId(connectionId)
         .configTypes(Collections.singletonList(JobConfigType.SYNC));
     return jobHistoryHandler.listJobsFor(jobListRequestBody);
   }
