@@ -407,7 +407,7 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
   public SourceReadWithConnectionPage getSourceWithConnection(final SourceIdPageRequestBody sourceIdPageRequestBody) {
     return execute(() -> {
       SourceRead sourceRead = sourceHandler.getSourceRead(new SourceIdRequestBody().sourceId(sourceIdPageRequestBody.getSourceId()));
-      WebBackendConnectionList webBackendConnectionList = webBackendConnectionsHandler.listConnectionsPageWithoutOperation(
+      WebBackendConnectionList webBackendConnectionList = webBackendConnectionsHandler.listActorConnectionsDetailsPage(
           sourceRead.getWorkspaceId(), sourceIdPageRequestBody.getSourceId(), null, sourceIdPageRequestBody.getPageSize(),
           sourceIdPageRequestBody.getPageCurrent());
       return new SourceReadWithConnectionPage().sourceRead(sourceRead).webBackendConnectionReadList(webBackendConnectionList)
@@ -618,7 +618,7 @@ public class ConfigurationApi implements io.airbyte.api.generated.V1Api {
   public DestinationReadWithConnectionPage getDestinationWithConnection(final DestinationIdPageRequestBody destinationIdPageRequestBody) {
     return execute(() -> {
       DestinationRead destinationRead = destinationHandler.getDestinationRead(destinationIdPageRequestBody);
-      WebBackendConnectionList webBackendConnectionList = webBackendConnectionsHandler.listConnectionsPageWithoutOperation(
+      WebBackendConnectionList webBackendConnectionList = webBackendConnectionsHandler.listActorConnectionsDetailsPage(
           destinationRead.getWorkspaceId(), null, destinationIdPageRequestBody.getDestinationId(),
           destinationIdPageRequestBody.getPageSize(), destinationIdPageRequestBody.getPageCurrent());
       return new DestinationReadWithConnectionPage().destinationRead(destinationRead).webBackendConnectionReadList(webBackendConnectionList)
