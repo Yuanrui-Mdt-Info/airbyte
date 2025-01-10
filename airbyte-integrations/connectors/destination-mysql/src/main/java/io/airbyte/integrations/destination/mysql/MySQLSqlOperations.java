@@ -60,7 +60,7 @@ public class MySQLSqlOperations extends JdbcSqlOperations {
       try {
         String sql;
         final double version = getVersion(database);
-        if(version>=5.7){
+        if(version>5.7){
           writeBatchToFile(tmpFile, records);
           sql = "LOAD DATA LOCAL INFILE %s INTO TABLE %s.%s FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\\\"' LINES TERMINATED BY '\\r\\n'";
         }else{

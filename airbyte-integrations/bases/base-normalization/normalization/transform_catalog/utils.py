@@ -100,7 +100,6 @@ def is_airbyte_column(name: str) -> bool:
     return name.startswith("_daspire_") or name.startswith("_airbyte_")
 
 
-
 def is_simple_property(definition: dict) -> bool:
     if "type" not in definition:
         property_type = "object"
