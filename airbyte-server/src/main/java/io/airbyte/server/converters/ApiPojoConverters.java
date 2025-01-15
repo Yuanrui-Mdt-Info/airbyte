@@ -158,6 +158,7 @@ public class ApiPojoConverters {
         .prefix(standardSync.getPrefix())
         .syncCatalog(new io.airbyte.api.model.generated.AirbyteCatalog())
         .sourceCatalogId(standardSync.getSourceCatalogId());
+    populateConnectionReadSchedule(standardSync, connectionRead);
     return connectionRead;
   }
 
