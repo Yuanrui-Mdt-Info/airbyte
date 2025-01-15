@@ -5,18 +5,7 @@
 package io.airbyte.server.converters;
 
 import io.airbyte.api.client.model.generated.ConnectionScheduleType;
-import io.airbyte.api.model.generated.ActorDefinitionResourceRequirements;
-import io.airbyte.api.model.generated.ConnectionAdvanceSetting;
-import io.airbyte.api.model.generated.ConnectionRead;
-import io.airbyte.api.model.generated.ConnectionSchedule;
-import io.airbyte.api.model.generated.ConnectionScheduleData;
-import io.airbyte.api.model.generated.ConnectionScheduleDataBasicSchedule;
-import io.airbyte.api.model.generated.ConnectionScheduleDataCron;
-import io.airbyte.api.model.generated.ConnectionStatus;
-import io.airbyte.api.model.generated.ConnectionUpdate;
-import io.airbyte.api.model.generated.JobType;
-import io.airbyte.api.model.generated.JobTypeResourceLimit;
-import io.airbyte.api.model.generated.ResourceRequirements;
+import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.enums.Enums;
 import io.airbyte.config.BasicSchedule;
 import io.airbyte.config.JobSyncConfig.NamespaceDefinitionType;
@@ -26,6 +15,8 @@ import io.airbyte.config.StandardSync.ScheduleType;
 import io.airbyte.server.handlers.helpers.CatalogConverter;
 import io.airbyte.server.handlers.helpers.ConnectionScheduleHelper;
 import io.airbyte.validation.json.JsonValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ApiPojoConverters {
@@ -276,6 +267,26 @@ public class ApiPojoConverters {
       }
     }
     throw new RuntimeException("Unexpected schedule type");
+  }
+
+  public static SourceEntityRead toSourceEntityRead(io.airbyte.config.SourceEntityRead sourceEntityRead) {
+    return new SourceEntityRead().isMultiselect(sourceEntityRead.getIsMultiselect())
+        .count(sourceEntityRead.getCount().intValue()).entities(toSourceEntity(sourceEntityRead.getEntities()));
+  }
+
+  public static List<SourceEntity> toSourceEntity(List<io.airbyte.config.SourceEntity> sourceEntityList) {
+    List<SourceEntity> sourceEntities = new ArrayList<>();
+    for (io.airbyte.config.SourceEntity sourceEntity : sourceEntityList) {
+      sourceEntities.add(new SourceEntity().id(sourceEntity.getId())
+          .id(sourceEntity.getId())
+          .name(sourceEntity.getName())
+          .url(sourceEntity.getUrl())
+          .logo(sourceEntity.getLogo())
+          .createdAt(sourceEntity.getCreatedAt())
+          .modifiedAt(sourceEntity.getModifiedAt())
+          .metadata(sourceEntity.getMetadata()));
+    }
+    return sourceEntities;
   }
 
 }

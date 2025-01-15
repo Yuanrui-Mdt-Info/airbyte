@@ -237,6 +237,7 @@ font-style: italic;
   <li><a href="#getStateType"><code><span class="http-method">post</span> /v1/web_backend/state/get_type</code></a></li>
   <li><a href="#listAllConnectionsForWorkspace"><code><span class="http-method">post</span> /v1/connections/list_all</code></a></li>
   <li><a href="#listConnectionsForWorkspace"><code><span class="http-method">post</span> /v1/connections/list</code></a></li>
+  <li><a href="#reactivateSystemDisabledConnection"><code><span class="http-method">post</span> /v1/connections/reactivate_system_disabled</code></a></li>
   <li><a href="#resetConnection"><code><span class="http-method">post</span> /v1/connections/reset</code></a></li>
   <li><a href="#searchConnections"><code><span class="http-method">post</span> /v1/connections/search</code></a></li>
   <li><a href="#syncConnection"><code><span class="http-method">post</span> /v1/connections/sync</code></a></li>
@@ -312,6 +313,8 @@ font-style: italic;
   <li><a href="#completeDestinationOAuth"><code><span class="http-method">post</span> /v1/destination_oauths/complete_oauth</code></a></li>
   <li><a href="#completeSourceOAuth"><code><span class="http-method">post</span> /v1/source_oauths/complete_oauth</code></a></li>
   <li><a href="#getDestinationOAuthConsent"><code><span class="http-method">post</span> /v1/destination_oauths/get_consent_url</code></a></li>
+  <li><a href="#getSourceEntities"><code><span class="http-method">post</span> /v1/source/entities</code></a></li>
+  <li><a href="#getSourceEntitiesForUpdate"><code><span class="http-method">post</span> /v1/source/entities_for_update</code></a></li>
   <li><a href="#getSourceOAuthConsent"><code><span class="http-method">post</span> /v1/source_oauths/get_consent_url</code></a></li>
   <li><a href="#setInstancewideDestinationOauthParams"><code><span class="http-method">post</span> /v1/destination_oauths/oauth_params/create</code></a></li>
   <li><a href="#setInstancewideSourceOauthParams"><code><span class="http-method">post</span> /v1/source_oauths/oauth_params/create</code></a></li>
@@ -1563,6 +1566,64 @@ font-style: italic;
     <h4 class="field-label">200</h4>
     Successful operation
         <a href="#ConnectionReadList">ConnectionReadList</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="reactivateSystemDisabledConnection"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/connections/reactivate_system_disabled</code></pre></div>
+    <div class="method-summary">reactivate all connections for workspaces. (<span class="nickname">reactivateSystemDisabledConnection</span>)</div>
+    <div class="method-notes">for workspace.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">WorkspaceIdListRequestBody <a href="#WorkspaceIdListRequestBody">WorkspaceIdListRequestBody</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "flag" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#ConnectionDisplayFlag">ConnectionDisplayFlag</a>
     <h4 class="field-label">404</h4>
     Object with given id was not found.
         <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
@@ -3791,7 +3852,7 @@ font-style: italic;
 
     <h3 class="field-label">Return type</h3>
     <div class="return-type">
-      <a href="#DestinationDefinitionReadList">DestinationDefinitionReadList</a>
+      <a href="#PageDestinationDefinitionReadList">PageDestinationDefinitionReadList</a>
       
     </div>
 
@@ -3830,6 +3891,7 @@ font-style: italic;
     "dockerRepository" : "dockerRepository",
     "name" : "name",
     "icon" : "icon",
+    "destinationType" : "database",
     "protocolVersion" : "protocolVersion",
     "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
   }, {
@@ -3862,6 +3924,7 @@ font-style: italic;
     "dockerRepository" : "dockerRepository",
     "name" : "name",
     "icon" : "icon",
+    "destinationType" : "database",
     "protocolVersion" : "protocolVersion",
     "destinationDefinitionId" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
   } ]
@@ -3877,7 +3940,7 @@ font-style: italic;
     <h3 class="field-label">Responses</h3>
     <h4 class="field-label">200</h4>
     Successful operation
-        <a href="#DestinationDefinitionReadList">DestinationDefinitionReadList</a>
+        <a href="#PageDestinationDefinitionReadList">PageDestinationDefinitionReadList</a>
   </div> <!-- method -->
   <hr/>
   <div class="method"><a name="listLatestDestinationDefinitions"/>
@@ -5808,6 +5871,172 @@ font-style: italic;
     <h4 class="field-label">422</h4>
     Input failed validation
         <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getSourceEntities"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/source/entities</code></pre></div>
+    <div class="method-summary">Using auth credential fetch accont details like files, id etc. (<span class="nickname">getSourceEntities</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">SourceEntitiesRequest <a href="#SourceEntitiesRequest">SourceEntitiesRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#SourceEntityRead">SourceEntityRead</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "isMultiselect" : true,
+  "entities" : [ {
+    "metadata" : {
+      "key" : ""
+    },
+    "name" : "name",
+    "logo" : "logo",
+    "created_at" : "created_at",
+    "id" : "id",
+    "modified_at" : "modified_at",
+    "url" : "url"
+  }, {
+    "metadata" : {
+      "key" : ""
+    },
+    "name" : "name",
+    "logo" : "logo",
+    "created_at" : "created_at",
+    "id" : "id",
+    "modified_at" : "modified_at",
+    "url" : "url"
+  } ],
+  "count" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#SourceEntityRead">SourceEntityRead</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+    <h4 class="field-label">401</h4>
+    Exception occurred; see message for details.
+        <a href="#KnownExceptionInfo">KnownExceptionInfo</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getSourceEntitiesForUpdate"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /v1/source/entities_for_update</code></pre></div>
+    <div class="method-summary">Using auth credential fetch accont details like files, id etc. (<span class="nickname">getSourceEntitiesForUpdate</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">SourceEntitiesUpdateRequest <a href="#SourceEntitiesUpdateRequest">SourceEntitiesUpdateRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#SourceEntityRead">SourceEntityRead</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "isMultiselect" : true,
+  "entities" : [ {
+    "metadata" : {
+      "key" : ""
+    },
+    "name" : "name",
+    "logo" : "logo",
+    "created_at" : "created_at",
+    "id" : "id",
+    "modified_at" : "modified_at",
+    "url" : "url"
+  }, {
+    "metadata" : {
+      "key" : ""
+    },
+    "name" : "name",
+    "logo" : "logo",
+    "created_at" : "created_at",
+    "id" : "id",
+    "modified_at" : "modified_at",
+    "url" : "url"
+  } ],
+  "count" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Successful operation
+        <a href="#SourceEntityRead">SourceEntityRead</a>
+    <h4 class="field-label">404</h4>
+    Object with given id was not found.
+        <a href="#NotFoundKnownExceptionInfo">NotFoundKnownExceptionInfo</a>
+    <h4 class="field-label">422</h4>
+    Input failed validation
+        <a href="#InvalidInputExceptionInfo">InvalidInputExceptionInfo</a>
+    <h4 class="field-label">401</h4>
+    Exception occurred; see message for details.
+        <a href="#KnownExceptionInfo">KnownExceptionInfo</a>
   </div> <!-- method -->
   <hr/>
   <div class="method"><a name="getSourceOAuthConsent"/>
@@ -11572,6 +11801,8 @@ font-style: italic;
     <li><a href="#OperatorDbt"><code>OperatorDbt</code> - </a></li>
     <li><a href="#OperatorNormalization"><code>OperatorNormalization</code> - </a></li>
     <li><a href="#OperatorType"><code>OperatorType</code> - </a></li>
+    <li><a href="#PageDestinationDefinitionRead"><code>PageDestinationDefinitionRead</code> - </a></li>
+    <li><a href="#PageDestinationDefinitionReadList"><code>PageDestinationDefinitionReadList</code> - </a></li>
     <li><a href="#PageRequestBody"><code>PageRequestBody</code> - </a></li>
     <li><a href="#Pagination"><code>Pagination</code> - </a></li>
     <li><a href="#PrivateDestinationDefinitionRead"><code>PrivateDestinationDefinitionRead</code> - </a></li>
@@ -11599,6 +11830,10 @@ font-style: italic;
     <li><a href="#SourceDefinitionUpdate"><code>SourceDefinitionUpdate</code> - </a></li>
     <li><a href="#SourceDiscoverSchemaRead"><code>SourceDiscoverSchemaRead</code> - </a></li>
     <li><a href="#SourceDiscoverSchemaRequestBody"><code>SourceDiscoverSchemaRequestBody</code> - </a></li>
+    <li><a href="#SourceEntitiesRequest"><code>SourceEntitiesRequest</code> - </a></li>
+    <li><a href="#SourceEntitiesUpdateRequest"><code>SourceEntitiesUpdateRequest</code> - </a></li>
+    <li><a href="#SourceEntity"><code>SourceEntity</code> - </a></li>
+    <li><a href="#SourceEntityRead"><code>SourceEntityRead</code> - </a></li>
     <li><a href="#SourceIdPageRequestBody"><code>SourceIdPageRequestBody</code> - </a></li>
     <li><a href="#SourceIdRequestBody"><code>SourceIdRequestBody</code> - </a></li>
     <li><a href="#SourceOauthConsentRequest"><code>SourceOauthConsentRequest</code> - </a></li>
@@ -12720,6 +12955,32 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
           </div>  <!-- field-items -->
   </div>
   <div class="model">
+    <h3><a name="PageDestinationDefinitionRead"><code>PageDestinationDefinitionRead</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinationDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">dockerRepository </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">dockerImageTag </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">documentationUrl </div><div class="param-desc"><span class="param-type"><a href="#URI">URI</a></span>  format: uri</div>
+<div class="param">icon (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">protocolVersion (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The Airbyte Protocol version supported by the connector </div>
+<div class="param">releaseStage (optional)</div><div class="param-desc"><span class="param-type"><a href="#ReleaseStage">ReleaseStage</a></span>  </div>
+<div class="param">releaseDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> The date when this connector was first released, in yyyy-mm-dd format. format: date</div>
+<div class="param">destinationType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">database</div>
+<div class="param">resourceRequirements (optional)</div><div class="param-desc"><span class="param-type"><a href="#ActorDefinitionResourceRequirements">ActorDefinitionResourceRequirements</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageDestinationDefinitionReadList"><code>PageDestinationDefinitionReadList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">destinationDefinitions </div><div class="param-desc"><span class="param-type"><a href="#PageDestinationDefinitionRead">array[PageDestinationDefinitionRead]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
     <h3><a name="PageRequestBody"><code>PageRequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
@@ -12954,6 +13215,45 @@ if oauth parameters were contained inside the top level, rootObject=[] If they w
     <div class="field-items">
       <div class="param">sourceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
 <div class="param">disable_cache (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SourceEntitiesRequest"><code>SourceEntitiesRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">workspaceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">sourceDefinitionId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+<div class="param">accessToken </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SourceEntitiesUpdateRequest"><code>SourceEntitiesUpdateRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">sourceId </div><div class="param-desc"><span class="param-type"><a href="#UUID">UUID</a></span>  format: uuid</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SourceEntity"><code>SourceEntity</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">url (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">logo (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">created_at (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">modified_at (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">metadata (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SourceEntityRead"><code>SourceEntityRead</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">isMultiselect </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">count (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">entities </div><div class="param-desc"><span class="param-type"><a href="#SourceEntity">array[SourceEntity]</a></span>  </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">

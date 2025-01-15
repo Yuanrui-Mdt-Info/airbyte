@@ -76,7 +76,7 @@ public class SecretsRepositoryReader {
     return dump;
   }
 
-  private SourceConnection hydrateSourcePartialConfig(final SourceConnection sourceWithPartialConfig) {
+  public SourceConnection hydrateSourcePartialConfig(final SourceConnection sourceWithPartialConfig) {
     final JsonNode hydratedConfig = secretsHydrator.hydrate(sourceWithPartialConfig.getConfiguration());
     return Jsons.clone(sourceWithPartialConfig).withConfiguration(hydratedConfig);
   }

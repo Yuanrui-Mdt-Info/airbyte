@@ -4,6 +4,8 @@
 
 package io.airbyte.oauth.flows.google;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -66,6 +68,14 @@ public abstract class GoogleOAuthFlow extends BaseOAuth2Flow {
    */
   protected abstract String getScope();
 
+  protected DecodedJWT decodeJWTToken(String jwtToken) {
+    return JWT.decode(jwtToken);
+  }
+
+  protected String claimEmail(DecodedJWT jwt) {
+    return jwt.getClaim("email").asString();
+  }
+
   @Override
   protected String getAccessTokenUrl(final JsonNode inputOAuthConfiguration) {
     return ACCESS_TOKEN_URL;
@@ -82,6 +92,17 @@ public abstract class GoogleOAuthFlow extends BaseOAuth2Flow {
         .put("code", authCode)
         .put("grant_type", "authorization_code")
         .put("redirect_uri", redirectUrl)
+        .build();
+  }
+
+  protected Map<String, String> rotateRefreshTokenQueryParameters(final String clientId,
+                                                                  final String clientSecret,
+                                                                  final String refreshToken) {
+    return ImmutableMap.<String, String>builder()
+        .put("client_id", clientId)
+        .put("client_secret", clientSecret)
+        .put("refresh_token", refreshToken)
+        .put("grant_type", "refresh_token")
         .build();
   }
 

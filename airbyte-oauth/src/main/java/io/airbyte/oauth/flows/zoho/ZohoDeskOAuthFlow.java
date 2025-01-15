@@ -5,11 +5,15 @@
 package io.airbyte.oauth.flows.zoho;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.collect.ImmutableMap;
 import io.airbyte.commons.json.Jsons;
+import io.airbyte.config.SourceEntity;
+import io.airbyte.config.SourceEntityRead;
 import io.airbyte.config.persistence.ConfigNotFoundException;
 import io.airbyte.config.persistence.ConfigRepository;
 import io.airbyte.oauth.BaseOAuth2Flow;
+import io.airbyte.oauth.UnauthorizedException;
 import io.airbyte.protocol.models.OAuthConfigSpecification;
 import io.airbyte.validation.json.JsonValidationException;
 import java.io.IOException;
@@ -79,7 +83,8 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
       "Desk.basic.READ",
       "Desk.contacts.READ",
       "Desk.tickets.READ",
-      "Desk.settings.READ");
+      "Desk.settings.READ",
+      "Desk.search.READ");
 
   public String getScopes() {
     return String.join(" ", SCOPES);
@@ -168,16 +173,13 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json")
         .build();
-    
+
     try {
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       Map<String, Object> output = extractOAuthOutput(Jsons.deserialize(response.body()), accessTokenUrl);
       // add location to response because which is help in connector to identify api region
       if (output.containsKey("refresh_token")) {
         output.put("dc_region", queryParams.get("location").toString().toUpperCase());
-        String host = LocationWiseHost.getDeskHost(queryParams.get("location").toString().toUpperCase());
-        List<String> orgIds = getOrgIds(Jsons.deserialize(response.body()).get("access_token").asText(), host);
-        output.put("org_ids", String.join(",", orgIds));
       }
       return output;
     } catch (final InterruptedException e) {
@@ -185,8 +187,11 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
     }
   }
 
-  public List<String> getOrgIds(String accessToken, String host) throws IOException {
+  @Override
+  public SourceEntityRead getSourceEntity(UUID workspaceId, UUID sourceDefinitionId, String accessToken, Map<String, Object> data)
+      throws IOException, UnauthorizedException {
     try {
+      String host = LocationWiseHost.getDeskHost(data.get("region").toString()); // handle exception
       String url = "%s/api/v1/organizations";
       String token = "Zoho-oauthtoken %s";
       HttpRequest request = HttpRequest.newBuilder()
@@ -194,16 +199,43 @@ public class ZohoDeskOAuthFlow extends BaseOAuth2Flow {
           .uri(URI.create(String.format(url, host)))
           .header("Authorization", String.format(token, accessToken))
           .build();
+
       final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-      List<String> orgIds = new ArrayList<>();
-      JsonNode jsonNode = Jsons.deserialize(response.body());
-      for (JsonNode data : jsonNode.get("data")) {
-        orgIds.add(data.get("id").asText());
+      if (HttpStatusCodes.STATUS_CODE_OK == response.statusCode()) {
+        JsonNode responseNode = Jsons.deserialize(response.body());
+        String responseField = "data";
+        if (responseNode.has(responseField)) {
+          return extractEntityOutput(responseNode);
+        } else {
+          throw new IOException(String.format("Missing 'data' object in response. status_code:%s", response.statusCode()));
+        }
+      } else if (HttpStatusCodes.STATUS_CODE_UNAUTHORIZED == response.statusCode()) {
+        throw new UnauthorizedException();
       }
-      return orgIds;
     } catch (InterruptedException | IOException e) {
       throw new IOException("Failed to fetch Org ids", e);
     }
+    throw new IOException("Failed to fetch Org ids");
+  }
+
+  public SourceEntityRead extractEntityOutput(JsonNode responseNode) {
+    long count = 0;
+    JsonNode jsonNode = responseNode.get("data");
+    List<SourceEntity> sourceEntityList = new ArrayList<>();
+    if (jsonNode != null && jsonNode.isArray()) {
+      count = jsonNode.size();
+      for (JsonNode data : jsonNode) {
+        sourceEntityList.add(new SourceEntity()
+            .withId(data.get("id").asText())
+            .withName(data.get("companyName").asText())
+            // .withCreatedAt(formatDate(data.get("createdTime").asText()))
+            // .withModifiedAt(formatDate(data.get("modifiedTime").asText()))
+            .withLogo(data.get("logoURL").asText())
+            .withUrl(data.get("portalURL").asText())
+            .withMetadata(Map.of("data", data)));
+      }
+    }
+    return new SourceEntityRead().withCount(count).withIsMultiselect(Boolean.FALSE).withEntities(sourceEntityList);
   }
 
 }

@@ -15,19 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import io.airbyte.api.model.generated.CustomDestinationDefinitionCreate;
-import io.airbyte.api.model.generated.DestinationDefinitionCreate;
-import io.airbyte.api.model.generated.DestinationDefinitionIdRequestBody;
-import io.airbyte.api.model.generated.DestinationDefinitionIdWithWorkspaceId;
-import io.airbyte.api.model.generated.DestinationDefinitionRead;
-import io.airbyte.api.model.generated.DestinationDefinitionReadList;
-import io.airbyte.api.model.generated.DestinationDefinitionUpdate;
-import io.airbyte.api.model.generated.DestinationRead;
-import io.airbyte.api.model.generated.DestinationReadList;
-import io.airbyte.api.model.generated.PrivateDestinationDefinitionRead;
-import io.airbyte.api.model.generated.PrivateDestinationDefinitionReadList;
-import io.airbyte.api.model.generated.ReleaseStage;
-import io.airbyte.api.model.generated.WorkspaceIdRequestBody;
+import io.airbyte.api.model.generated.*;
 import io.airbyte.commons.docker.DockerUtils;
 import io.airbyte.commons.json.Jsons;
 import io.airbyte.config.ActorDefinitionResourceRequirements;
@@ -160,7 +148,7 @@ class DestinationDefinitionsHandlerTest {
     when(configRepository.listPublicDestinationDefinitions(false)).thenReturn(Lists.newArrayList(destinationDefinition));
     when(configRepository.listGrantedDestinationDefinitions(workspaceId, false)).thenReturn(Lists.newArrayList(destination2));
 
-    final DestinationDefinitionRead expectedDestinationDefinitionRead1 = new DestinationDefinitionRead()
+    final PageDestinationDefinitionRead expectedDestinationDefinitionRead1 = new PageDestinationDefinitionRead()
         .destinationDefinitionId(destinationDefinition.getDestinationDefinitionId())
         .name(destinationDefinition.getName())
         .dockerRepository(destinationDefinition.getDockerRepository())
@@ -170,12 +158,13 @@ class DestinationDefinitionsHandlerTest {
         .protocolVersion(destinationDefinition.getProtocolVersion())
         .releaseStage(ReleaseStage.fromValue(destinationDefinition.getReleaseStage().value()))
         .releaseDate(LocalDate.parse(destinationDefinition.getReleaseDate()))
+        .destinationType(PageDestinationDefinitionRead.DestinationTypeEnum.DATABASE)
         .resourceRequirements(new io.airbyte.api.model.generated.ActorDefinitionResourceRequirements()
             ._default(new io.airbyte.api.model.generated.ResourceRequirements()
                 .cpuRequest(destinationDefinition.getResourceRequirements().getDefault().getCpuRequest()))
             .jobSpecific(Collections.emptyList()));
 
-    final DestinationDefinitionRead expectedDestinationDefinitionRead2 = new DestinationDefinitionRead()
+    final PageDestinationDefinitionRead expectedDestinationDefinitionRead2 = new PageDestinationDefinitionRead()
         .destinationDefinitionId(destination2.getDestinationDefinitionId())
         .name(destination2.getName())
         .dockerRepository(destination2.getDockerRepository())
@@ -185,12 +174,13 @@ class DestinationDefinitionsHandlerTest {
         .protocolVersion(destinationDefinition.getProtocolVersion())
         .releaseStage(ReleaseStage.fromValue(destinationDefinition.getReleaseStage().value()))
         .releaseDate(LocalDate.parse(destinationDefinition.getReleaseDate()))
+        .destinationType(PageDestinationDefinitionRead.DestinationTypeEnum.DATABASE)
         .resourceRequirements(new io.airbyte.api.model.generated.ActorDefinitionResourceRequirements()
             ._default(new io.airbyte.api.model.generated.ResourceRequirements()
                 .cpuRequest(destination2.getResourceRequirements().getDefault().getCpuRequest()))
             .jobSpecific(Collections.emptyList()));
 
-    final DestinationDefinitionReadList actualDestinationDefinitionReadList = destinationDefinitionsHandler
+    final PageDestinationDefinitionReadList actualDestinationDefinitionReadList = destinationDefinitionsHandler
         .listDestinationDefinitionsForWorkspace(new WorkspaceIdRequestBody().workspaceId(workspaceId));
 
     assertEquals(

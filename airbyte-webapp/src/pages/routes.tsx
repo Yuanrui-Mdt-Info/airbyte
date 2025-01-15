@@ -14,12 +14,11 @@ import { storeUtmFromQuery } from "utils/utmStorage";
 import { CompleteOauthRequest } from "views/CompleteOauthRequest";
 import MainView from "views/layout/MainView";
 
-import LoginNewPage from "./AuthPage/LoginNewPage/LoginNewPage";
-// import { LoginPage } from "./AuthPage/LoginPage";
-// import ResetPasswordPage from "./AuthPage/ResetPasswordPage";
-// import SignupPage from "./AuthPage/SignupPage";
-// import UserSignupPage from "./AuthPage/UserSignupPage";
-// import VerifyEmailPage from "./AuthPage/VerifyEmailPage";
+import { LoginPage } from "./AuthPage/LoginPage";
+import ResetPasswordPage from "./AuthPage/ResetPasswordPage";
+import SignupPage from "./AuthPage/SignupPage";
+import UserSignupPage from "./AuthPage/UserSignupPage";
+import VerifyEmailPage from "./AuthPage/VerifyEmailPage";
 import ConnectionPage from "./ConnectionPage";
 import DestinationPage from "./DestinationPage";
 import PaymentErrorPage from "./PaymentErrorPage";
@@ -59,18 +58,17 @@ const PreferencesRoutes = () => (
 
 const AuthRoutes = () => (
   <Routes>
-    <Route path={`${RoutePaths.LoginNew}/*`} element={<LoginNewPage />} />
-    {/* <Route path={`${RoutePaths.Signin}`} element={<LoginPage />} />
+    <Route path={`${RoutePaths.Signin}`} element={<LoginPage />} />
     <Route path={`${RoutePaths.Signup}`} element={<SignupPage />} />
     <Route path={`${RoutePaths.UserSignup}`} element={<UserSignupPage />} />
     <Route path={`${RoutePaths.VerifyEmail}`} element={<VerifyEmailPage />} />
-    <Route path={`${RoutePaths.ResetPassword}`} element={<ResetPasswordPage />} /> */}
+    <Route path={`${RoutePaths.ResetPassword}`} element={<ResetPasswordPage />} />
     <Route path="*" element={<AutoMoveToAuth />} />
   </Routes>
 );
 
 export const AutoMoveToAuth = () => {
-  return <Navigate to={`/${RoutePaths.LoginNew}${window.location.search}`} replace />;
+  return <Navigate to={`/${RoutePaths.Signin}`} replace />;
 };
 export const AutoSelectFirstWorkspace: React.FC = () => {
   const location = useLocation();
@@ -108,10 +106,8 @@ export const Routing: React.FC = () => {
       {user.token && (
         <Routes>
           <Route path={RoutePaths.AuthFlow} element={<CompleteOauthRequest />} />
-          {/* {!user.workspaceId && <Route path={`${RoutePaths.Payment}/*`} element={<PaymentPage />} />}
-          {!user.workspaceId && <Route path={`${RoutePaths.Settings}/*`} element={<SettingsPage />} />} */}
-          {user.workspaceId && <Route path="/*" element={<RoutingWithWorkspace />} />}
-          {user.workspaceId && <Route path="*" element={<AutoSelectFirstWorkspace />} />}
+          <Route path="/*" element={<RoutingWithWorkspace />} />
+          <Route path="*" element={<AutoSelectFirstWorkspace />} />
         </Routes>
       )}
       {!user.token && <AuthRoutes />}

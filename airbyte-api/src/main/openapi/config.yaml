@@ -966,7 +966,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DestinationDefinitionReadList"
+                $ref: "#/components/schemas/PageDestinationDefinitionReadList"
   /v1/destination_definitions/create_custom:
     post:
       tags:
@@ -1457,6 +1457,30 @@ paths:
       summary: disabled all connections for workspaces.
       description: for workspace.
       operationId: connectionsDisabledAllForWorkspaceAll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceIdListRequestBody"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionDisplayFlag"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
+  /v1/connections/reactivate_system_disabled:
+    post:
+      tags:
+        - connection
+      summary: reactivate all connections for workspaces.
+      description: for workspace.
+      operationId: reactivateSystemDisabledConnection
       requestBody:
         content:
           application/json:
@@ -2078,6 +2102,56 @@ paths:
           $ref: "#/components/responses/ExceptionResponse"
         "404":
           $ref: "#/components/responses/NotFoundResponse"
+  /v1/source/entities:
+    post:
+      tags:
+        - oauth
+      summary: Using auth credential fetch accont details like files, id etc.
+      operationId: getSourceEntities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SourceEntitiesRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceEntityRead"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
+        "401":
+          $ref: "#/components/responses/ExceptionResponse"
+  /v1/source/entities_for_update:
+    post:
+      tags:
+        - oauth
+      summary: Using auth credential fetch accont details like files, id etc.
+      operationId: getSourceEntitiesForUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SourceEntitiesUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceEntityRead"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "422":
+          $ref: "#/components/responses/InvalidInputResponse"
+        "401":
+          $ref: "#/components/responses/ExceptionResponse"
   /v1/web_backend/connections/filter/param:
     post:
       tags:
@@ -3262,6 +3336,43 @@ components:
           format: date
         resourceRequirements:
           $ref: "#/components/schemas/ActorDefinitionResourceRequirements"
+    PageDestinationDefinitionRead:
+      type: object
+      required:
+        - destinationDefinitionId
+        - name
+        - dockerRepository
+        - dockerImageTag
+        - documentationUrl
+      properties:
+        destinationDefinitionId:
+          $ref: "#/components/schemas/DestinationDefinitionId"
+        name:
+          type: string
+        dockerRepository:
+          type: string
+        dockerImageTag:
+          type: string
+        documentationUrl:
+          type: string
+          format: uri
+        icon:
+          type: string
+        protocolVersion:
+          description: The Airbyte Protocol version supported by the connector
+          type: string
+        releaseStage:
+          $ref: "#/components/schemas/ReleaseStage"
+        releaseDate:
+          description: The date when this connector was first released, in yyyy-mm-dd format.
+          type: string
+          format: date
+        destinationType:
+          type: string
+          enum:
+            - database
+        resourceRequirements:
+          $ref: "#/components/schemas/ActorDefinitionResourceRequirements"
     DestinationDefinitionReadList:
       type: object
       required:
@@ -3271,6 +3382,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DestinationDefinitionRead"
+    PageDestinationDefinitionReadList:
+      type: object
+      required:
+        - destinationDefinitions
+      properties:
+        destinationDefinitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PageDestinationDefinitionRead"
     CustomDestinationDefinitionCreate:
       type: object
       required:
@@ -5046,6 +5166,71 @@ components:
           additionalProperties: true
         token:
           type: string
+    SourceEntitiesRequest:
+      type: object
+      required:
+        - sourceDefinitionId
+        - accessToken
+      properties:
+        workspaceId:
+          $ref: "#/components/schemas/WorkspaceId"
+        sourceDefinitionId:
+          $ref: "#/components/schemas/SourceDefinitionId"
+        accessToken:
+          $ref: "#/components/schemas/AccessToken"
+        data:
+          type: object
+          additionalProperties: true
+    SourceEntitiesUpdateRequest:
+      type: object
+      required:
+        - sourceId
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/SourceId"
+    AccessToken:
+      type: string
+    SourceEntityRead:
+      type: object
+      required:
+        - isMultiselect
+        - entities
+      properties:
+        isMultiselect:
+          type: boolean
+        count:
+          type: integer
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceEntity"
+    SourceEntity:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        logo:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          nullable: true
+        modified_at:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
     # Web Backend
     WebBackendConnectionFilterParamItem:
       type: object
