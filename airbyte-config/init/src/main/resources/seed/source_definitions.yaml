@@ -1425,3 +1425,11 @@
   sourceType: api
   releaseStage: alpha
   public: true
+- name: TikTok
+  sourceDefinitionId: c06ea894-3708-4fab-84bd-31660978f353
+  dockerRepository: yuanrui2014/source-tiktok
+  dockerImageTag: 0.0.1
+  documentationUrl: https://docsurl.com
+  sourceType: api
+  releaseStage: alpha
+  public: true
